@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Code à Cuisine palette derived from the Figma design:
+   forest green #396039, creme #faf0e6, beige #f5f5dc, leaf green #008000 */
+
+body {
+  font-family: "Quicksand", ui-sans-serif, system-ui, sans-serif;
+}
+
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]),
+a[href],
+select:not(:disabled),
+input[type="checkbox"]:not(:disabled),
+input[type="radio"]:not(:disabled) {
+  cursor: pointer;
+}
+
+/* Utility: hide scrollbars while keeping an element scrollable (swipe rows). */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* No horizontal page scrollbar anywhere; vertical scrolling stays functional. */
+html,
+body {
+  overflow-x: hidden;
+}
+
+/* Hide the visible page scrollbar (content stays scrollable, checklist rule). */
+html {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+html::-webkit-scrollbar {
+  display: none;
+}
+
+/* Mobile readability: base font size never below 16px (checklist rule). */
+@media (max-width: 767px) {
+  html {
+    font-size: 16px;
+  }
+  .text-xs,
+  .text-sm {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+}

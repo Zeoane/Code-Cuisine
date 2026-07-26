@@ -1,0 +1,47 @@
+<div class="flex min-h-screen flex-col overflow-x-hidden bg-creme">
+  <app-site-header />
+  <main class="mx-auto w-full max-w-[1100px] flex-1 px-4 py-10 sm:px-8 sm:py-12">
+    <section class="mb-10">
+      <h1 class="font-ubuntu mb-2 text-3xl font-bold text-forest-dark sm:text-4xl">Was hast du zu Hause?</h1>
+      <p class="font-quicksand mb-6 text-base text-forest/80 sm:text-lg">
+        Gib deine vorhandenen Zutaten ein und wähle deine Optionen – die KI generiert daraus genau drei passende
+        Rezepte mit Nährwerten und Arbeitsplan.
+      </p>
+      <app-ingredient-input
+        [ingredients]="ingredients()"
+        [disabled]="isGenerating()"
+        (ingredientsChange)="setIngredients($event)" />
+      <div class="mt-6">
+        <app-generator-options
+          [values]="options()"
+          [disabled]="isGenerating()"
+          (valuesChange)="setOptions($event)" />
+      </div>
+      <button
+        type="button"
+        (click)="handleGenerate()"
+        [disabled]="ingredients().length === 0 || isGenerating()"
+        class="font-quicksand mt-6 flex h-14 w-full items-center justify-center gap-2 bg-leaf px-8 text-lg font-semibold text-white hover:bg-[#006a00] disabled:opacity-60 sm:w-auto">
+        <app-icon
+          [name]="isGenerating() ? 'loader' : 'sparkles'"
+          [klass]="'h-5 w-5 ' + (isGenerating() ? 'animate-spin' : '')" />
+        {{ isGenerating() ? "Rezepte werden generiert …" : "Rezepte generieren" }}
+      </button>
+    </section>
+
+    @if (isGenerating()) {
+      <section
+        class="font-quicksand flex flex-col items-center gap-3 rounded-lg border border-dashed border-forest/30 p-10 text-forest sm:p-12"
+        aria-live="polite">
+        <app-icon name="loader" klass="h-8 w-8 animate-spin" />
+        <p class="text-center text-base">Die KI überlegt sich drei leckere Rezepte aus deinen Zutaten …</p>
+      </section>
+    } @else if (recipes().length > 0) {
+      <section aria-label="Generierte Rezepte">
+        <h2 class="font-ubuntu mb-6 text-2xl font-bold text-forest-dark">Deine Rezeptvorschläge</h2>
+        <app-recipe-results [recipes]="recipes()" [savedTitles]="savedTitles()" (recipeSave)="handleSave($event)" />
+      </section>
+    }
+  </main>
+  <app-site-footer />
+</div>

@@ -1,0 +1,44 @@
+<div class="relative flex min-h-screen flex-col overflow-x-hidden bg-forest">
+  <header class="relative z-20 flex items-center px-4 pt-10 sm:pr-10 sm:pl-[68px]">
+    <a routerLink="/" aria-label="Code à Cuisine – Home">
+      <app-logo klass="h-10 w-auto sm:h-12" />
+    </a>
+  </header>
+
+  <app-hero-plates variant="desktop" />
+
+  <main class="relative z-10 mx-auto w-full max-w-[1440px] flex-1">
+    <div class="flex flex-col items-start gap-16 px-4 pt-16 sm:px-[65px] lg:pt-[152px]">
+      <div class="flex w-full max-w-[755px] flex-col items-start">
+        <h2 class="font-quicksand text-2xl font-semibold text-beige min-[400px]:text-[28px] sm:text-5xl">
+          AI-Powered recipe generator
+        </h2>
+        <h1
+          class="font-ubuntu text-[44px] leading-[1.15] font-bold text-creme min-[400px]:text-[52px] sm:text-[104px]">
+          Code à Cuisine
+        </h1>
+      </div>
+      <a
+        routerLink="/generator"
+        class="font-quicksand flex h-[60px] items-center justify-center bg-creme px-[26px] py-4 text-2xl font-semibold text-leaf transition-transform duration-150 ease-out hover:brightness-105 active:scale-[0.97]">
+        Get started
+      </a>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-4 px-4 pt-24 pb-16 sm:px-[65px] lg:pt-[254px] lg:pb-[126px]">
+      <p class="font-ubuntu text-2xl font-medium text-creme sm:text-[32px]">Hungry for inspiration?</p>
+      <a
+        routerLink="/cookbook"
+        class="font-quicksand group flex h-[52px] items-center justify-center gap-2.5 rounded-[5px] px-[26px] py-4 text-xl font-medium text-creme transition-colors duration-150 ease-out hover:bg-white/10 active:scale-[0.97]">
+        Go to cookbook
+        <app-icon
+          name="arrow-right"
+          klass="w-6 transition-transform duration-150 ease-out group-hover:translate-x-1" />
+      </a>
+    </div>
+
+    <app-hero-plates variant="mobile" />
+  </main>
+
+  <app-site-footer [dark]="true" />
+</div>

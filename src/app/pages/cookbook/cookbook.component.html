@@ -1,0 +1,33 @@
+<div class="flex min-h-screen flex-col overflow-x-hidden bg-creme">
+  <app-site-header />
+  <main class="mx-auto w-full max-w-[1100px] flex-1 px-4 py-10 sm:px-8 sm:py-12">
+    <div class="mb-2 flex items-center gap-3">
+      <app-icon name="book-open" klass="h-8 w-8 text-forest" />
+      <h1 class="font-ubuntu text-3xl font-bold text-forest-dark sm:text-4xl">Mein Kochbuch</h1>
+    </div>
+    <p class="font-quicksand mb-8 text-sm text-forest/70">
+      Rezepte werden aktuell in diesem Browser gespeichert. Ein Konto-Sync über Firebase folgt.
+    </p>
+
+    @if (recipes().length > 0) {
+      <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        @for (recipe of recipes(); track recipe.id) {
+          <app-recipe-card [recipe]="recipe" [showDelete]="true" (delete)="handleRemove(recipe.id)" />
+        }
+      </div>
+    } @else {
+      <section
+        class="font-quicksand flex flex-col items-start gap-4 rounded-lg border border-dashed border-forest/30 p-6 text-forest sm:p-8">
+        <p class="text-lg">
+          Dein Kochbuch ist noch leer. Generiere Rezepte aus deinen Zutaten und speichere deine Favoriten hier.
+        </p>
+        <a
+          routerLink="/generator"
+          class="font-quicksand flex min-h-11 items-center rounded-md bg-leaf px-4 text-white hover:bg-[#006a00]">
+          Zum Rezept-Generator
+        </a>
+      </section>
+    }
+  </main>
+  <app-site-footer />
+</div>

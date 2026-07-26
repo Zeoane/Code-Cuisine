@@ -1,0 +1,12 @@
+<footer [class]="dark ? 'bg-forest' : 'bg-creme'">
+  <div
+    class="mx-auto flex w-full max-w-[1440px] flex-wrap items-center justify-between gap-3 px-4 py-6 sm:px-[68px]">
+    <p class="font-quicksand text-base" [class]="dark ? 'text-creme/70' : 'text-forest/70'">
+      © 2026 Code à Cuisine – Schulprojekt
+    </p>
+    <nav class="flex flex-wrap gap-4" aria-label="Footer">
+      <a routerLink="/library" [class]="linkClass">Bibliothek</a>
+      <a routerLink="/impressum" [class]="linkClass">Impressum</a>
+    </nav>
+  </div>
+</footer>

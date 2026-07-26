@@ -1,0 +1,87 @@
+<div class="flex min-h-screen flex-col overflow-x-hidden bg-creme">
+  <app-site-header />
+  <main class="mx-auto w-full max-w-[1100px] flex-1 px-4 py-10 sm:px-8 sm:py-12">
+    <div class="mb-6 flex items-center gap-3">
+      <app-icon name="library" klass="h-8 w-8 text-forest" />
+      <h1 class="font-ubuntu text-3xl font-bold text-forest-dark sm:text-4xl">Rezept-Bibliothek</h1>
+    </div>
+    <p class="font-quicksand mb-6 text-base text-forest/80 sm:text-lg">
+      Alle jemals generierten Rezepte – frei zugänglich für alle, ganz ohne Account.
+    </p>
+
+    <div
+      class="scrollbar-none -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0"
+      role="group"
+      aria-label="Nach Kochstil filtern">
+      @for (entry of filterEntries; track entry[0]) {
+        <button
+          type="button"
+          (click)="setFilter(entry[0])"
+          [attr.aria-pressed]="cuisine() === entry[0]"
+          [class]="
+            'font-quicksand min-h-11 shrink-0 rounded-full border px-4 text-base transition-colors ' +
+            (cuisine() === entry[0]
+              ? 'border-forest bg-forest text-creme'
+              : 'border-forest/30 bg-white text-forest hover:bg-forest/10')
+          ">
+          {{ entry[1] }}
+        </button>
+      }
+    </div>
+
+    @if (result().recipes.length > 0) {
+      <div class="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        @for (recipe of result().recipes; track recipe.id) {
+          <a [routerLink]="['/library', recipe.id]" class="block h-full">
+            <article
+              class="h-full cursor-pointer rounded-lg border border-forest/15 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
+              <app-recipe-meta
+                [difficulty]="recipe.difficulty"
+                [cookingTimeMinutes]="recipe.cookingTimeMinutes"
+                [servings]="recipe.servings"
+                [cuisineStyle]="recipe.cuisineStyle" />
+              <h3 class="font-ubuntu mt-2 text-xl text-forest-dark">{{ recipe.title }}</h3>
+              @if (recipe.description) {
+                <p class="font-quicksand mt-1 line-clamp-2 text-base text-forest/80">{{ recipe.description }}</p>
+              }
+            </article>
+          </a>
+        }
+      </div>
+
+      @if (totalPages() > 1) {
+        <nav class="mt-8 flex items-center justify-center gap-3" aria-label="Bibliotheks-Seiten">
+          <button
+            type="button"
+            (click)="setPage(page() - 1)"
+            [disabled]="page() <= 1"
+            class="font-quicksand flex min-h-11 items-center gap-1 rounded-md px-3 text-base text-forest disabled:pointer-events-none disabled:opacity-50">
+            <app-icon name="arrow-left" klass="h-4 w-4" /> Zurück
+          </button>
+          <span class="font-quicksand px-3 text-base text-forest">Seite {{ page() }} von {{ totalPages() }}</span>
+          <button
+            type="button"
+            (click)="setPage(page() + 1)"
+            [disabled]="page() >= totalPages()"
+            class="font-quicksand flex min-h-11 items-center gap-1 rounded-md px-3 text-base text-forest disabled:pointer-events-none disabled:opacity-50">
+            Weiter <app-icon name="arrow-right" klass="h-4 w-4" />
+          </button>
+        </nav>
+      }
+    } @else {
+      <section
+        class="font-quicksand mt-6 flex flex-col items-start gap-4 rounded-lg border border-dashed border-forest/30 p-8 text-forest">
+        <p class="text-lg">
+          Die Bibliothek ist noch leer. Generiere die ersten Rezepte – sie erscheinen automatisch hier für alle
+          sichtbar.
+        </p>
+        <a
+          routerLink="/generator"
+          class="font-quicksand flex min-h-11 items-center rounded-md bg-leaf px-4 text-white hover:bg-[#006a00]">
+          Zum Rezept-Generator
+        </a>
+      </section>
+    }
+  </main>
+  <app-site-footer />
+</div>

@@ -1,0 +1,35 @@
+@if (helpers > 1) {
+  <div class="mt-2 space-y-4">
+    @for (group of groups(); track group.helper) {
+      <div>
+        <h5 class="font-ubuntu text-base font-bold text-forest">Person {{ group.helper }}</h5>
+        <ol class="mt-2 list-inside list-decimal space-y-2">
+          @for (step of group.steps; track $index) {
+            <li class="font-quicksand text-base text-[#333]">
+              {{ step.instruction }}
+              @if (step.isParallel) {
+                <span
+                  class="ml-1.5 inline-flex items-center gap-0.5 rounded bg-[#e6f4e6] px-1.5 py-0.5 text-sm text-leaf">
+                  <app-icon name="zap" klass="h-3 w-3" /> parallel
+                </span>
+              }
+            </li>
+          }
+        </ol>
+      </div>
+    }
+  </div>
+} @else {
+  <ol class="mt-2 list-inside list-decimal space-y-2">
+    @for (step of steps; track $index) {
+      <li class="font-quicksand text-base text-[#333]">
+        {{ step.instruction }}
+        @if (step.isParallel) {
+          <span class="ml-1.5 inline-flex items-center gap-0.5 rounded bg-[#e6f4e6] px-1.5 py-0.5 text-sm text-leaf">
+            <app-icon name="zap" klass="h-3 w-3" /> parallel
+          </span>
+        }
+      </li>
+    }
+  </ol>
+}

@@ -1,0 +1,77 @@
+<article
+  class="flex h-full flex-col rounded-lg border border-forest/15 bg-white shadow-sm transition-shadow hover:shadow-md">
+  <header class="flex flex-col gap-2 p-6 pb-4">
+    <app-recipe-meta
+      [difficulty]="recipe.difficulty"
+      [cookingTimeMinutes]="recipe.cookingTimeMinutes"
+      [servings]="recipe.servings"
+      [cuisineStyle]="recipe.cuisineStyle" />
+    <h3 class="font-ubuntu text-xl text-forest-dark">{{ recipe.title }}</h3>
+    @if (recipe.description) {
+      <p class="font-quicksand text-base text-forest/80">{{ recipe.description }}</p>
+    }
+  </header>
+
+  <div class="flex flex-1 flex-col gap-4 px-6 pb-6">
+    <section>
+      <h4 class="font-ubuntu mb-2 text-base font-bold tracking-wide text-forest uppercase">Zutaten</h4>
+      <ul class="font-quicksand list-inside list-disc space-y-1 text-base text-[#333]">
+        @for (item of recipe.ingredients; track $index) {
+          <li>{{ item }}</li>
+        }
+      </ul>
+      @if (recipe.missingIngredients.length) {
+        <p
+          class="font-quicksand mt-2 flex flex-wrap items-center gap-1.5 rounded-md bg-[#fdf3d7] p-2 text-sm text-[#a07400]">
+          <app-icon name="shopping-basket" klass="h-4 w-4 shrink-0" />
+          <span class="font-semibold">Noch besorgen:</span> {{ recipe.missingIngredients.join(", ") }}
+        </p>
+      }
+    </section>
+
+    @if (recipe.nutrition) {
+      <app-recipe-nutrition [nutrition]="recipe.nutrition" />
+    }
+
+    <section>
+      <button
+        type="button"
+        (click)="toggleSteps()"
+        class="font-ubuntu flex min-h-11 items-center gap-1 text-base font-bold tracking-wide text-forest uppercase"
+        [attr.aria-expanded]="expanded()">
+        Zubereitung
+        <app-icon
+          name="chevron-down"
+          [klass]="'h-4 w-4 transition-transform duration-200 ' + (expanded() ? 'rotate-180' : '')" />
+      </button>
+      @if (expanded()) {
+        <app-recipe-steps [steps]="recipe.steps" [helpers]="recipe.helpers ?? 1" />
+      }
+    </section>
+  </div>
+
+  @if (showSave || showDelete) {
+    <footer class="flex justify-end gap-2 border-t border-forest/10 p-4">
+      @if (showSave) {
+        <button
+          type="button"
+          (click)="save.emit()"
+          [disabled]="saving || saved"
+          class="font-quicksand flex min-h-11 items-center gap-1.5 rounded-md bg-forest px-4 text-base text-creme hover:bg-[#2d4c2d] disabled:opacity-70">
+          <app-icon name="bookmark-plus" klass="h-4 w-4" />
+          {{ saved ? "Gespeichert" : saving ? "Speichern …" : "Ins Kochbuch" }}
+        </button>
+      }
+      @if (showDelete) {
+        <button
+          type="button"
+          (click)="delete.emit()"
+          [disabled]="deleting"
+          class="font-quicksand flex min-h-11 items-center gap-1.5 rounded-md border border-[#b3341f]/40 px-4 text-base text-[#b3341f] hover:bg-[#fbe4e0] disabled:opacity-70">
+          <app-icon name="trash-2" klass="h-4 w-4" />
+          {{ deleting ? "Entfernen …" : "Entfernen" }}
+        </button>
+      }
+    </footer>
+  }
+</article>

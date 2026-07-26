@@ -1,0 +1,36 @@
+@if (variant === "desktop") {
+  <div
+    class="pointer-events-none absolute top-[-42px] z-10 hidden h-[1145px] w-[480px] lg:block"
+    style="right: max(calc((100vw - 1440px) / 2 + 49px), 49px)"
+    aria-hidden="true">
+    <img
+      src="assets/img/hero/plate-top.webp"
+      alt=""
+      class="absolute top-0 left-[5px] h-[470px] w-[470px] rounded-full shadow-[6px_-2px_4px_0px_rgba(0,0,0,0.25)]" />
+    <img
+      src="assets/img/hero/plate-middle.webp"
+      alt=""
+      class="absolute top-[315px] left-[-8px] h-[484px] w-[484px] rounded-full shadow-[6px_-2px_4px_0px_rgba(0,0,0,0.25)]" />
+    <img
+      src="assets/img/hero/plate-bottom.webp"
+      alt=""
+      class="absolute top-[553.86px] left-[-68.87px] h-[633.28px] w-[617.73px] origin-top-left rotate-[18.91deg] rounded-full shadow-[6px_-2px_4px_0px_rgba(0,0,0,0.25)]" />
+  </div>
+} @else {
+  <div class="flex justify-center px-4 pb-16 lg:hidden" aria-hidden="true">
+    <div class="relative h-[180px] w-full max-w-[560px] sm:h-[220px]">
+      <img
+        src="assets/img/hero/plate-top.webp"
+        alt=""
+        class="absolute top-0 left-[4%] h-[150px] w-[150px] rounded-full shadow-[6px_-2px_4px_0px_rgba(0,0,0,0.25)] sm:h-[200px] sm:w-[200px]" />
+      <img
+        src="assets/img/hero/plate-middle.webp"
+        alt=""
+        class="absolute top-[10px] left-[32%] h-[155px] w-[155px] rounded-full shadow-[6px_-2px_4px_0px_rgba(0,0,0,0.25)] sm:h-[205px] sm:w-[205px]" />
+      <img
+        src="assets/img/hero/plate-bottom.webp"
+        alt=""
+        class="absolute top-0 left-[60%] h-[155px] w-[152px] rotate-[18.91deg] rounded-full shadow-[6px_-2px_4px_0px_rgba(0,0,0,0.25)] sm:h-[210px] sm:w-[205px]" />
+    </div>
+  </div>
+}

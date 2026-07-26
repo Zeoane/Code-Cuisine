@@ -1,0 +1,39 @@
+<header class="bg-forest">
+  <div
+    class="mx-auto flex w-full max-w-[1440px] flex-wrap items-center justify-between gap-2 px-4 py-4 sm:px-[68px] sm:py-6">
+    <a routerLink="/" aria-label="Code à Cuisine – Home">
+      <app-logo klass="h-9 w-auto sm:h-11" />
+    </a>
+    <button
+      type="button"
+      class="flex h-11 w-11 items-center justify-center text-creme md:hidden"
+      (click)="toggleMenu()"
+      [attr.aria-expanded]="open()"
+      [attr.aria-label]="open() ? 'Menü schließen' : 'Menü öffnen'">
+      <app-icon [name]="open() ? 'close' : 'menu'" klass="h-6 w-6" />
+    </button>
+
+    <nav class="hidden items-center gap-6 md:flex" aria-label="Hauptnavigation">
+      @for (item of navItems; track item.path) {
+        <a [routerLink]="item.path" routerLinkActive #rla="routerLinkActive" [class]="navLinkClass(rla.isActive)">
+          {{ item.label }}
+        </a>
+      }
+    </nav>
+
+    @if (open()) {
+      <nav class="flex w-full flex-col gap-2 pb-4 md:hidden" aria-label="Mobile Navigation">
+        @for (item of navItems; track item.path) {
+          <a
+            [routerLink]="item.path"
+            routerLinkActive
+            #rla="routerLinkActive"
+            (click)="closeMenu()"
+            [class]="navLinkClass(rla.isActive, 'px-1')">
+            {{ item.label }}
+          </a>
+        }
+      </nav>
+    }
+  </div>
+</header>

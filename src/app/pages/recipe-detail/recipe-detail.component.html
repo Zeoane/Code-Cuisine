@@ -1,0 +1,25 @@
+<div class="flex min-h-screen flex-col overflow-x-hidden bg-creme">
+  <app-site-header />
+  <main class="mx-auto w-full max-w-[760px] flex-1 px-4 py-10 sm:px-8 sm:py-12">
+    <a
+      routerLink="/library"
+      class="font-quicksand mb-6 inline-flex min-h-11 items-center gap-1.5 text-base text-forest hover:underline">
+      <app-icon name="arrow-left" klass="h-4 w-4" />
+      Zurück zur Bibliothek
+    </a>
+    @if (recipe(); as r) {
+      <app-recipe-card [recipe]="r" />
+    } @else {
+      <section
+        class="font-quicksand flex flex-col items-start gap-4 rounded-lg border border-dashed border-forest/30 p-8 text-forest">
+        <p class="text-lg">Dieses Rezept wurde nicht gefunden.</p>
+        <a
+          routerLink="/library"
+          class="font-quicksand flex min-h-11 items-center rounded-md bg-forest px-4 text-creme hover:bg-[#2d4c2d]">
+          Zurück zur Bibliothek
+        </a>
+      </section>
+    }
+  </main>
+  <app-site-footer />
+</div>

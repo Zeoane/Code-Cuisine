@@ -1,0 +1,16 @@
+<div
+  class="scrollbar-none -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 xl:grid-cols-3">
+  @for (recipe of recipes; track recipe.title) {
+    <div class="w-[88%] shrink-0 snap-start sm:w-auto">
+      <app-recipe-card
+        [recipe]="recipe"
+        [showSave]="true"
+        [saving]="savingTitle === recipe.title"
+        [saved]="savedTitles.has(recipe.title)"
+        (save)="recipeSave.emit(recipe)" />
+    </div>
+  }
+</div>
+<p class="font-quicksand mt-3 text-center text-sm text-forest/70 sm:hidden">
+  ← Wischen, um alle Vorschläge zu sehen →
+</p>

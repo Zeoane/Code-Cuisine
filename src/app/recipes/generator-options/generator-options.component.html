@@ -1,0 +1,93 @@
+<fieldset
+  class="grid grid-cols-1 gap-4 rounded-lg border border-forest/15 bg-white/60 p-4 sm:grid-cols-2 lg:grid-cols-5"
+  [disabled]="disabled">
+  <legend class="sr-only">Rezept-Optionen</legend>
+
+  <div class="flex flex-col gap-1.5">
+    <label class="font-quicksand text-base text-forest">Portionen</label>
+    <div class="flex items-center gap-2">
+      <button
+        type="button"
+        (click)="stepServings(-1)"
+        [disabled]="disabled || values.servings <= 1"
+        aria-label="Portionen verringern"
+        class="flex h-11 w-11 items-center justify-center rounded-md border border-forest/30 bg-white text-forest disabled:opacity-50">
+        <app-icon name="minus" klass="h-4 w-4" />
+      </button>
+      <span class="font-ubuntu w-8 text-center text-lg font-bold text-forest-dark">{{ values.servings }}</span>
+      <button
+        type="button"
+        (click)="stepServings(1)"
+        [disabled]="disabled || values.servings >= 12"
+        aria-label="Portionen erhöhen"
+        class="flex h-11 w-11 items-center justify-center rounded-md border border-forest/30 bg-white text-forest disabled:opacity-50">
+        <app-icon name="plus" klass="h-4 w-4" />
+      </button>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-1.5">
+    <label class="font-quicksand text-base text-forest" for="timeCategory">Zeitrahmen</label>
+    <select
+      id="timeCategory"
+      class="font-quicksand h-11 w-full rounded-md border border-forest/30 bg-white px-2 text-base text-forest-dark"
+      [ngModel]="values.timeCategory"
+      (ngModelChange)="patch({ timeCategory: $event })"
+      [disabled]="disabled">
+      @for (entry of timeEntries; track entry[0]) {
+        <option [value]="entry[0]">{{ entry[1] }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="flex flex-col gap-1.5">
+    <label class="font-quicksand text-base text-forest" for="cuisineStyle">Kochstil</label>
+    <select
+      id="cuisineStyle"
+      class="font-quicksand h-11 w-full rounded-md border border-forest/30 bg-white px-2 text-base text-forest-dark"
+      [ngModel]="values.cuisineStyle"
+      (ngModelChange)="patch({ cuisineStyle: $event })"
+      [disabled]="disabled">
+      @for (entry of cuisineEntries; track entry[0]) {
+        <option [value]="entry[0]">{{ entry[1] }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="flex flex-col gap-1.5">
+    <label class="font-quicksand text-base text-forest" for="diet">Ernährungsweise</label>
+    <select
+      id="diet"
+      class="font-quicksand h-11 w-full rounded-md border border-forest/30 bg-white px-2 text-base text-forest-dark"
+      [ngModel]="values.diet"
+      (ngModelChange)="patch({ diet: $event })"
+      [disabled]="disabled">
+      @for (entry of dietEntries; track entry[0]) {
+        <option [value]="entry[0]">{{ entry[1] }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="flex flex-col gap-1.5">
+    <label class="font-quicksand text-base text-forest">Kochhelfer</label>
+    <div class="flex items-center gap-2">
+      <button
+        type="button"
+        (click)="stepHelpers(-1)"
+        [disabled]="disabled || values.helpers <= 1"
+        aria-label="Kochhelfer verringern"
+        class="flex h-11 w-11 items-center justify-center rounded-md border border-forest/30 bg-white text-forest disabled:opacity-50">
+        <app-icon name="minus" klass="h-4 w-4" />
+      </button>
+      <span class="font-ubuntu w-8 text-center text-lg font-bold text-forest-dark">{{ values.helpers }}</span>
+      <button
+        type="button"
+        (click)="stepHelpers(1)"
+        [disabled]="disabled || values.helpers >= 3"
+        aria-label="Kochhelfer erhöhen"
+        class="flex h-11 w-11 items-center justify-center rounded-md border border-forest/30 bg-white text-forest disabled:opacity-50">
+        <app-icon name="plus" klass="h-4 w-4" />
+      </button>
+    </div>
+  </div>
+</fieldset>
