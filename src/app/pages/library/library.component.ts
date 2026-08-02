@@ -3,7 +3,6 @@ import { RouterLink } from "@angular/router";
 import { CUISINE_LABELS } from "../../core/data/recipe-labels";
 import { CuisineStyle } from "../../core/models/recipe.models";
 import { LibraryService } from "../../core/services/library.service";
-import { SiteFooterComponent } from "../../layout/site-footer/site-footer.component";
 import { SiteHeaderComponent } from "../../layout/site-header/site-header.component";
 import { RecipeMetaComponent } from "../../recipes/recipe-meta/recipe-meta.component";
 import { IconComponent } from "../../shared/icon/icon.component";
@@ -18,7 +17,7 @@ type CuisineFilter = CuisineStyle | "all";
 @Component({
   selector: "app-library",
   standalone: true,
-  imports: [RouterLink, SiteHeaderComponent, SiteFooterComponent, RecipeMetaComponent, IconComponent],
+  imports: [RouterLink, SiteHeaderComponent, RecipeMetaComponent, IconComponent],
   templateUrl: "./library.component.html",
 })
 export class LibraryComponent {

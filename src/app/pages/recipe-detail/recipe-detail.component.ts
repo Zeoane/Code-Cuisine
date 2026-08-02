@@ -2,7 +2,6 @@ import { Component, OnInit, signal } from "@angular/core";
 import { ActivatedRoute, RouterLink } from "@angular/router";
 import { StoredRecipe } from "../../core/models/recipe.models";
 import { LibraryService } from "../../core/services/library.service";
-import { SiteFooterComponent } from "../../layout/site-footer/site-footer.component";
 import { SiteHeaderComponent } from "../../layout/site-header/site-header.component";
 import { RecipeCardComponent } from "../../recipes/recipe-card/recipe-card.component";
 import { IconComponent } from "../../shared/icon/icon.component";
@@ -14,7 +13,7 @@ import { IconComponent } from "../../shared/icon/icon.component";
 @Component({
   selector: "app-recipe-detail",
   standalone: true,
-  imports: [RouterLink, SiteHeaderComponent, SiteFooterComponent, RecipeCardComponent, IconComponent],
+  imports: [RouterLink, SiteHeaderComponent, RecipeCardComponent, IconComponent],
   templateUrl: "./recipe-detail.component.html",
 })
 export class RecipeDetailComponent implements OnInit {

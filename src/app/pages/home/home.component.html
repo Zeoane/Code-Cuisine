@@ -1,15 +1,16 @@
 <div class="relative flex min-h-screen flex-col overflow-x-hidden bg-forest">
-  <header class="relative z-20 flex items-center px-4 pt-10 sm:pr-10 sm:pl-[68px]">
+  <header class="relative z-20 flex items-center pt-3 pr-4 pb-2 pl-4 sm:pt-10 sm:pb-0 sm:pr-10 sm:pl-[68px]">
     <a routerLink="/" aria-label="Code à Cuisine – Home">
       <app-logo klass="h-10 w-auto sm:h-12" />
     </a>
   </header>
 
   <app-hero-plates variant="desktop" />
+  <app-hero-plates variant="mobile" />
 
   <main class="relative z-10 mx-auto w-full max-w-[1440px] flex-1">
-    <div class="flex flex-col items-start gap-16 px-4 pt-16 sm:px-[65px] lg:pt-[152px]">
-      <div class="flex w-full max-w-[755px] flex-col items-start">
+    <div class="flex flex-col items-start gap-10 px-4 pt-16 sm:gap-16 sm:px-[65px] lg:pt-[152px]">
+      <div class="flex w-full max-w-[240px] flex-col items-start sm:max-w-[755px]">
         <h2 class="font-quicksand text-2xl font-semibold text-beige min-[400px]:text-[28px] sm:text-5xl">
           AI-Powered recipe generator
         </h2>
@@ -25,7 +26,8 @@
       </a>
     </div>
 
-    <div class="flex flex-wrap items-center gap-4 px-4 pt-24 pb-16 sm:px-[65px] lg:pt-[254px] lg:pb-[126px]">
+    <div
+      class="absolute top-[597px] left-4 -translate-y-1/2 flex flex-col items-start gap-4 sm:top-[569px] sm:left-[65px] sm:flex-row sm:flex-wrap sm:items-center lg:top-[726.36px] min-[1440px]:top-[1289.6px]">
       <p class="font-ubuntu text-2xl font-medium text-creme sm:text-[32px]">Hungry for inspiration?</p>
       <a
         routerLink="/cookbook"
@@ -36,9 +38,5 @@
           klass="w-6 transition-transform duration-150 ease-out group-hover:translate-x-1" />
       </a>
     </div>
-
-    <app-hero-plates variant="mobile" />
   </main>
-
-  <app-site-footer [dark]="true" />
 </div>

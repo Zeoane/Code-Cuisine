@@ -2,7 +2,6 @@ import { Component } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import { HeroPlatesComponent } from "../../hero/hero-plates/hero-plates.component";
 import { LogoComponent } from "../../hero/logo/logo.component";
-import { SiteFooterComponent } from "../../layout/site-footer/site-footer.component";
 import { IconComponent } from "../../shared/icon/icon.component";
 
 /**
@@ -12,7 +11,7 @@ import { IconComponent } from "../../shared/icon/icon.component";
 @Component({
   selector: "app-home",
   standalone: true,
-  imports: [RouterLink, LogoComponent, HeroPlatesComponent, SiteFooterComponent, IconComponent],
+  imports: [RouterLink, LogoComponent, HeroPlatesComponent, IconComponent],
   templateUrl: "./home.component.html",
 })
 export class HomeComponent {}

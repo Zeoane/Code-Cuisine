@@ -4,7 +4,6 @@ import { CookbookService } from "../../core/services/cookbook.service";
 import { LibraryService } from "../../core/services/library.service";
 import { RecipeGeneratorService } from "../../core/services/recipe-generator.service";
 import { ToastService } from "../../core/services/toast.service";
-import { SiteFooterComponent } from "../../layout/site-footer/site-footer.component";
 import { SiteHeaderComponent } from "../../layout/site-header/site-header.component";
 import {
   GeneratorOptionsComponent,
@@ -35,7 +34,6 @@ const GENERATION_DELAY_MS = 900;
   standalone: true,
   imports: [
     SiteHeaderComponent,
-    SiteFooterComponent,
     GeneratorOptionsComponent,
     IngredientInputComponent,
     RecipeResultsComponent,

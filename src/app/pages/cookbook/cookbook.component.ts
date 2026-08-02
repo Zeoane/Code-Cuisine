@@ -3,7 +3,6 @@ import { RouterLink } from "@angular/router";
 import { StoredRecipe } from "../../core/models/recipe.models";
 import { CookbookService } from "../../core/services/cookbook.service";
 import { ToastService } from "../../core/services/toast.service";
-import { SiteFooterComponent } from "../../layout/site-footer/site-footer.component";
 import { SiteHeaderComponent } from "../../layout/site-header/site-header.component";
 import { RecipeCardComponent } from "../../recipes/recipe-card/recipe-card.component";
 import { IconComponent } from "../../shared/icon/icon.component";
@@ -16,7 +15,7 @@ import { IconComponent } from "../../shared/icon/icon.component";
 @Component({
   selector: "app-cookbook",
   standalone: true,
-  imports: [RouterLink, SiteHeaderComponent, SiteFooterComponent, RecipeCardComponent, IconComponent],
+  imports: [RouterLink, SiteHeaderComponent, RecipeCardComponent, IconComponent],
   templateUrl: "./cookbook.component.html",
 })
 export class CookbookComponent {
