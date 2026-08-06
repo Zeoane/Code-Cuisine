@@ -1,8 +1,9 @@
-import { Component } from "@angular/core";
+import { Component, signal } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import { HeroPlatesComponent } from "../../hero/hero-plates/hero-plates.component";
 import { LogoComponent } from "../../hero/logo/logo.component";
 import { IconComponent } from "../../shared/icon/icon.component";
+import { ImpressumModalComponent } from "../../shared/impressum-modal/impressum-modal.component";
 
 /**
  * Hero landing page - pixel-faithful implementation of the Figma design
@@ -11,7 +12,9 @@ import { IconComponent } from "../../shared/icon/icon.component";
 @Component({
   selector: "app-home",
   standalone: true,
-  imports: [RouterLink, LogoComponent, HeroPlatesComponent, IconComponent],
+  imports: [RouterLink, LogoComponent, HeroPlatesComponent, IconComponent, ImpressumModalComponent],
   templateUrl: "./home.component.html",
 })
-export class HomeComponent {}
+export class HomeComponent {
+  protected readonly impressumOpen = signal(false);
+}

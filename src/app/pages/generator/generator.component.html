@@ -1,46 +1,37 @@
-<div class="flex min-h-screen flex-col overflow-x-hidden bg-creme">
-  <app-site-header />
-  <main class="mx-auto w-full max-w-[1100px] flex-1 px-4 py-10 sm:px-8 sm:py-12">
-    <section class="mb-10">
-      <h1 class="font-ubuntu mb-2 text-3xl font-bold text-forest-dark sm:text-4xl">Was hast du zu Hause?</h1>
-      <p class="font-quicksand mb-6 text-base text-forest/80 sm:text-lg">
-        Gib deine vorhandenen Zutaten ein und wähle deine Optionen – die KI generiert daraus genau drei passende
-        Rezepte mit Nährwerten und Arbeitsplan.
-      </p>
-      <app-ingredient-input
-        [ingredients]="ingredients()"
-        [disabled]="isGenerating()"
-        (ingredientsChange)="setIngredients($event)" />
-      <div class="mt-6">
-        <app-generator-options
-          [values]="options()"
-          [disabled]="isGenerating()"
-          (valuesChange)="setOptions($event)" />
-      </div>
-      <button
-        type="button"
-        (click)="handleGenerate()"
-        [disabled]="ingredients().length === 0 || isGenerating()"
-        class="font-quicksand mt-6 flex h-14 w-full items-center justify-center gap-2 bg-leaf px-8 text-lg font-semibold text-white hover:bg-[#006a00] disabled:opacity-60 sm:w-auto">
-        <app-icon
-          [name]="isGenerating() ? 'loader' : 'sparkles'"
-          [klass]="'h-5 w-5 ' + (isGenerating() ? 'animate-spin' : '')" />
-        {{ isGenerating() ? "Rezepte werden generiert …" : "Rezepte generieren" }}
-      </button>
-    </section>
+<div class="flex min-h-screen flex-col items-center gap-16 bg-white pb-16">
+  <header class="flex w-full items-center px-4 pt-6 sm:px-[68px] sm:pt-10">
+    <a routerLink="/" aria-label="Code à Cuisine – Home">
+      <app-logo variant="color" klass="h-10 w-auto sm:h-12" />
+    </a>
+  </header>
 
-    @if (isGenerating()) {
-      <section
-        class="font-quicksand flex flex-col items-center gap-3 rounded-lg border border-dashed border-forest/30 p-10 text-forest sm:p-12"
-        aria-live="polite">
-        <app-icon name="loader" klass="h-8 w-8 animate-spin" />
-        <p class="text-center text-base">Die KI überlegt sich drei leckere Rezepte aus deinen Zutaten …</p>
-      </section>
-    } @else if (recipes().length > 0) {
-      <section aria-label="Generierte Rezepte">
-        <h2 class="font-ubuntu mb-6 text-2xl font-bold text-forest-dark">Deine Rezeptvorschläge</h2>
-        <app-recipe-results [recipes]="recipes()" [savedTitles]="savedTitles()" (recipeSave)="handleSave($event)" />
-      </section>
-    }
+  <main class="flex w-full max-w-[1087px] flex-1 flex-col items-center gap-6 px-4 sm:px-8">
+    <h1
+      class="font-quicksand text-center text-[36px] leading-tight font-semibold text-mid-green sm:text-[54px] sm:leading-[65px]">
+      Generate recipe
+    </h1>
+    <p class="font-quicksand text-center text-lg font-medium text-deep-green sm:text-2xl">
+      Got random stuff in your kitchen? Pop it in—we've got the perfect recipe waiting.
+    </p>
+
+    <div class="flex w-full flex-col gap-8 sm:flex-row">
+      <div class="flex flex-col gap-8 rounded-[20px] bg-forest/30 px-6 py-6 sm:max-w-[577px] sm:flex-1 sm:py-[25px]">
+        <app-ingredient-quantity-form (add)="addIngredient($event)" />
+      </div>
+      <div class="flex-1 rounded-[20px] bg-forest/30 p-6">
+        <app-ingredient-entry-list
+          [entries]="ingredients()"
+          (update)="updateIngredient($event)"
+          (remove)="removeIngredient($event)" />
+      </div>
+    </div>
+
+    <button
+      type="button"
+      (click)="handleNextStep()"
+      [disabled]="ingredients().length === 0"
+      class="font-quicksand flex items-center gap-2.5 self-start rounded-md bg-forest px-[26px] py-4 text-base font-semibold text-white transition-colors hover:bg-[#2d4c2d] disabled:cursor-not-allowed disabled:opacity-50">
+      Next step
+    </button>
   </main>
 </div>

@@ -1,94 +1,48 @@
 import { Component, signal } from "@angular/core";
-import { CardRecipe, GeneratedRecipe } from "../../core/models/recipe.models";
-import { CookbookService } from "../../core/services/cookbook.service";
-import { LibraryService } from "../../core/services/library.service";
-import { RecipeGeneratorService } from "../../core/services/recipe-generator.service";
+import { RouterLink } from "@angular/router";
+import { IngredientEntry } from "../../core/models/recipe.models";
 import { ToastService } from "../../core/services/toast.service";
-import { SiteHeaderComponent } from "../../layout/site-header/site-header.component";
-import {
-  GeneratorOptionsComponent,
-  OptionValues,
-} from "../../recipes/generator-options/generator-options.component";
-import { IngredientInputComponent } from "../../recipes/ingredient-input/ingredient-input.component";
-import { RecipeResultsComponent } from "../../recipes/recipe-results/recipe-results.component";
-import { IconComponent } from "../../shared/icon/icon.component";
+import { LogoComponent } from "../../hero/logo/logo.component";
+import { IngredientEntryListComponent } from "../../recipes/ingredient-entry-list/ingredient-entry-list.component";
+import { IngredientQuantityFormComponent } from "../../recipes/ingredient-quantity-form/ingredient-quantity-form.component";
 
-/** Default option values shown when the generator page first loads. */
-const DEFAULT_OPTIONS: OptionValues = {
-  servings: 2,
-  timeCategory: "medium",
-  cuisineStyle: "fusion",
-  diet: "none",
-  helpers: 1,
-};
-
-/** Simulated generation delay so the loading state is visible (User Story 8). */
-const GENERATION_DELAY_MS = 900;
+/** Session-wide counter so freshly added ingredients get a stable, unique id. */
+let nextId = 1;
 
 /**
- * Recipe generator page: ingredient chips plus servings, time budget,
- * cuisine, diet and helper options; generates exactly three recipes.
+ * Step 1 of the recipe generator wizard ("Generate recipe"): collect
+ * ingredients with quantity and unit. Preferences and results follow as
+ * their own steps once those designs are ready.
  */
 @Component({
   selector: "app-generator",
   standalone: true,
-  imports: [
-    SiteHeaderComponent,
-    GeneratorOptionsComponent,
-    IngredientInputComponent,
-    RecipeResultsComponent,
-    IconComponent,
-  ],
+  imports: [RouterLink, LogoComponent, IngredientQuantityFormComponent, IngredientEntryListComponent],
   templateUrl: "./generator.component.html",
 })
 export class GeneratorComponent {
-  protected readonly ingredients = signal<string[]>([]);
-  protected readonly options = signal<OptionValues>(DEFAULT_OPTIONS);
-  protected readonly recipes = signal<CardRecipe[]>([]);
-  protected readonly savedTitles = signal<Set<string>>(new Set());
-  protected readonly isGenerating = signal(false);
+  protected readonly ingredients = signal<IngredientEntry[]>([]);
 
-  constructor(
-    private readonly generator: RecipeGeneratorService,
-    private readonly library: LibraryService,
-    private readonly cookbook: CookbookService,
-    private readonly toast: ToastService,
-  ) {}
+  constructor(private readonly toast: ToastService) {}
 
-  /** Updates the ingredient list from the child input component. */
-  setIngredients(list: string[]): void {
-    this.ingredients.set(list);
+  /** Adds a new ingredient to the top of the list (most recent first). */
+  addIngredient(entry: Omit<IngredientEntry, "id">): void {
+    this.ingredients.update(list => [{ ...entry, id: nextId++ }, ...list]);
   }
 
-  /** Updates generator options from the child options panel. */
-  setOptions(values: OptionValues): void {
-    this.options.set(values);
+  /** Applies an inline edit (quantity/unit) to an existing ingredient. */
+  updateIngredient(updated: IngredientEntry): void {
+    this.ingredients.update(list => list.map(entry => (entry.id === updated.id ? updated : entry)));
   }
 
-  /** Starts the generation with the current ingredients and options. */
-  handleGenerate(): void {
+  /** Removes an ingredient from the list. */
+  removeIngredient(id: number): void {
+    this.ingredients.update(list => list.filter(entry => entry.id !== id));
+  }
+
+  /** Proceeds to the next wizard step (Preferences), once it exists. */
+  handleNextStep(): void {
     if (this.ingredients().length === 0) return;
-    this.isGenerating.set(true);
-    this.savedTitles.set(new Set());
-    setTimeout(() => this.finishGenerate(), GENERATION_DELAY_MS);
-  }
-
-  /** Completes generation after the simulated loading delay. */
-  private finishGenerate(): void {
-    const options = this.options();
-    const generated: GeneratedRecipe[] = this.generator.generate({
-      ...options,
-      ingredients: this.ingredients(),
-    });
-    const stored = this.library.addGenerated(generated, options.helpers);
-    this.recipes.set(stored.map(r => ({ ...r, helpers: options.helpers })));
-    this.isGenerating.set(false);
-  }
-
-  /** Saves a recipe into the personal cookbook. */
-  handleSave(recipe: CardRecipe): void {
-    this.cookbook.save(recipe, this.options().helpers);
-    this.savedTitles.update(set => new Set(set).add(recipe.title));
-    this.toast.success("Rezept im Kochbuch gespeichert!");
+    this.toast.info("Schritt 2 (Preferences) folgt als Nächstes.");
   }
 }

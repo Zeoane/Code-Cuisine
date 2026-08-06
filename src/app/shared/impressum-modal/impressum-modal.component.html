@@ -1,0 +1,45 @@
+@if (open) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-forest/70 p-4"
+    (click)="handleBackdropClick($event)"
+    role="presentation">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="impressum-modal-title"
+      class="font-quicksand relative w-full max-w-md rounded-lg bg-creme p-6 text-forest-dark shadow-xl sm:p-8">
+      <button
+        type="button"
+        (click)="closed.emit()"
+        aria-label="Impressum schließen"
+        class="absolute top-3 right-3 flex h-11 w-11 items-center justify-center rounded-full text-forest hover:bg-forest/10">
+        <app-icon name="close" klass="h-5 w-5" />
+      </button>
+
+      <h2 id="impressum-modal-title" class="font-ubuntu mb-4 pr-8 text-2xl font-bold text-forest-dark">
+        Impressum
+      </h2>
+
+      <div class="space-y-4 text-base">
+        <p>
+          Code à Cuisine
+          <br />
+          Gabriel [Nachname]
+          <br />
+          [Straße und Hausnummer], [PLZ und Ort]
+        </p>
+        <p>Kontakt: [deine E-Mail-Adresse]</p>
+        <p class="text-sm text-forest/80">
+          Generierte Rezepte dienen ausschließlich der Inspiration – Angaben ohne Gewähr.
+        </p>
+      </div>
+
+      <a
+        routerLink="/impressum"
+        (click)="closed.emit()"
+        class="font-quicksand mt-6 flex min-h-11 items-center text-sm text-forest underline-offset-4 hover:underline">
+        Vollständiges Impressum ansehen →
+      </a>
+    </div>
+  </div>
+}

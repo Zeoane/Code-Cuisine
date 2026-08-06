@@ -1,0 +1,25 @@
+<div class="relative inline-block">
+  <button type="button" (click)="toggle()" [attr.aria-expanded]="open()" aria-haspopup="listbox" [class]="triggerClass()">
+    {{ value }}
+    <img
+      src="assets/img/Generate-Page/arrow_drop_down.svg"
+      alt=""
+      class="h-[5px] w-[10px] transition-transform duration-200"
+      [class.rotate-180]="open()" />
+  </button>
+
+  @if (open()) {
+    <ul role="listbox" class="absolute top-full left-0 z-20 mt-1 w-full overflow-hidden rounded-2xl bg-forest/30 py-1">
+      @for (unit of units; track unit) {
+        <li role="option" [attr.aria-selected]="unit === value">
+          <button
+            type="button"
+            (click)="select(unit)"
+            class="block w-full px-3 py-1 text-left font-quicksand text-sm text-forest-dark hover:bg-forest/20">
+            {{ unit }}
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</div>

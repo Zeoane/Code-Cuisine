@@ -27,16 +27,26 @@
     </div>
 
     <div
-      class="absolute top-[597px] left-4 -translate-y-1/2 flex flex-col items-start gap-4 sm:top-[569px] sm:left-[65px] sm:flex-row sm:flex-wrap sm:items-center lg:top-[726.36px] min-[1440px]:top-[1289.6px]">
-      <p class="font-ubuntu text-2xl font-medium text-creme sm:text-[32px]">Hungry for inspiration?</p>
-      <a
-        routerLink="/cookbook"
-        class="font-quicksand group flex h-[52px] items-center justify-center gap-2.5 rounded-[5px] px-[26px] py-4 text-xl font-medium text-creme transition-colors duration-150 ease-out hover:bg-white/10 active:scale-[0.97]">
-        Go to cookbook
-        <app-icon
-          name="arrow-right"
-          klass="w-6 transition-transform duration-150 ease-out group-hover:translate-x-1" />
-      </a>
+      class="absolute top-[597px] left-4 -translate-y-1/2 flex flex-col items-start gap-2 sm:top-[569px] sm:left-[65px] lg:top-[726.36px] min-[1440px]:top-[1120px]">
+      <div class="flex flex-col items-start gap-4 sm:flex-row sm:flex-wrap sm:items-center">
+        <p class="font-ubuntu text-2xl font-medium text-creme sm:text-[32px]">Hungry for inspiration?</p>
+        <a
+          routerLink="/cookbook"
+          class="font-quicksand group flex h-[52px] items-center justify-center gap-2.5 rounded-[5px] px-[26px] py-4 text-xl font-medium text-creme transition-colors duration-150 ease-out hover:bg-white/10 active:scale-[0.97]">
+          Go to cookbook
+          <app-icon
+            name="arrow-right"
+            klass="w-6 transition-transform duration-150 ease-out group-hover:translate-x-1" />
+        </a>
+      </div>
+      <button
+        type="button"
+        (click)="impressumOpen.set(true)"
+        class="font-quicksand flex min-h-11 items-center text-sm text-creme/60 underline-offset-4 transition-colors hover:text-creme hover:underline">
+        Impressum
+      </button>
     </div>
   </main>
+
+  <app-impressum-modal [open]="impressumOpen()" (closed)="impressumOpen.set(false)" />
 </div>

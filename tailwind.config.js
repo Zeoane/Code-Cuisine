@@ -14,6 +14,8 @@ module.exports = {
         beige: "#f5f5dc",
         leaf: "#008000",
         "forest-dark": "#2c452c",
+        "mid-green": "#1e5515",
+        "deep-green": "#10310b",
       },
     },
   },

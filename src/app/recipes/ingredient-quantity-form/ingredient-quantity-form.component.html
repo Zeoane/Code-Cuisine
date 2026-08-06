@@ -1,0 +1,46 @@
+<div class="flex flex-1 flex-col gap-6 sm:flex-row sm:items-start sm:gap-8">
+  <div class="flex flex-1 flex-col gap-2">
+    <label for="ingredient-name" class="font-quicksand text-base font-medium text-deep-green"> Ingredient </label>
+    <input
+      id="ingredient-name"
+      type="text"
+      [(ngModel)]="name"
+      (keydown)="handleKeydown($event)"
+      maxlength="64"
+      class="h-9 w-full rounded-[20px] bg-creme/80 px-4 font-quicksand text-base text-forest-dark focus-visible:ring-2 focus-visible:ring-forest focus-visible:outline-none" />
+  </div>
+
+  <div class="flex flex-col gap-2">
+    <span class="font-quicksand text-base font-medium text-deep-green">Serving size</span>
+    <div class="flex items-center gap-2.5">
+      <input
+        type="number"
+        min="0"
+        [(ngModel)]="quantity"
+        aria-label="Menge"
+        class="h-9 w-[61px] rounded-full bg-creme px-2 text-center font-quicksand text-sm text-forest-dark focus-visible:outline-none" />
+      <div class="relative">
+        <select
+          [(ngModel)]="unit"
+          aria-label="Einheit"
+          class="h-9 appearance-none rounded-full bg-creme py-0 pr-7 pl-[15px] font-quicksand text-sm text-forest-dark focus-visible:outline-none">
+          <option value="gram">gram</option>
+          <option value="piece">piece</option>
+          <option value="ml">ml</option>
+        </select>
+        <img
+          src="assets/img/Generate-Page/arrow_drop_down.svg"
+          alt=""
+          class="pointer-events-none absolute top-1/2 right-2.5 h-[5px] w-[10px] -translate-y-1/2" />
+      </div>
+      <button
+        type="button"
+        (click)="submit()"
+        [disabled]="!name.trim() || quantity <= 0"
+        aria-label="Zutat hinzufügen"
+        class="flex h-6 w-6 shrink-0 items-center justify-center disabled:opacity-40">
+        <img src="assets/img/Generate-Page/add_2.svg" alt="" class="h-6 w-6" />
+      </button>
+    </div>
+  </div>
+</div>

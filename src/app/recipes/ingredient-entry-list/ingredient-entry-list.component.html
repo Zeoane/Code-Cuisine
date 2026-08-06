@@ -1,0 +1,67 @@
+<h2 class="font-quicksand mb-4 text-base font-medium text-deep-green">List of your Ingredients</h2>
+
+@if (entries.length > 0) {
+  <ul class="flex flex-col gap-3">
+    @for (entry of entries; track entry.id) {
+      <li class="font-quicksand flex items-center gap-2 text-base text-deep-green">
+        <span aria-hidden="true">•</span>
+
+        @if (editingId() === entry.id) {
+          <input
+            type="number"
+            min="0"
+            [(ngModel)]="editQuantity"
+            aria-label="Menge bearbeiten"
+            class="h-7 w-14 rounded-full bg-creme px-1 text-center text-sm text-forest-dark focus-visible:outline-none" />
+          <div class="relative">
+            <select
+              [(ngModel)]="editUnit"
+              aria-label="Einheit bearbeiten"
+              class="h-7 appearance-none rounded-full bg-creme py-0 pr-5 pl-2 text-sm text-forest-dark focus-visible:outline-none">
+              <option value="gram">gram</option>
+              <option value="piece">piece</option>
+              <option value="ml">ml</option>
+            </select>
+            <img
+              src="assets/img/Generate-Page/arrow_drop_down.svg"
+              alt=""
+              class="pointer-events-none absolute top-1/2 right-2 h-[5px] w-[10px] -translate-y-1/2" />
+          </div>
+        } @else {
+          <span class="font-medium">{{ entry.quantity }}{{ unitSuffix(entry.unit) }}</span>
+        }
+
+        <span class="flex-1">{{ entry.name }}</span>
+
+        <span class="flex items-center gap-4">
+          @if (editingId() === entry.id) {
+            <button
+              type="button"
+              (click)="confirmEdit(entry)"
+              aria-label="Änderung bestätigen"
+              class="flex h-6 w-6 items-center justify-center text-deep-green">
+              <app-icon name="check" klass="h-4 w-4" />
+            </button>
+          } @else {
+            <button
+              type="button"
+              (click)="startEdit(entry)"
+              aria-label="Zutat bearbeiten"
+              class="flex h-6 w-6 items-center justify-center">
+              <img src="assets/img/Generate-Page/edit.svg" alt="" class="h-[14px] w-[13px]" />
+            </button>
+          }
+          <button
+            type="button"
+            (click)="remove.emit(entry.id)"
+            aria-label="Zutat entfernen"
+            class="flex h-6 w-6 items-center justify-center">
+            <img src="assets/img/Generate-Page/delete.svg" alt="" class="h-[15px] w-[13px]" />
+          </button>
+        </span>
+      </li>
+    }
+  </ul>
+} @else {
+  <p class="font-quicksand text-sm text-deep-green/60">Noch keine Zutaten hinzugefügt.</p>
+}

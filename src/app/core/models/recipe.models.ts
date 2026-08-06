@@ -61,3 +61,14 @@ export interface StoredRecipe extends GeneratedRecipe {
 
 /** Shape needed to render a recipe as a card, generated or stored. */
 export type CardRecipe = GeneratedRecipe & { helpers?: number };
+
+/** Unit a user can pick when entering an ingredient's quantity. */
+export type IngredientUnit = "piece" | "ml" | "gram";
+
+/** One ingredient collected in Step 1 of the generator wizard. */
+export interface IngredientEntry {
+  id: number;
+  name: string;
+  quantity: number;
+  unit: IngredientUnit;
+}
