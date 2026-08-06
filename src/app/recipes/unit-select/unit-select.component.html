@@ -1,4 +1,4 @@
-<div class="relative inline-block">
+<div class="inline-flex flex-col items-start">
   <button type="button" (click)="toggle()" [attr.aria-expanded]="open()" aria-haspopup="listbox" [class]="triggerClass()">
     {{ value }}
     <img
@@ -9,7 +9,7 @@
   </button>
 
   @if (open()) {
-    <ul role="listbox" class="absolute top-full left-0 z-20 mt-1 w-full overflow-hidden rounded-2xl bg-forest/30 py-1">
+    <ul role="listbox" class="mt-1 min-w-max overflow-hidden rounded-2xl py-1">
       @for (unit of units; track unit) {
         <li role="option" [attr.aria-selected]="unit === value">
           <button

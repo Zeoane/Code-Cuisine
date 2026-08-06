@@ -10,7 +10,7 @@
       class="font-quicksand text-center text-[36px] leading-tight font-semibold text-mid-green sm:text-[54px] sm:leading-[65px]">
       Generate recipe
     </h1>
-    <p class="font-quicksand text-center text-lg font-medium text-deep-green sm:text-2xl">
+    <p class="font-quicksand pb-12 text-center text-lg font-medium text-deep-green sm:text-2xl">
       Got random stuff in your kitchen? Pop it in—we've got the perfect recipe waiting.
     </p>
 
@@ -30,7 +30,7 @@
       type="button"
       (click)="handleNextStep()"
       [disabled]="ingredients().length === 0"
-      class="font-quicksand flex items-center gap-2.5 self-start rounded-md bg-forest px-[26px] py-4 text-base font-semibold text-white transition-colors hover:bg-[#2d4c2d] disabled:cursor-not-allowed disabled:opacity-50">
+      class="font-quicksand mt-[22px] flex items-center gap-2.5 self-end rounded-none bg-forest px-[26px] py-4 text-base font-semibold text-white transition-colors hover:bg-[#2d4c2d] disabled:cursor-not-allowed disabled:hover:bg-forest">
       Next step
     </button>
   </main>

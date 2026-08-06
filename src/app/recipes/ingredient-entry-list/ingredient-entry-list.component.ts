@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { IngredientEntry, IngredientUnit } from "../../core/models/recipe.models";
 import { IconComponent } from "../../shared/icon/icon.component";
+import { UnitSelectComponent } from "../unit-select/unit-select.component";
 
 /** Short display suffix appended directly after the quantity number. */
 const UNIT_SUFFIX: Record<IngredientUnit, string> = {
@@ -18,7 +19,7 @@ const UNIT_SUFFIX: Record<IngredientUnit, string> = {
 @Component({
   selector: "app-ingredient-entry-list",
   standalone: true,
-  imports: [FormsModule, IconComponent],
+  imports: [FormsModule, IconComponent, UnitSelectComponent],
   templateUrl: "./ingredient-entry-list.component.html",
 })
 export class IngredientEntryListComponent {
