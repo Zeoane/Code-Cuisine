@@ -1,6 +1,10 @@
 import { Routes } from "@angular/router";
+import { ingredientsGuard } from "./core/guards/ingredients.guard";
 
-/** Application route table. All pages are publicly reachable. */
+/**
+ * Application route table. All pages are publicly reachable; the wizard steps
+ * after the ingredient input additionally require at least one ingredient.
+ */
 export const routes: Routes = [
   {
     path: "",
@@ -13,15 +17,18 @@ export const routes: Routes = [
   },
   {
     path: "preferences",
+    canActivate: [ingredientsGuard],
     loadComponent: () =>
       import("./pages/preferences/preferences.component").then(m => m.PreferencesComponent),
   },
   {
     path: "loading",
+    canActivate: [ingredientsGuard],
     loadComponent: () => import("./pages/loading/loading.component").then(m => m.LoadingComponent),
   },
   {
     path: "results",
+    canActivate: [ingredientsGuard],
     loadComponent: () => import("./pages/results/results.component").then(m => m.ResultsComponent),
   },
   {

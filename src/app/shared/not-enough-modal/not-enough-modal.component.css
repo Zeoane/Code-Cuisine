@@ -1,0 +1,21 @@
+/* Figma interaction: "Move in", direction up, linear, 400ms. */
+.not-enough-card {
+  animation: move-in 400ms linear both;
+}
+
+@keyframes move-in {
+  from {
+    transform: translateY(64px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .not-enough-card {
+    animation: none;
+  }
+}

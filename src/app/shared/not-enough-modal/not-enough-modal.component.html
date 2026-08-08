@@ -1,0 +1,37 @@
+@if (open) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-[#0c2108]/40 p-4"
+    (click)="handleBackdropClick($event)"
+    role="presentation">
+    <div
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="not-enough-title"
+      class="not-enough-card relative flex w-full max-w-[562px] flex-col gap-4 rounded-[20px] bg-forest px-8 py-10 text-creme sm:px-[61px]">
+      <button
+        type="button"
+        (click)="closed.emit()"
+        aria-label="Hinweis schließen"
+        class="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-[6px] text-creme transition-colors hover:bg-creme/20">
+        <app-icon name="close" klass="h-5 w-5" />
+      </button>
+
+      <h2 id="not-enough-title" class="font-quicksand pr-8 text-[28px] leading-none font-semibold">
+        Ups! Not quite enough...
+      </h2>
+
+      <p class="font-quicksand text-xl leading-7 font-medium">
+        It looks like some ingredients aren't sufficient for your selected servings. Please add or
+        adjust quantities and try again.
+      </p>
+
+      <a
+        routerLink="/generator"
+        (click)="closed.emit()"
+        class="font-quicksand mt-6 flex w-fit items-center gap-2.5 text-xl font-medium underline-offset-4 transition-colors hover:underline">
+        Go back to ingredients
+        <span aria-hidden="true">&#8594;</span>
+      </a>
+    </div>
+  </div>
+}

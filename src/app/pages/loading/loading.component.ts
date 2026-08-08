@@ -1,8 +1,10 @@
-import { Component, OnDestroy, OnInit, inject } from "@angular/core";
+import { Component, OnDestroy, OnInit, inject, signal } from "@angular/core";
 import { Router } from "@angular/router";
+import { hasEnoughIngredients } from "../../core/services/ingredient-check";
 import { RecipeGeneratorService } from "../../core/services/recipe-generator.service";
 import { WizardStateService } from "../../core/services/wizard-state.service";
 import { LogoComponent } from "../../hero/logo/logo.component";
+import { NotEnoughModalComponent } from "../../shared/not-enough-modal/not-enough-modal.component";
 
 /** One illustration element that drops into the bowl, in animation order. */
 interface FallingItem {
@@ -44,7 +46,7 @@ const LOADER_DURATION_MS = 5200;
 @Component({
   selector: "app-loading",
   standalone: true,
-  imports: [LogoComponent],
+  imports: [LogoComponent, NotEnoughModalComponent],
   templateUrl: "./loading.component.html",
   styleUrl: "./loading.component.css",
 })
@@ -57,7 +59,17 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
   protected readonly items = FALLING_ITEMS;
 
+  /** Shows the "Ups! Not quite enough..." popup over the loader. */
+  protected readonly notEnough = signal(false);
+
   ngOnInit(): void {
+    const { servings } = this.wizard.preferences();
+
+    if (!hasEnoughIngredients(this.wizard.ingredients(), servings)) {
+      this.notEnough.set(true);
+      return;
+    }
+
     this.runGeneration();
     this.timer = setTimeout(() => this.router.navigate(["/results"]), LOADER_DURATION_MS);
   }
@@ -69,6 +81,12 @@ export class LoadingComponent implements OnInit, OnDestroy {
   /** Delay before an item starts falling, staggered in list order. */
   itemDelay(index: number): string {
     return `${0.45 + index * 0.5}s`;
+  }
+
+  /** Dismissing the popup returns to the ingredient step. */
+  closeNotEnough(): void {
+    this.notEnough.set(false);
+    this.router.navigate(["/generator"]);
   }
 
   /** Hides an illustration whose SVG has not been exported yet. */
