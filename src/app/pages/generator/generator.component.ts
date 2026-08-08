@@ -1,7 +1,7 @@
-import { Component, signal } from "@angular/core";
-import { RouterLink } from "@angular/router";
+import { Component, inject } from "@angular/core";
+import { Router, RouterLink } from "@angular/router";
 import { IngredientEntry } from "../../core/models/recipe.models";
-import { ToastService } from "../../core/services/toast.service";
+import { WizardStateService } from "../../core/services/wizard-state.service";
 import { LogoComponent } from "../../hero/logo/logo.component";
 import { IngredientEntryListComponent } from "../../recipes/ingredient-entry-list/ingredient-entry-list.component";
 import { IngredientQuantityFormComponent } from "../../recipes/ingredient-quantity-form/ingredient-quantity-form.component";
@@ -11,8 +11,9 @@ let nextId = 1;
 
 /**
  * Step 1 of the recipe generator wizard ("Generate recipe"): collect
- * ingredients with quantity and unit. Preferences and results follow as
- * their own steps once those designs are ready.
+ * ingredients with quantity and unit. Step 2 (Preferences) follows on
+ * /preferences; the entered ingredients live in WizardStateService so
+ * navigating between the steps keeps them.
  */
 @Component({
   selector: "app-generator",
@@ -21,9 +22,10 @@ let nextId = 1;
   templateUrl: "./generator.component.html",
 })
 export class GeneratorComponent {
-  protected readonly ingredients = signal<IngredientEntry[]>([]);
+  private readonly wizard = inject(WizardStateService);
+  private readonly router = inject(Router);
 
-  constructor(private readonly toast: ToastService) {}
+  protected readonly ingredients = this.wizard.ingredients;
 
   /** Adds a new ingredient to the top of the list (most recent first). */
   addIngredient(entry: Omit<IngredientEntry, "id">): void {
@@ -40,9 +42,9 @@ export class GeneratorComponent {
     this.ingredients.update(list => list.filter(entry => entry.id !== id));
   }
 
-  /** Proceeds to the next wizard step (Preferences), once it exists. */
+  /** Proceeds to step 2 of the wizard (Preferences). */
   handleNextStep(): void {
     if (this.ingredients().length === 0) return;
-    this.toast.info("Schritt 2 (Preferences) folgt als Nächstes.");
+    this.router.navigate(["/preferences"]);
   }
 }

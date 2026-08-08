@@ -1,0 +1,29 @@
+<div class="flex min-h-screen flex-col gap-12 bg-white pb-16">
+  <header class="px-4 pt-6 sm:px-[68px] sm:pt-10">
+    <a routerLink="/" aria-label="Code à Cuisine – Home" class="inline-block">
+      <app-logo variant="color" klass="h-10 w-auto sm:h-12" />
+    </a>
+  </header>
+
+  <main class="mx-auto flex w-full max-w-[1087px] flex-col gap-6 px-4">
+    <h1 class="font-quicksand text-[28px] leading-none font-semibold text-deep-green">The recipe results</h1>
+    <p class="font-quicksand text-base text-deep-green">
+      We took what you have and let our AI do the thinking. Here are
+      {{ recipes().length }} easy recipes you can make right now!
+    </p>
+
+    <ul class="flex flex-col gap-3">
+      @for (recipe of recipes(); track recipe.title) {
+        <li class="font-quicksand rounded-[20px] bg-forest/20 px-6 py-4 text-base text-deep-green">
+          {{ recipe.title }}
+        </li>
+      }
+    </ul>
+
+    <a
+      routerLink="/preferences"
+      class="font-quicksand w-fit bg-forest px-[26px] py-4 text-base font-semibold text-white transition-colors hover:bg-[#2d4c2d]">
+      Back to preferences
+    </a>
+  </main>
+</div>

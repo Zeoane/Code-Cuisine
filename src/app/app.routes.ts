@@ -12,6 +12,19 @@ export const routes: Routes = [
       import("./pages/generator/generator.component").then(m => m.GeneratorComponent),
   },
   {
+    path: "preferences",
+    loadComponent: () =>
+      import("./pages/preferences/preferences.component").then(m => m.PreferencesComponent),
+  },
+  {
+    path: "loading",
+    loadComponent: () => import("./pages/loading/loading.component").then(m => m.LoadingComponent),
+  },
+  {
+    path: "results",
+    loadComponent: () => import("./pages/results/results.component").then(m => m.ResultsComponent),
+  },
+  {
     path: "cookbook",
     loadComponent: () =>
       import("./pages/cookbook/cookbook.component").then(m => m.CookbookComponent),

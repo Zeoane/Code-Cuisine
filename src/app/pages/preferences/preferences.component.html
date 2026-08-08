@@ -1,0 +1,140 @@
+<div class="flex min-h-screen flex-col items-center gap-16 bg-white pb-16">
+  <header class="flex w-full flex-col gap-3 px-4 pt-6 sm:px-[68px] sm:pt-10">
+    <a routerLink="/" aria-label="Code à Cuisine – Home" class="w-fit">
+      <app-logo variant="color" klass="h-10 w-auto sm:h-12" />
+    </a>
+    <a
+      routerLink="/generator"
+      class="font-quicksand flex w-fit items-center gap-2.5 text-sm font-medium text-forest transition-colors hover:text-deep-green">
+      <app-icon name="arrow-left" klass="h-4 w-4" />
+      Ingredients
+    </a>
+  </header>
+
+  <main class="flex w-full max-w-[721px] flex-col gap-14 px-4 sm:px-0">
+    <h1 class="font-quicksand text-center text-[28px] leading-none font-semibold text-deep-green">
+      Choose your preferences
+    </h1>
+
+    <div class="flex flex-col gap-8 sm:flex-row sm:gap-[45px]">
+      <div class="flex flex-1 flex-col gap-4">
+        <span class="font-quicksand text-xl leading-5 font-medium text-deep-green">
+          How many portions you need?
+        </span>
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            (click)="stepServings(-1)"
+            [disabled]="preferences().servings <= 1"
+            aria-label="Portionen verringern"
+            class="flex h-5 w-5 items-center justify-center rounded-[3px] border border-deep-green text-deep-green transition-colors hover:bg-forest/20 disabled:opacity-40 disabled:hover:bg-transparent">
+            <app-icon name="minus" klass="h-3 w-3" />
+          </button>
+          <span
+            class="font-quicksand flex h-5 min-w-5 items-center justify-center rounded-[3px] bg-forest/20 px-1 text-base leading-none font-medium text-deep-green">
+            {{ preferences().servings }}
+          </span>
+          <span class="font-quicksand text-xl leading-5 font-medium text-deep-green">Portions</span>
+          <button
+            type="button"
+            (click)="stepServings(1)"
+            [disabled]="preferences().servings >= 12"
+            aria-label="Portionen erhöhen"
+            class="flex h-5 w-5 items-center justify-center rounded-[3px] border border-deep-green text-deep-green transition-colors hover:bg-forest/20 disabled:opacity-40 disabled:hover:bg-transparent">
+            <app-icon name="plus" klass="h-3 w-3" />
+          </button>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-4 sm:w-[263px]">
+        <span class="font-quicksand text-xl leading-5 font-medium text-deep-green">
+          How many are cooking?
+        </span>
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            (click)="stepHelpers(-1)"
+            [disabled]="preferences().helpers <= 1"
+            aria-label="Kochhelfer verringern"
+            class="flex h-5 w-5 items-center justify-center rounded-[3px] border border-deep-green text-deep-green transition-colors hover:bg-forest/20 disabled:opacity-40 disabled:hover:bg-transparent">
+            <app-icon name="minus" klass="h-3 w-3" />
+          </button>
+          <span
+            class="font-quicksand flex h-5 min-w-5 items-center justify-center rounded-[3px] bg-forest/20 px-1 text-base leading-none font-medium text-deep-green">
+            {{ preferences().helpers }}
+          </span>
+          <span class="font-quicksand text-xl leading-5 font-medium text-deep-green">Person</span>
+          <button
+            type="button"
+            (click)="stepHelpers(1)"
+            [disabled]="preferences().helpers >= 3"
+            aria-label="Kochhelfer erhöhen"
+            class="flex h-5 w-5 items-center justify-center rounded-[3px] border border-deep-green text-deep-green transition-colors hover:bg-forest/20 disabled:opacity-40 disabled:hover:bg-transparent">
+            <app-icon name="plus" klass="h-3 w-3" />
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <section class="flex flex-col gap-10 rounded-[20px] bg-forest/20 px-6 py-8">
+      <div class="flex flex-col gap-3">
+        <h2 class="font-quicksand flex items-center gap-2 text-2xl leading-none font-medium text-deep-green">
+          <img src="assets/img/Preferences-Page/clock.svg" alt="" class="h-6 w-6" />
+          Cooking time:
+        </h2>
+        <div class="flex flex-wrap items-start gap-2.5">
+          @for (option of timeOptions; track option.value) {
+            <div class="flex flex-col items-start gap-1">
+              <app-choice-chip
+                [selected]="preferences().timeCategory === option.value"
+                (click)="selectTime(option.value)">
+                {{ option.label }}
+              </app-choice-chip>
+              <span class="font-quicksand px-1 text-xs font-medium text-deep-green/70">{{ option.hint }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <h2 class="font-quicksand flex items-center gap-2 text-2xl leading-none font-medium text-deep-green">
+          <img src="assets/img/Preferences-Page/world.svg" alt="" class="h-6 w-6" />
+          Cuisine
+        </h2>
+        <div class="flex flex-wrap gap-2.5">
+          @for (option of cuisineOptions; track option.value) {
+            <app-choice-chip
+              [selected]="preferences().cuisineStyle === option.value"
+              (click)="selectCuisine(option.value)">
+              {{ option.label }}
+            </app-choice-chip>
+          }
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <h2 class="font-quicksand flex items-center gap-2 text-2xl leading-none font-medium text-deep-green">
+          <img src="assets/img/Preferences-Page/fork_spoon.svg" alt="" class="h-6 w-6" />
+          Diet preferences
+        </h2>
+        <div class="flex flex-wrap gap-2.5">
+          @for (option of dietOptions; track option.value) {
+            <app-choice-chip
+              [selected]="preferences().diet === option.value"
+              (click)="selectDiet(option.value)">
+              {{ option.label }}
+            </app-choice-chip>
+          }
+        </div>
+      </div>
+    </section>
+
+    <button
+      type="button"
+      (click)="generate()"
+      [disabled]="!canGenerate()"
+      class="font-quicksand self-center bg-forest px-[26px] py-4 text-base font-semibold text-white transition-colors hover:bg-[#2d4c2d] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-forest">
+      Generate a recipe
+    </button>
+  </main>
+</div>
