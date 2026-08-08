@@ -9,13 +9,13 @@
   </button>
 
   @if (open()) {
-    <ul role="listbox" class="mt-1 min-w-max overflow-hidden rounded-2xl py-1">
+    <ul role="listbox" class="mt-1 min-w-max overflow-hidden rounded-2xl px-1 py-1">
       @for (unit of units; track unit) {
         <li role="option" [attr.aria-selected]="unit === value">
           <button
             type="button"
             (click)="select(unit)"
-            class="block w-full px-3 py-1 text-left font-quicksand text-sm text-forest-dark hover:bg-forest/20">
+            class="font-quicksand block w-full rounded-[10px] px-3 py-1 text-left text-sm text-forest-dark transition-colors hover:bg-creme/80">
             {{ unit }}
           </button>
         </li>

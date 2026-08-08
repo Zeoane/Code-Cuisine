@@ -1,6 +1,6 @@
 <div class="flex flex-1 flex-col gap-6 sm:flex-row sm:items-start sm:gap-8">
   <div class="relative flex flex-1 flex-col gap-2">
-    <label for="ingredient-name" class="font-quicksand text-base font-medium text-deep-green"> Ingredient </label>
+    <label for="ingredient-name" class="font-quicksand text-xl font-medium text-deep-green"> Ingredient </label>
     <input
       id="ingredient-name"
       type="text"
@@ -14,13 +14,13 @@
       class="h-9 w-full rounded-[20px] bg-creme/80 px-4 font-quicksand text-base text-forest-dark focus:outline-none" />
 
     @if (showSuggestions()) {
-      <ul role="listbox" class="mt-1 w-full overflow-hidden rounded-2xl py-1">
+      <ul role="listbox" class="mt-1 w-full overflow-hidden rounded-2xl px-1 py-1">
         @for (item of suggestions(); track item) {
           <li role="option">
             <button
               type="button"
               (mousedown)="handleSuggestionMouseDown($event, item)"
-              class="block w-full px-4 py-1.5 text-left font-quicksand text-base text-forest-dark hover:bg-forest/20">
+              class="font-quicksand block w-full rounded-[10px] px-4 py-1.5 text-left text-base text-forest-dark transition-colors hover:bg-creme/80">
               {{ item }}
             </button>
           </li>
@@ -30,7 +30,7 @@
   </div>
 
   <div class="flex flex-col gap-2">
-    <span class="font-quicksand text-base font-medium text-deep-green">Serving size</span>
+    <span class="font-quicksand text-xl font-medium text-deep-green">Serving size</span>
     <div class="flex items-start gap-2.5">
       <input
         type="number"
