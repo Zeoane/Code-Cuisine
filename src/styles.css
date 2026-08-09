@@ -18,6 +18,17 @@ input[type="radio"]:not(:disabled) {
   cursor: pointer;
 }
 
+/* Quantities are typed in directly, so the native number spinners are hidden. */
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 /* Utility: hide scrollbars while keeping an element scrollable (swipe rows). */
 .scrollbar-none {
   scrollbar-width: none;
@@ -42,14 +53,8 @@ html::-webkit-scrollbar {
   display: none;
 }
 
-/* Mobile readability: base font size never below 16px (checklist rule). */
-@media (max-width: 767px) {
-  html {
-    font-size: 16px;
-  }
-  .text-xs,
-  .text-sm {
-    font-size: 1rem;
-    line-height: 1.5rem;
-  }
+/* Readability: base font size never below 16px on any breakpoint (checklist
+   rule). The theme maps text-xs/text-sm to 1rem as well, see tailwind.config.js. */
+html {
+  font-size: 16px;
 }

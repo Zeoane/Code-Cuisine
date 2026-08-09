@@ -4,6 +4,13 @@ module.exports = {
   content: ["./src/**/*.{html,ts}"],
   theme: {
     extend: {
+      // Safety net for the "never below 16px" rule: the two small steps of the
+      // default scale (12px/14px) are raised to 16px, so no utility can fall
+      // below the minimum on any breakpoint.
+      fontSize: {
+        xs: ["1rem", "1.5rem"],
+        sm: ["1rem", "1.5rem"],
+      },
       fontFamily: {
         ubuntu: ["Ubuntu", "ui-sans-serif", "system-ui", "sans-serif"],
         quicksand: ["Quicksand", "ui-sans-serif", "system-ui", "sans-serif"],

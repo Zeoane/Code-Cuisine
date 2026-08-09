@@ -5,8 +5,8 @@ const UNITS: IngredientUnit[] = ["gram", "piece", "ml"];
 
 /** Trigger button sizing per context (main form vs. inline row editing). */
 const TRIGGER_SIZE_CLASSES: Record<"md" | "sm", string> = {
-  md: "h-9 pl-[15px] pr-2.5 text-sm",
-  sm: "h-7 pl-2 pr-2 text-sm",
+  md: "h-9 pl-[15px] pr-2.5 text-base",
+  sm: "h-7 pl-2 pr-2 text-base",
 };
 
 /**

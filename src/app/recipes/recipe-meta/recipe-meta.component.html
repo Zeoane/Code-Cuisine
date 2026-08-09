@@ -1,22 +1,22 @@
 <div class="flex flex-wrap items-center gap-2">
   <span
-    class="font-quicksand inline-flex items-center rounded-md px-2.5 py-1 text-sm font-medium {{ difficultyClass() }}">
+    class="font-quicksand inline-flex items-center rounded-md px-2.5 py-1 text-base font-medium {{ difficultyClass() }}">
     <app-icon name="chef-hat" klass="mr-1 h-3.5 w-3.5" />
     {{ difficultyLabels[difficulty] }}
   </span>
   <span
-    class="font-quicksand inline-flex items-center rounded-md border border-forest/25 px-2.5 py-1 text-sm text-forest">
+    class="font-quicksand inline-flex items-center rounded-md border border-forest/25 px-2.5 py-1 text-base text-forest">
     <app-icon name="clock" klass="mr-1 h-3.5 w-3.5" />
     {{ cookingTimeMinutes }} Min.
   </span>
   <span
-    class="font-quicksand inline-flex items-center rounded-md border border-forest/25 px-2.5 py-1 text-sm text-forest">
+    class="font-quicksand inline-flex items-center rounded-md border border-forest/25 px-2.5 py-1 text-base text-forest">
     <app-icon name="users" klass="mr-1 h-3.5 w-3.5" />
     {{ servings }} Portionen
   </span>
   @if (cuisineStyle) {
     <span
-      class="font-quicksand inline-flex items-center rounded-md border border-forest/25 px-2.5 py-1 text-sm text-forest">
+      class="font-quicksand inline-flex items-center rounded-md border border-forest/25 px-2.5 py-1 text-base text-forest">
       <app-icon name="utensils-crossed" klass="mr-1 h-3.5 w-3.5" />
       {{ cuisineLabels[cuisineStyle] }}
     </span>

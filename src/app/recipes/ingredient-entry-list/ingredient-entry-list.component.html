@@ -14,7 +14,7 @@
             min="0"
             [(ngModel)]="editQuantity"
             aria-label="Menge bearbeiten"
-            class="h-7 w-14 rounded-full bg-creme px-1 text-center text-sm text-forest-dark focus-visible:outline-none" />
+            class="h-7 w-14 rounded-full bg-creme px-1 text-center text-base text-forest-dark focus-visible:outline-none" />
           <app-unit-select [value]="editUnit" (valueChange)="editUnit = $event" size="sm" />
         } @else {
           <span class="font-medium">{{ entry.quantity }}{{ unitSuffix(entry.unit) }}</span>

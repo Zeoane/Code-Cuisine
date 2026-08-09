@@ -22,7 +22,7 @@
       </ul>
       @if (recipe.missingIngredients.length) {
         <p
-          class="font-quicksand mt-2 flex flex-wrap items-center gap-1.5 rounded-md bg-[#fdf3d7] p-2 text-sm text-[#a07400]">
+          class="font-quicksand mt-2 flex flex-wrap items-center gap-1.5 rounded-md bg-[#fdf3d7] p-2 text-base text-[#a07400]">
           <app-icon name="shopping-basket" klass="h-4 w-4 shrink-0" />
           <span class="font-semibold">Noch besorgen:</span> {{ recipe.missingIngredients.join(", ") }}
         </p>
