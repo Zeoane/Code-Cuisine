@@ -1,35 +1,15 @@
 import { Component, computed, inject } from "@angular/core";
 import { Router, RouterLink } from "@angular/router";
+import {
+  CUISINE_OPTIONS,
+  DIET_OPTIONS,
+  TIME_OPTIONS,
+} from "../../core/data/preference-options";
 import { CuisineStyle, DietPreference, TimeCategory } from "../../core/models/recipe.models";
 import { WizardStateService } from "../../core/services/wizard-state.service";
 import { LogoComponent } from "../../hero/logo/logo.component";
 import { ChoiceChipComponent } from "../../recipes/choice-chip/choice-chip.component";
 import { IconComponent } from "../../shared/icon/icon.component";
-
-/** Cooking time options with their English label and duration hint. */
-const TIME_OPTIONS: { value: TimeCategory; label: string; hint: string }[] = [
-  { value: "quick", label: "Quick", hint: "up to 20min" },
-  { value: "medium", label: "Medium", hint: "25-40min" },
-  { value: "elaborate", label: "Complex", hint: "over 45min" },
-];
-
-/** Cuisine options in the order used by the Figma design. */
-const CUISINE_OPTIONS: { value: CuisineStyle; label: string }[] = [
-  { value: "german", label: "German" },
-  { value: "italian", label: "Italian" },
-  { value: "indian", label: "Indian" },
-  { value: "japanese", label: "Japanese" },
-  { value: "gourmet", label: "Gourmet" },
-  { value: "fusion", label: "Fusion" },
-];
-
-/** Diet options in the order used by the Figma design. */
-const DIET_OPTIONS: { value: DietPreference; label: string }[] = [
-  { value: "vegetarian", label: "Vegetarian" },
-  { value: "vegan", label: "Vegan" },
-  { value: "keto", label: "Keto" },
-  { value: "none", label: "No preferences" },
-];
 
 /**
  * Step 2 of the recipe generator wizard ("Choose your preferences"):

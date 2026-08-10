@@ -20,6 +20,7 @@ module.exports = {
         creme: "#faf0e6",
         peach: "#ffd9b3",
         sage: "#c4d0c4",
+        mist: "#dbe0db",
         beige: "#f5f5dc",
         leaf: "#008000",
         "forest-dark": "#2c452c",

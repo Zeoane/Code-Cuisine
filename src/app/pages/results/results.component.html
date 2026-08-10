@@ -1,29 +1,82 @@
-<div class="flex min-h-screen flex-col gap-12 bg-white pb-16">
-  <header class="px-4 pt-6 sm:px-[68px] sm:pt-10">
-    <a routerLink="/" aria-label="Code à Cuisine – Home" class="inline-block">
-      <app-logo variant="color" klass="h-10 w-auto sm:h-12" />
-    </a>
+<div class="flex min-h-screen flex-col gap-16 bg-forest pb-16">
+  <header class="px-4 pt-6 sm:px-8 sm:pt-10 xl:px-20">
+    <app-logo klass="h-10 w-auto sm:h-12" />
   </header>
 
-  <main class="mx-auto flex w-full max-w-[1087px] flex-col gap-6 px-4">
-    <h1 class="font-quicksand text-[28px] leading-none font-semibold text-deep-green">The recipe results</h1>
-    <p class="font-quicksand text-base text-deep-green">
-      We took what you have and let our AI do the thinking. Here are
-      {{ recipes().length }} easy recipes you can make right now!
-    </p>
+  <main class="mx-auto flex w-full max-w-[1281px] flex-col gap-16 px-4 sm:px-8 xl:px-0">
+    <section class="flex flex-col items-start gap-8 lg:flex-row lg:items-center lg:justify-between">
+      <div class="flex max-w-[610px] flex-col gap-4">
+        <h1 class="font-quicksand text-[36px] leading-tight font-semibold text-creme sm:text-[54px] sm:leading-[65px]">
+          The recipe results
+        </h1>
+        <p class="font-quicksand text-xl leading-7 font-medium text-creme">
+          We took what you have and let our AI do the thinking. Here are {{ recipes().length }} easy
+          recipes you can make right now!
+        </p>
+        @if (tags().length > 0) {
+          <ul class="flex flex-wrap gap-2.5">
+            @for (tag of tags(); track tag) {
+              <li
+                class="font-quicksand flex h-8 items-center rounded-[30px] bg-creme px-3 text-base leading-none font-medium text-forest">
+                {{ tag }}
+              </li>
+            }
+          </ul>
+        }
+      </div>
 
-    <ul class="flex flex-col gap-3">
-      @for (recipe of recipes(); track recipe.title) {
-        <li class="font-quicksand rounded-[20px] bg-forest/20 px-6 py-4 text-base text-deep-green">
-          {{ recipe.title }}
+      <img
+        src="assets/img/Results-Page/ai-serving-bell.webp"
+        alt="Roboterhand serviert eine Cloche"
+        width="574"
+        height="222"
+        loading="lazy"
+        decoding="async"
+        class="w-full max-w-[574px] rounded-[20px] object-cover" />
+    </section>
+
+    <ul class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+      @for (recipe of recipes(); track recipe.title; let i = $index) {
+        <li class="flex min-h-[338px] flex-col justify-between rounded-[20px] bg-mist px-6 py-8">
+          <div class="flex flex-col gap-3">
+            <div class="flex items-center gap-2.5">
+              <img
+                src="assets/img/Results-Page/serving-bell.webp"
+                alt=""
+                width="40"
+                height="28"
+                class="h-7 w-10" />
+              <span class="font-quicksand text-xl leading-5 font-medium text-forest">
+                Recipe {{ i + 1 }}
+              </span>
+            </div>
+
+            <h2 class="font-quicksand text-[28px] leading-[34px] font-semibold text-deep-green">
+              {{ recipe.title }}
+            </h2>
+
+            <p class="font-quicksand flex items-center gap-2 text-base font-medium text-deep-green">
+              <img src="assets/img/Preferences-Page/clock.svg" alt="" class="h-4 w-4" />
+              Cooking time: {{ recipe.cookingTimeMinutes }}min
+            </p>
+          </div>
+
+          <button
+            type="button"
+            (click)="openRecipe(recipe.title)"
+            class="font-quicksand mt-12 w-fit bg-creme px-[26px] py-4 text-xl leading-5 font-medium text-forest transition-colors hover:bg-peach">
+            View
+          </button>
         </li>
       }
     </ul>
 
-    <a
-      routerLink="/preferences"
-      class="font-quicksand w-fit bg-forest px-[26px] py-4 text-base font-semibold text-white transition-colors hover:bg-[#2d4c2d]">
-      Back to preferences
-    </a>
+    <button
+      type="button"
+      (click)="generateNew()"
+      class="font-quicksand flex items-center gap-2.5 self-end text-xl leading-5 font-medium text-creme underline-offset-4 transition-colors hover:underline">
+      Generate new recipe
+      <span aria-hidden="true">&#8594;</span>
+    </button>
   </main>
 </div>
