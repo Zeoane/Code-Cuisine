@@ -1,32 +1,106 @@
-<div class="flex min-h-screen flex-col overflow-x-hidden bg-creme">
-  <app-site-header />
-  <main class="mx-auto w-full max-w-[1100px] flex-1 px-4 py-10 sm:px-8 sm:py-12">
-    <div class="mb-2 flex items-center gap-3">
-      <app-icon name="book-open" klass="h-8 w-8 text-forest" />
-      <h1 class="font-ubuntu text-3xl font-bold text-forest-dark sm:text-4xl">Mein Kochbuch</h1>
-    </div>
-    <p class="font-quicksand mb-8 text-base text-forest/70">
-      Rezepte werden aktuell in diesem Browser gespeichert. Ein Konto-Sync über Firebase folgt.
-    </p>
+<div class="flex min-h-screen flex-col gap-16 bg-white pb-16">
+  <header class="flex w-full flex-col gap-9 px-4 pt-6 sm:px-[68px] sm:pt-10">
+    <a routerLink="/" aria-label="Code à Cuisine – Home" class="w-fit">
+      <app-logo variant="color" klass="h-10 w-auto sm:h-12" />
+    </a>
+    <button
+      type="button"
+      (click)="goBack()"
+      class="font-quicksand flex w-fit items-center gap-2.5 text-base font-medium text-forest transition-colors hover:text-deep-green"
+    >
+      <img src="assets/img/arrow-back.svg" alt="" class="h-[14px] w-5" />
+      Back
+    </button>
+  </header>
 
-    @if (recipes().length > 0) {
-      <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-        @for (recipe of recipes(); track recipe.id) {
-          <app-recipe-card [recipe]="recipe" [showDelete]="true" (delete)="handleRemove(recipe.id)" />
-        }
-      </div>
-    } @else {
-      <section
-        class="font-quicksand flex flex-col items-start gap-4 rounded-lg border border-dashed border-forest/30 p-6 text-forest sm:p-8">
-        <p class="text-lg">
-          Dein Kochbuch ist noch leer. Generiere Rezepte aus deinen Zutaten und speichere deine Favoriten hier.
+  <main class="mx-auto flex w-full max-w-[1466px] flex-col gap-10 px-4 sm:px-[68px]">
+    <section class="flex flex-col gap-8 rounded-[20px] bg-mist/40 p-6 sm:p-8 xl:flex-row xl:gap-6">
+      <div class="flex flex-col gap-4 xl:w-[454px] xl:shrink-0">
+        <h1
+          class="font-quicksand text-[40px] leading-none font-bold text-mid-green sm:text-[64px] sm:leading-[65px]"
+        >
+          Cookbook
+        </h1>
+        <p class="font-quicksand text-2xl leading-8 font-medium text-deep-green">
+          From quick bites to gourmet delights, explore them all in our ultimate cookbook and get
+          inspired for your next culinary adventure.
         </p>
-        <a
-          routerLink="/generator"
-          class="font-quicksand flex min-h-11 items-center rounded-md bg-leaf px-4 text-white hover:bg-[#006a00]">
-          Zum Rezept-Generator
-        </a>
-      </section>
-    }
+      </div>
+
+      <div class="flex min-w-0 flex-1 flex-col gap-4 xl:pt-[35px]">
+        <h2
+          class="font-quicksand flex items-center gap-2 text-2xl leading-none font-semibold text-mid-green"
+        >
+          Most liked recipes
+          <app-heart-icon klass="h-[26px] w-[29px]" />
+        </h2>
+
+        <ul class="scrollbar-none flex gap-3 overflow-x-auto pr-5" tabindex="0">
+          @for (recipe of mostLiked(); track recipe.title) {
+            <li
+              class="flex w-[276px] shrink-0 flex-col justify-between gap-3 rounded-2xl bg-mist p-4"
+            >
+              <div class="flex items-start justify-between gap-2">
+                <span
+                  class="font-quicksand flex items-center gap-1.5 text-base leading-5 font-medium text-deep-green"
+                >
+                  <img src="assets/img/OneRecipe-Page/schedule.svg" alt="" class="h-5 w-5" />
+                  Cooking time: {{ recipe.cookingTimeMinutes }}min
+                </span>
+                <span
+                  class="font-quicksand flex h-7 shrink-0 items-center gap-1 rounded-[30px] bg-sage px-2 text-base leading-none font-medium text-deep-green"
+                >
+                  <app-heart-icon klass="h-3.5 w-4" />
+                  <span class="sr-only">Herzen:</span>
+                  {{ recipe.likes }}
+                </span>
+              </div>
+
+              <p class="font-quicksand text-xl leading-6 font-medium text-mid-green">
+                {{ recipe.title }}
+              </p>
+            </li>
+          }
+        </ul>
+      </div>
+    </section>
+
+    <section
+      class="grid gap-x-[65px] gap-y-[52px] sm:grid-cols-2 xl:grid-cols-3"
+      aria-label="Küchen-Kategorien"
+    >
+      @for (cuisine of cuisines; track cuisine.value) {
+        <button
+          type="button"
+          (click)="openCuisine(cuisine)"
+          class="group flex w-full flex-col gap-2 text-left"
+        >
+          <h2
+            class="font-quicksand flex items-center gap-2 text-[28px] leading-none font-semibold text-mid-green"
+          >
+            {{ cuisine.label }}
+            <span class="text-[28px] leading-none" aria-hidden="true">{{ cuisine.emoji }}</span>
+          </h2>
+          <div class="relative w-full overflow-hidden bg-mist pt-[100%]">
+            <img
+              [src]="'assets/img/Cookbook/' + cuisine.image"
+              alt=""
+              loading="lazy"
+              decoding="async"
+              class="absolute inset-0 !h-full !w-full !max-w-none object-cover transition-transform duration-300 ease-out group-hover:scale-105"
+            />
+          </div>
+        </button>
+      }
+    </section>
+
+    <button
+      type="button"
+      (click)="generateNew()"
+      class="font-quicksand flex items-center gap-2.5 self-end text-xl leading-5 font-medium text-forest transition-colors"
+    >
+      Generate new recipe
+      <span aria-hidden="true">&#8594;</span>
+    </button>
   </main>
 </div>

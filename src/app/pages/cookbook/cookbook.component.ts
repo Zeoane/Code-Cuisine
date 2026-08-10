@@ -1,37 +1,76 @@
-import { Component, signal } from "@angular/core";
-import { RouterLink } from "@angular/router";
+import { Location } from "@angular/common";
+import { Component, computed, inject, signal } from "@angular/core";
+import { Router, RouterLink } from "@angular/router";
+import { CUISINE_CATEGORIES, CuisineCategory } from "../../core/data/cuisine-categories";
 import { StoredRecipe } from "../../core/models/recipe.models";
 import { CookbookService } from "../../core/services/cookbook.service";
 import { ToastService } from "../../core/services/toast.service";
-import { SiteHeaderComponent } from "../../layout/site-header/site-header.component";
-import { RecipeCardComponent } from "../../recipes/recipe-card/recipe-card.component";
+import { LogoComponent } from "../../hero/logo/logo.component";
+import { HeartIconComponent } from "../../shared/heart-icon/heart-icon.component";
 import { IconComponent } from "../../shared/icon/icon.component";
 
+/** One entry of the horizontally scrolling "Most liked recipes" row. */
+export interface LikedRecipe {
+  title: string;
+  cookingTimeMinutes: number;
+  likes: number;
+}
+
 /**
- * Personal cookbook page: lists saved recipes with removal support.
- * Stored in this browser only for now; Firebase sync (with login)
- * follows once it is wired in.
+ * Placeholder entries so the row matches the design while the cookbook is
+ * still empty. Replaced by real like counts once Firebase is wired in.
+ */
+const DEMO_LIKED: LikedRecipe[] = [
+  { title: "Pasta with spinach and cherry tomatoes", cookingTimeMinutes: 20, likes: 66 },
+  { title: "Low Carb Vegan No-Bake Paleo Bars", cookingTimeMinutes: 35, likes: 57 },
+  { title: "Schnitzel with potato salad", cookingTimeMinutes: 45, likes: 51 },
+  { title: "Creamy garlic shrimp pasta", cookingTimeMinutes: 22, likes: 44 },
+  { title: "Pasta alla Trapanese", cookingTimeMinutes: 20, likes: 38 },
+];
+
+/**
+ * Personal cookbook page. This step covers the intro panel and the
+ * horizontally scrolling "Most liked recipes" row; the cuisine sections
+ * follow next.
  */
 @Component({
   selector: "app-cookbook",
   standalone: true,
-  imports: [RouterLink, SiteHeaderComponent, RecipeCardComponent, IconComponent],
+  imports: [RouterLink, LogoComponent, IconComponent, HeartIconComponent],
   templateUrl: "./cookbook.component.html",
 })
 export class CookbookComponent {
-  protected readonly recipes = signal<StoredRecipe[]>([]);
+  private readonly cookbook = inject(CookbookService);
+  private readonly location = inject(Location);
+  private readonly toast = inject(ToastService);
+  private readonly router = inject(Router);
 
-  constructor(
-    private readonly cookbook: CookbookService,
-    private readonly toast: ToastService,
-  ) {
-    this.recipes.set(this.cookbook.list());
+  protected readonly recipes = signal<StoredRecipe[]>(this.cookbook.list());
+  protected readonly cuisines = CUISINE_CATEGORIES;
+
+  /** Saved recipes for the liked row, falling back to the design's demo set. */
+  protected readonly mostLiked = computed<LikedRecipe[]>(() => {
+    const saved = this.recipes();
+    if (saved.length === 0) return DEMO_LIKED;
+    return saved.map(recipe => ({
+      title: recipe.title,
+      cookingTimeMinutes: recipe.cookingTimeMinutes,
+      likes: 0,
+    }));
+  });
+
+  /** Opens the recipe list of a cuisine (that screen follows next). */
+  openCuisine(cuisine: CuisineCategory): void {
+    this.toast.info(`${cuisine.label} – die Rezeptliste folgt als Nächstes.`);
   }
 
-  /** Removes a saved recipe from the cookbook. */
-  handleRemove(id: number): void {
-    this.cookbook.remove(id);
-    this.recipes.set(this.cookbook.list());
-    this.toast.success("Rezept entfernt.");
+  /** Starts a new run at the ingredient step. */
+  generateNew(): void {
+    this.router.navigate(["/generator"]);
+  }
+
+  /** Returns to wherever the user came from. */
+  goBack(): void {
+    this.location.back();
   }
 }

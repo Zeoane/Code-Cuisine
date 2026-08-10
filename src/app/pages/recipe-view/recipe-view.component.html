@@ -1,5 +1,5 @@
-<div class="flex min-h-screen flex-col gap-16 bg-white pb-16">
-  <header class="flex w-full flex-col gap-3 px-4 pt-6 sm:px-[68px] sm:pt-10">
+<div class="flex min-h-screen flex-col gap-32 bg-white pb-16">
+  <header class="flex w-full flex-col gap-9 px-4 pt-6 sm:px-[68px] sm:pt-10">
     <a routerLink="/" aria-label="Code à Cuisine – Home" class="w-fit">
       <app-logo variant="color" klass="h-10 w-auto sm:h-12" />
     </a>
@@ -8,7 +8,7 @@
       (click)="goBack()"
       class="font-quicksand flex w-fit items-center gap-2.5 text-base font-medium text-forest transition-colors hover:text-deep-green"
     >
-      <app-icon name="arrow-left" klass="h-4 w-4" />
+      <img src="assets/img/arrow-back.svg" alt="" class="h-[14px] w-5" />
       {{ fromCookbook ? "Cookbook" : "Recipe results" }}
     </button>
   </header>
@@ -223,7 +223,7 @@
       <button
         type="button"
         (click)="generateNew()"
-        class="font-quicksand flex items-center gap-2.5 self-end text-xl leading-5 font-medium text-forest underline-offset-4 transition-colors hover:underline"
+        class="font-quicksand flex items-center gap-2.5 self-end text-xl leading-5 font-medium text-forest transition-colors"
       >
         Generate new recipe
         <span aria-hidden="true">&#8594;</span>
