@@ -32,6 +32,12 @@ export const routes: Routes = [
     loadComponent: () => import("./pages/results/results.component").then(m => m.ResultsComponent),
   },
   {
+    path: "recipe/:index",
+    canActivate: [ingredientsGuard],
+    loadComponent: () =>
+      import("./pages/recipe-view/recipe-view.component").then(m => m.RecipeViewComponent),
+  },
+  {
     path: "cookbook",
     loadComponent: () =>
       import("./pages/cookbook/cookbook.component").then(m => m.CookbookComponent),

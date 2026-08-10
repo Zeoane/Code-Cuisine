@@ -9,7 +9,7 @@
         <h1 class="font-quicksand text-[36px] leading-tight font-semibold text-creme sm:text-[54px] sm:leading-[65px]">
           The recipe results
         </h1>
-        <p class="font-quicksand text-xl leading-7 font-medium text-creme">
+        <p class="font-quicksand text-2xl leading-8 font-medium text-creme">
           We took what you have and let our AI do the thinking. Here are {{ recipes().length }} easy
           recipes you can make right now!
         </p>
@@ -46,25 +46,26 @@
                 width="40"
                 height="28"
                 class="h-7 w-10" />
-              <span class="font-quicksand text-xl leading-5 font-medium text-forest">
+              <span class="font-quicksand text-base leading-5 font-medium text-forest">
                 Recipe {{ i + 1 }}
               </span>
             </div>
 
-            <h2 class="font-quicksand text-[28px] leading-[34px] font-semibold text-deep-green">
+            <h2
+              class="font-quicksand text-[28px] leading-[34px] font-semibold text-deep-green sm:text-[32px] sm:leading-[38px]">
               {{ recipe.title }}
             </h2>
 
-            <p class="font-quicksand flex items-center gap-2 text-base font-medium text-deep-green">
-              <img src="assets/img/Preferences-Page/clock.svg" alt="" class="h-4 w-4" />
+            <p class="font-quicksand flex items-center gap-2 text-xl font-medium text-deep-green">
+              <img src="assets/img/Preferences-Page/clock.svg" alt="" class="h-6 w-6" />
               Cooking time: {{ recipe.cookingTimeMinutes }}min
             </p>
           </div>
 
           <button
             type="button"
-            (click)="openRecipe(recipe.title)"
-            class="font-quicksand mt-12 w-fit bg-creme px-[26px] py-4 text-xl leading-5 font-medium text-forest transition-colors hover:bg-peach">
+            (click)="openRecipe(i)"
+            class="font-quicksand mt-12 w-fit bg-creme px-[26px] py-4 text-2xl leading-7 font-semibold text-forest transition-colors hover:bg-peach">
             View
           </button>
         </li>

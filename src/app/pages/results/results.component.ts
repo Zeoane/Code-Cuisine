@@ -1,7 +1,6 @@
 import { Component, computed, inject } from "@angular/core";
 import { Router } from "@angular/router";
 import { cuisineLabel, timeLabel } from "../../core/data/preference-options";
-import { ToastService } from "../../core/services/toast.service";
 import { WizardStateService } from "../../core/services/wizard-state.service";
 import { LogoComponent } from "../../hero/logo/logo.component";
 
@@ -17,7 +16,6 @@ import { LogoComponent } from "../../hero/logo/logo.component";
 })
 export class ResultsComponent {
   private readonly wizard = inject(WizardStateService);
-  private readonly toast = inject(ToastService);
   private readonly router = inject(Router);
 
   protected readonly recipes = this.wizard.results;
@@ -30,9 +28,9 @@ export class ResultsComponent {
     );
   });
 
-  /** Opens the single recipe view (follows once that screen is designed). */
-  openRecipe(title: string): void {
-    this.toast.info(`"${title}" – die Einzelansicht folgt als Nächstes.`);
+  /** Opens the single recipe view for the card at the given position. */
+  openRecipe(index: number): void {
+    this.router.navigate(["/recipe", index]);
   }
 
   /** Starts over at the ingredient step, keeping what was entered. */

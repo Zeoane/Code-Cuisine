@@ -1,0 +1,246 @@
+<div class="flex min-h-screen flex-col gap-16 bg-white pb-16">
+  <header class="flex w-full flex-col gap-3 px-4 pt-6 sm:px-[68px] sm:pt-10">
+    <a routerLink="/" aria-label="Code à Cuisine – Home" class="w-fit">
+      <app-logo variant="color" klass="h-10 w-auto sm:h-12" />
+    </a>
+    <button
+      type="button"
+      (click)="goBack()"
+      class="font-quicksand flex w-fit items-center gap-2.5 text-base font-medium text-forest transition-colors hover:text-deep-green"
+    >
+      <app-icon name="arrow-left" klass="h-4 w-4" />
+      {{ fromCookbook ? "Cookbook" : "Recipe results" }}
+    </button>
+  </header>
+
+  @if (recipe(); as recipe) {
+    <main class="mx-auto flex w-full max-w-[1248px] flex-col gap-8 px-4 xl:px-0">
+      <article
+        class="flex flex-col gap-12 rounded-[20px] border-4 border-creme bg-creme/30 px-6 py-8 sm:px-12 sm:py-10"
+      >
+        <!-- Name + nutritions -->
+        <section
+          class="flex flex-col gap-6 rounded-[20px] bg-creme p-6 lg:flex-row lg:items-start lg:justify-between"
+        >
+          <div class="flex flex-col gap-2">
+            <p
+              class="font-quicksand flex items-center gap-2 text-xl leading-5 font-medium text-forest"
+            >
+              <img src="assets/img/OneRecipe-Page/schedule.svg" alt="" class="h-6 w-6" />
+              Cooking time: {{ recipe.cookingTimeMinutes }}min
+            </p>
+
+            <h1
+              class="font-quicksand text-[36px] leading-tight font-semibold text-mid-green sm:text-[54px] sm:leading-[65px]"
+            >
+              {{ recipe.title }}
+            </h1>
+
+            <div class="flex flex-wrap items-center gap-2.5">
+              <span class="font-quicksand text-xl leading-5 font-medium text-forest">
+                Cooking person: {{ preferences().helpers }}
+              </span>
+              @for (cook of cooks(); track cook) {
+                <img [src]="cookLabel(cook)" [alt]="'Chef ' + cook" class="h-[27px] w-[91px]" />
+              }
+            </div>
+          </div>
+
+          <div class="flex flex-col lg:items-start">
+            <ul class="flex flex-wrap items-center gap-2.5">
+              @for (tag of tags(); track tag) {
+                <li
+                  class="font-quicksand flex h-8 items-center rounded-[30px] bg-mist px-3 py-1.5 text-lg leading-none font-medium text-deep-green"
+                >
+                  {{ tag }}
+                </li>
+              }
+              <li
+                class="font-quicksand flex h-8 items-center gap-1 rounded-[30px] bg-mist px-3 py-1.5 text-lg leading-none font-medium text-deep-green"
+              >
+                <app-heart-icon [filled]="liked()" klass="h-4 w-[18px]" />
+                <span class="sr-only">Herzen:</span>
+                {{ likes() }}
+              </li>
+            </ul>
+
+            <p class="font-quicksand mt-3 mb-1 text-lg leading-none font-medium text-deep-green">
+              Nutritional information
+            </p>
+
+            @if (recipe.nutrition; as nutrition) {
+              <dl class="grid grid-cols-[82px_77px_38px_62px] gap-x-6 gap-y-2 text-center">
+                <dt
+                  class="font-quicksand flex h-7 items-center justify-center text-[22px] leading-none font-bold text-deep-green"
+                >
+                  Energie
+                </dt>
+                <dt
+                  class="font-quicksand flex h-7 items-center justify-center text-[22px] leading-none font-bold text-deep-green"
+                >
+                  Protein
+                </dt>
+                <dt
+                  class="font-quicksand flex h-7 items-center justify-center text-[22px] leading-none font-bold text-deep-green"
+                >
+                  Fat
+                </dt>
+                <dt
+                  class="font-quicksand flex h-7 items-center justify-center text-[22px] leading-none font-bold text-deep-green"
+                >
+                  Carbs
+                </dt>
+                <dd class="font-quicksand text-xl leading-7 font-medium text-deep-green">
+                  {{ nutrition.caloriesPerServing }} kcal
+                </dd>
+                <dd class="font-quicksand text-xl leading-7 font-medium text-deep-green">
+                  {{ nutrition.proteinGrams }}g
+                </dd>
+                <dd class="font-quicksand text-xl leading-7 font-medium text-deep-green">
+                  {{ nutrition.fatGrams }}g
+                </dd>
+                <dd class="font-quicksand text-xl leading-7 font-medium text-deep-green">
+                  {{ nutrition.carbsGrams }}g
+                </dd>
+              </dl>
+            }
+          </div>
+        </section>
+
+        <!-- Ingredients -->
+        <section class="flex flex-col gap-6">
+          <div class="relative">
+            <img src="assets/img/OneRecipe-Page/hero-ingredients.webp" alt="" class="w-full" />
+            <h2
+              class="font-quicksand absolute inset-0 flex items-center justify-center text-2xl font-medium text-mid-green"
+            >
+              Ingredients
+            </h2>
+          </div>
+
+          <div class="grid gap-8 px-4 sm:grid-cols-2 sm:px-12">
+            <div class="flex flex-col gap-4">
+              <h3 class="font-quicksand text-xl leading-5 font-semibold text-leaf">
+                Your ingredients
+              </h3>
+              <ul class="flex flex-col gap-2">
+                @for (entry of ownIngredients(); track entry.id) {
+                  <li
+                    class="font-quicksand flex gap-4 text-xl leading-5 font-medium text-deep-green"
+                  >
+                    <span aria-hidden="true">&bull;</span>
+                    <span class="w-20">{{ formatAmount(entry) }}</span>
+                    <span>{{ entry.name }}</span>
+                  </li>
+                }
+              </ul>
+            </div>
+
+            <div class="flex flex-col gap-4">
+              <h3 class="font-quicksand text-xl leading-5 font-semibold text-leaf">
+                Extra ingredients
+              </h3>
+              <ul class="flex flex-col gap-2">
+                @for (extra of recipe.missingIngredients; track extra) {
+                  <li
+                    class="font-quicksand flex gap-4 text-xl leading-5 font-medium text-deep-green"
+                  >
+                    <span aria-hidden="true">&bull;</span>
+                    <span>{{ extra }}</span>
+                  </li>
+                }
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- Directions -->
+        <section class="flex flex-col gap-6">
+          <div class="relative">
+            <img src="assets/img/OneRecipe-Page/hero-directions.webp" alt="" class="w-full" />
+            <h2
+              class="font-quicksand absolute inset-0 flex items-center justify-center text-2xl font-medium text-mid-green"
+            >
+              Directions
+            </h2>
+          </div>
+
+          <ol class="grid gap-8 px-4 sm:grid-cols-2 sm:px-12">
+            @for (step of recipe.steps; track $index) {
+              <li class="flex flex-col gap-3">
+                <div class="flex items-center justify-between gap-4">
+                  <h3 class="font-quicksand text-2xl leading-none font-medium text-deep-green">
+                    {{ $index + 1 }}. Step
+                  </h3>
+                  <img
+                    [src]="cookLabel(step.assignedTo)"
+                    [alt]="'Chef ' + step.assignedTo"
+                    class="h-[27px] w-[91px]"
+                  />
+                </div>
+                <p class="font-quicksand text-base leading-6 font-medium text-deep-green">
+                  {{ step.instruction }}
+                </p>
+              </li>
+            }
+          </ol>
+        </section>
+
+        <!-- Like prompt -->
+        <div class="flex flex-wrap items-center justify-center gap-4 px-4 sm:px-12">
+          <p class="font-quicksand text-xl leading-5 font-semibold text-deep-green">
+            Just finished this meal?
+            <span class="font-medium"
+              >Give it a heart, so that the others know it is delicious.</span
+            >
+          </p>
+          <button
+            type="button"
+            (click)="toggleLike()"
+            [attr.aria-pressed]="liked()"
+            aria-label="Rezept mit einem Herz markieren"
+            class="flex h-10 w-10 items-center justify-center"
+          >
+            <app-heart-icon [filled]="liked()" klass="h-9 w-10" />
+          </button>
+        </div>
+      </article>
+
+      <div
+        class="flex min-h-[142px] flex-wrap items-center justify-center gap-8 rounded-[20px] bg-mist px-6 py-5"
+      >
+        <p class="font-quicksand text-2xl leading-8 font-semibold text-deep-green">
+          Find inspiration for your next culinary adventure!
+        </p>
+        <a
+          routerLink="/cookbook"
+          class="font-quicksand flex h-[62px] w-[169px] shrink-0 items-center justify-center gap-2.5 bg-forest px-[26px] py-4 text-center text-2xl leading-none font-semibold text-creme transition-colors hover:bg-[#2d4c2d]"
+        >
+          Cookbook
+        </a>
+      </div>
+
+      <button
+        type="button"
+        (click)="generateNew()"
+        class="font-quicksand flex items-center gap-2.5 self-end text-xl leading-5 font-medium text-forest underline-offset-4 transition-colors hover:underline"
+      >
+        Generate new recipe
+        <span aria-hidden="true">&#8594;</span>
+      </button>
+    </main>
+  } @else {
+    <main class="mx-auto flex w-full max-w-[1248px] flex-col gap-6 px-4">
+      <p class="font-quicksand text-xl font-medium text-deep-green">
+        Dieses Rezept ist nicht mehr verfügbar. Bitte starte eine neue Suche.
+      </p>
+      <button
+        type="button"
+        (click)="generateNew()"
+        class="font-quicksand w-fit bg-forest px-[26px] py-4 text-base font-semibold text-white transition-colors hover:bg-[#2d4c2d]"
+      >
+        Generate a recipe
+      </button>
+    </main>
+  }
+</div>
