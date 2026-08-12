@@ -35,7 +35,12 @@
           <app-heart-icon klass="h-[26px] w-[29px]" />
         </h2>
 
-        <ul class="scrollbar-none flex gap-3 overflow-x-auto pr-5" tabindex="0">
+        <ul
+          appDragScroll
+          class="scrollbar-none flex gap-3 overflow-x-auto overscroll-x-contain pr-5"
+          tabindex="0"
+          aria-label="Beliebteste Rezepte, horizontal scrollbar"
+        >
           @for (recipe of mostLiked(); track recipe.title) {
             <li
               class="flex w-[276px] shrink-0 flex-col justify-between gap-3 rounded-2xl bg-mist p-4"

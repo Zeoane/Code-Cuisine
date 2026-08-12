@@ -38,6 +38,10 @@ export const routes: Routes = [
       import("./pages/recipe-view/recipe-view.component").then(m => m.RecipeViewComponent),
   },
   {
+    path: "recipes/:cuisine",
+    loadComponent: () => import("./pages/recipes/recipes.component").then(m => m.RecipesComponent),
+  },
+  {
     path: "cookbook",
     loadComponent: () =>
       import("./pages/cookbook/cookbook.component").then(m => m.CookbookComponent),

@@ -4,8 +4,8 @@ import { Router, RouterLink } from "@angular/router";
 import { CUISINE_CATEGORIES, CuisineCategory } from "../../core/data/cuisine-categories";
 import { StoredRecipe } from "../../core/models/recipe.models";
 import { CookbookService } from "../../core/services/cookbook.service";
-import { ToastService } from "../../core/services/toast.service";
 import { LogoComponent } from "../../hero/logo/logo.component";
+import { DragScrollDirective } from "../../shared/drag-scroll/drag-scroll.directive";
 import { HeartIconComponent } from "../../shared/heart-icon/heart-icon.component";
 import { IconComponent } from "../../shared/icon/icon.component";
 
@@ -36,13 +36,12 @@ const DEMO_LIKED: LikedRecipe[] = [
 @Component({
   selector: "app-cookbook",
   standalone: true,
-  imports: [RouterLink, LogoComponent, IconComponent, HeartIconComponent],
+  imports: [RouterLink, LogoComponent, IconComponent, HeartIconComponent, DragScrollDirective],
   templateUrl: "./cookbook.component.html",
 })
 export class CookbookComponent {
   private readonly cookbook = inject(CookbookService);
   private readonly location = inject(Location);
-  private readonly toast = inject(ToastService);
   private readonly router = inject(Router);
 
   protected readonly recipes = signal<StoredRecipe[]>(this.cookbook.list());
@@ -59,9 +58,9 @@ export class CookbookComponent {
     }));
   });
 
-  /** Opens the recipe list of a cuisine (that screen follows next). */
+  /** Opens the recipe list of a cuisine. */
   openCuisine(cuisine: CuisineCategory): void {
-    this.toast.info(`${cuisine.label} – die Rezeptliste folgt als Nächstes.`);
+    this.router.navigate(["/recipes", cuisine.value]);
   }
 
   /** Starts a new run at the ingredient step. */
