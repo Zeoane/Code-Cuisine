@@ -1,0 +1,17 @@
+rules_version = '2';
+
+// Quota counters (User Story 11) are read/written exclusively by the n8n
+// workflow via a Firebase service account, which has Admin-level access and
+// bypasses these rules entirely. Denying all client access here is defense
+// in depth: no browser client should ever be able to read or tamper with
+// quota data directly.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /quota_ip/{docId} {
+      allow read, write: if false;
+    }
+    match /quota_total/{docId} {
+      allow read, write: if false;
+    }
+  }
+}

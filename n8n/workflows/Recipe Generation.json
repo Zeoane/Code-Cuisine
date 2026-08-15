@@ -1,0 +1,653 @@
+{
+  "name": "Recipe Generation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generate-recipe",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "a2bbee65-f5cb-45ba-ae93-378b668fa88b",
+      "name": "Webhook: Recipe Generation Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -2160,
+        192
+      ],
+      "webhookId": "generate-recipe",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "function firstIp(value) {\n  if (!value) return null;\n  return String(value).split(',')[0].trim();\n}\n\nconst headers = $json.headers || {};\nconst candidate =\n  $json.ip ||\n  firstIp(headers['x-forwarded-for']) ||\n  headers['x-real-ip'] ||\n  headers['cf-connecting-ip'] ||\n  null;\n\nconst IPV4 = /^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$/;\nconst IPV6 = /^[0-9a-fA-F:]+$/;\n\nfunction isValidIp(ip) {\n  if (!ip) return false;\n  const m = ip.match(IPV4);\n  if (m) return m.slice(1).every(function (o) { return Number(o) <= 255; });\n  return ip.indexOf(':') !== -1 && IPV6.test(ip);\n}\n\nreturn [{\n  json: Object.assign({}, $json, {\n    clientIp: candidate,\n    clientIpValid: isValidIp(candidate),\n  })\n}];"
+      },
+      "id": "94323a52-f8a6-43eb-adba-9abfa7504702",
+      "name": "Extract Client IP",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1936,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "ip-valid-cond",
+              "leftValue": "={{ $json.clientIpValid }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "f94cf3a8-393b-4397-83c7-868788a79af7",
+      "name": "IP Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -1728,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { error: \"invalid_request\", message: \"Could not determine a valid client IP address for this request.\" } }}",
+        "options": {}
+      },
+      "id": "085abe72-826a-45ec-88a2-ba80bb2e12b5",
+      "name": "Respond: 400 Invalid IP",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        -1520,
+        336
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body || {};\nconst errors = [];\n\nconst ingredients = body.ingredients;\nif (!Array.isArray(ingredients) || ingredients.length === 0 || ingredients.length > 30) {\n  errors.push('ingredients must be a non-empty array of at most 30 items');\n} else if (ingredients.some(function (i) { return typeof i !== 'string' || i.length === 0 || i.length > 64; })) {\n  errors.push('each ingredient must be a non-empty string up to 64 characters');\n}\n\nconst servings = body.servings;\nif (typeof servings !== 'number' || servings < 1 || servings > 12) {\n  errors.push('servings must be a number between 1 and 12');\n}\n\nconst helpers = body.helpers;\nif (typeof helpers !== 'number' || helpers < 1 || helpers > 3) {\n  errors.push('helpers must be a number between 1 and 3');\n}\n\nconst validTimeCategories = ['quick', 'medium', 'elaborate'];\nif (validTimeCategories.indexOf(body.timeCategory) === -1) {\n  errors.push('timeCategory must be one of ' + validTimeCategories.join(', '));\n}\n\nconst validCuisines = ['german', 'italian', 'japanese', 'indian', 'gourmet', 'fusion'];\nif (validCuisines.indexOf(body.cuisineStyle) === -1) {\n  errors.push('cuisineStyle must be one of ' + validCuisines.join(', '));\n}\n\nconst validDiets = ['vegetarian', 'vegan', 'keto', 'none'];\nif (validDiets.indexOf(body.diet) === -1) {\n  errors.push('diet must be one of ' + validDiets.join(', '));\n}\n\nreturn [{\n  json: Object.assign({}, $json, {\n    payloadValid: errors.length === 0,\n    payloadErrors: errors,\n  })\n}];"
+      },
+      "id": "c2a4d2e9-da9b-4bb4-a0c6-c51c6ced6bff",
+      "name": "Validate Request Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1520,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "payload-valid-cond",
+              "leftValue": "={{ $json.payloadValid }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "be5444cb-8b45-4bfd-be2d-89aa18c006c7",
+      "name": "Payload Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -1296,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { error: \"invalid_request\", message: $json.payloadErrors.join(\"; \") } }}",
+        "options": {}
+      },
+      "id": "81ab4dd7-9ebd-421c-8dfe-864445b7a3c8",
+      "name": "Respond: 400 Invalid Request",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        -1104,
+        336
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const crypto = require('crypto');\n\n// Not secret – fine to commit. From the downloaded service account JSON's \"client_email\" field.\nconst SERVICE_ACCOUNT_EMAIL = 'firebase-adminsdk-fbsvc@code-a-cuisine-3d1e0.iam.gserviceaccount.com';\n// SECRET – paste locally in n8n after import, never commit this filled in. From the JSON's \"private_key\" field (paste exactly, including the \\n sequences – JS turns them into real newlines inside a template literal).\nconst PRIVATE_KEY = '0ec2d7ffde40d7259631b564ca6a663062b6f0a1'.trim().replace(/^\"|\"$/g, '').replace(/\\\\n/g, '\\n');\n\nfunction base64url(input) {\n  return Buffer.from(input).toString('base64').replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '');\n}\n\nconst now = Math.floor(Date.now() / 1000);\nconst header = { alg: 'RS256', typ: 'JWT' };\nconst payload = {\n  iss: SERVICE_ACCOUNT_EMAIL,\n  scope: 'https://www.googleapis.com/auth/datastore',\n  aud: 'https://oauth2.googleapis.com/token',\n  iat: now,\n  exp: now + 3600,\n};\n\nconst unsigned = base64url(JSON.stringify(header)) + '.' + base64url(JSON.stringify(payload));\nconst signer = crypto.createSign('RSA-SHA256');\nsigner.update(unsigned);\nsigner.end();\nconst signature = signer.sign(PRIVATE_KEY).toString('base64').replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '');\n\nreturn [{\n  json: Object.assign({}, $json, {\n    firestoreJwt: unsigned + '.' + signature,\n  })\n}];"
+      },
+      "id": "58e43583-31c6-45d9-ad2b-59e24ee6e6d8",
+      "name": "Build & Sign Firestore JWT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1104,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://oauth2.googleapis.com/token",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "grant_type",
+              "value": "urn:ietf:params:oauth:grant-type:jwt-bearer"
+            },
+            {
+              "name": "assertion",
+              "value": "={{ $json.firestoreJwt }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "91ac5213-15d2-436f-8be9-bd95af69ba44",
+      "name": "Exchange JWT for Access Token",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -880,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const jwtStep = $node[\"Build & Sign Firestore JWT\"].json;\nconst accessToken = $json.access_token;\n\nreturn [{\n  json: Object.assign({}, jwtStep, { accessToken: accessToken })\n}];"
+      },
+      "id": "b011d7a8-dc93-4c2f-af56-9b6022465be4",
+      "name": "Store Access Token",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -656,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\nconst date = now.toISOString().slice(0, 10);\nconst ip = $json.clientIp;\n\nreturn [{\n  json: Object.assign({}, $json, {\n    quotaDate: date,\n    ipDocId: date + '_' + ip,\n    totalDocId: date,\n  })\n}];"
+      },
+      "id": "7c61cc81-8707-4064-87f5-4e0e724166aa",
+      "name": "Compute Quota Keys",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -448,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://firestore.googleapis.com/v1/projects/code-a-cuisine-3d1e0/databases/(default)/documents/quota_ip/{{ encodeURIComponent($node[\"Compute Quota Keys\"].json.ipDocId) }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $node[\"Store Access Token\"].json.accessToken }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "bf1f30f0-c581-420f-8245-b8e321cfe4f1",
+      "name": "Read IP Quota Counter",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -256,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://firestore.googleapis.com/v1/projects/code-a-cuisine-3d1e0/databases/(default)/documents/quota_total/{{ encodeURIComponent($node[\"Compute Quota Keys\"].json.totalDocId) }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $node[\"Store Access Token\"].json.accessToken }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "73598bfd-9b98-4782-b27c-67ac34fb2a3b",
+      "name": "Read Global Quota Counter",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -48,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "function extractCount(doc) {\n  if (!doc || !doc.fields || !doc.fields.count) return 0;\n  return Number(doc.fields.count.integerValue || 0);\n}\n\nconst keys = $node[\"Compute Quota Keys\"].json;\nconst ipDoc = $node[\"Read IP Quota Counter\"].json;\nconst totalDoc = $node[\"Read Global Quota Counter\"].json;\n\nreturn [{\n  json: Object.assign({}, keys, {\n    ipCount: extractCount(ipDoc),\n    totalCount: extractCount(totalDoc),\n  })\n}];"
+      },
+      "id": "6139c932-1d78-4dca-8982-30066f6bb331",
+      "name": "Parse Quota Counts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "quota-exceeded-cond",
+              "leftValue": "={{ $json.ipCount >= 3 || $json.totalCount >= 12 }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "0483a2f5-3a93-4626-ae68-9eff0cd12c5f",
+      "name": "Check Quota Limits",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        352,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const ipCount = $json.ipCount;\nconst totalCount = $json.totalCount;\nconst ipExceeded = ipCount >= 3;\nconst message = ipExceeded\n  ? \"You've reached today's limit of 3 recipe generations for your network. Please try again tomorrow.\"\n  : \"All daily recipe generations have been used up across all users. Please try again tomorrow.\";\n\nreturn [{\n  json: {\n    error: 'quota_exceeded',\n    message: message,\n    quota: {\n      ipRemaining: Math.max(0, 3 - ipCount),\n      totalRemaining: Math.max(0, 12 - totalCount),\n    }\n  }\n}];"
+      },
+      "id": "3f5db8a1-f2fa-4544-b164-886797985d2b",
+      "name": "Build Quota Exceeded Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        -256
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "93bce54e-9241-4a43-b653-e5d3c0c8376a",
+      "name": "Respond: 429 Quota Exceeded",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        752,
+        -256
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://firestore.googleapis.com/v1/projects/code-a-cuisine-3d1e0/databases/(default)/documents/quota_ip/{{ encodeURIComponent($json.ipDocId) }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $node[\"Store Access Token\"].json.accessToken }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { fields: { count: { integerValue: String($json.ipCount + 1) }, date: { stringValue: $json.quotaDate }, ip: { stringValue: $json.clientIp } } } }}",
+        "options": {}
+      },
+      "id": "431d09cc-2507-4263-b180-b9f274338502",
+      "name": "Increment IP Quota",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://firestore.googleapis.com/v1/projects/code-a-cuisine-3d1e0/databases/(default)/documents/quota_total/{{ encodeURIComponent($json.totalDocId) }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $node[\"Store Access Token\"].json.accessToken }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { fields: { count: { integerValue: String($json.totalCount + 1) }, date: { stringValue: $json.quotaDate } } } }}",
+        "options": {}
+      },
+      "id": "0b0c01d7-2045-44d2-9d67-0ced892d1b0a",
+      "name": "Increment Global Quota",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const CUISINE_PRESETS = {\n  german: { nameTemplates: [\"%s Pan, Home-Style\", \"Hearty %s Stew\", \"%s Bake\"], spices: [\"Marjoram\", \"Caraway\", \"Mustard\", \"Parsley\"], staples: [\"Butter\", \"Flour\", \"Cream\", \"Bacon\"] },\n  italian: { nameTemplates: [\"Pasta al %s\", \"%s Risotto\", \"Oven-Baked %s alla Italiana\"], spices: [\"Basil\", \"Oregano\", \"Garlic\", \"Chili flakes\"], staples: [\"Olive oil\", \"Parmesan\", \"Pasta\", \"Tomato passata\"] },\n  japanese: { nameTemplates: [\"%s Teriyaki Pan\", \"%s Donburi\", \"Miso Soup with %s\"], spices: [\"Soy sauce\", \"Ginger\", \"Sesame\", \"Mirin\"], staples: [\"Rice\", \"Soy sauce\", \"Sesame oil\", \"Nori\"] },\n  indian: { nameTemplates: [\"%s Curry\", \"%s Masala Pan\", \"Spicy %s Dal\"], spices: [\"Turmeric\", \"Garam masala\", \"Cumin\", \"Coriander\"], staples: [\"Basmati rice\", \"Coconut milk\", \"Lentils\", \"Ghee\"] },\n  gourmet: { nameTemplates: [\"%s Finely Poached with Beurre Blanc\", \"Confit %s Composition\", \"%s Fine-Dining Plate\"], spices: [\"Thyme\", \"Sea salt\", \"Butter\", \"White wine\"], staples: [\"Butter\", \"Cream\", \"White wine\", \"Shallots\"] },\n  fusion: { nameTemplates: [\"%s Fusion Bowl\", \"Street Food Wrap with %s\", \"Pan-Seared %s Fusion-Style\"], spices: [\"Soy sauce\", \"Lime\", \"Chili\", \"Coriander\"], staples: [\"Soy sauce\", \"Lime\", \"Sesame oil\", \"Spring onions\"] }\n};\nconst DIET_EXCLUDED_STAPLES = {\n  vegan: [\"Butter\", \"Cream\", \"Bacon\", \"Parmesan\", \"Ghee\"],\n  vegetarian: [\"Bacon\"],\n  keto: [\"Rice\", \"Basmati rice\", \"Pasta\", \"Flour\"],\n  none: []\n};\nconst TIME_RANGES = { quick: [15, 20], medium: [25, 45], elaborate: [50, 75] };\nconst DIFFICULTY_SEQUENCE = {\n  quick: [\"easy\", \"easy\", \"medium\"],\n  medium: [\"easy\", \"medium\", \"medium\"],\n  elaborate: [\"medium\", \"hard\", \"hard\"]\n};\n\nfunction capitalize(word) { return word.charAt(0).toUpperCase() + word.slice(1); }\nfunction pickRandom(items) { return items[Math.floor(Math.random() * items.length)]; }\nfunction gramsFor(servings) { return 80 + servings * 40; }\nfunction dietSafeStaples(cuisine, diet) {\n  const excluded = DIET_EXCLUDED_STAPLES[diet] || [];\n  return CUISINE_PRESETS[cuisine].staples.filter(function (s) { return excluded.indexOf(s) === -1; });\n}\n\nconst options = $node[\"Validate Request Payload\"].json.body;\n\nfunction buildTitle(index) {\n  const templates = CUISINE_PRESETS[options.cuisineStyle].nameTemplates;\n  const template = templates[index % templates.length];\n  const lead = capitalize(options.ingredients[0] || \"Vegetables\");\n  return template.replace(\"%s\", lead);\n}\nfunction buildDescription(title) {\n  const spice = pickRandom(CUISINE_PRESETS[options.cuisineStyle].spices);\n  return title + \", finished with \" + spice + \" \\u2013 quickly prepared from your ingredients.\";\n}\nfunction scaleIngredients() {\n  const grams = gramsFor(options.servings);\n  return options.ingredients.map(function (item) { return grams + \" g \" + item; });\n}\nfunction buildMissingIngredients() {\n  const have = options.ingredients.map(function (i) { return i.toLowerCase(); });\n  const candidates = dietSafeStaples(options.cuisineStyle, options.diet);\n  return candidates.filter(function (s) { return have.indexOf(s.toLowerCase()) === -1; }).slice(0, 3);\n}\nfunction stepTexts(missing) {\n  const spice = pickRandom(CUISINE_PRESETS[options.cuisineStyle].spices);\n  const main = options.ingredients.slice(0, 3).join(\", \") || \"the ingredients\";\n  return [\n    \"Wash and prepare \" + main + \".\",\n    missing.length ? (\"Get \" + missing.join(\", \") + \" ready.\") : \"Weigh out all ingredients.\",\n    \"Heat a pan or pot and season with \" + spice + \".\",\n    \"Add the ingredients one by one and cook while stirring.\",\n    \"Season to taste and plate for \" + options.servings + \" servings.\"\n  ];\n}\nfunction buildSteps(missing) {\n  const texts = stepTexts(missing);\n  return texts.map(function (instruction, i) {\n    return { instruction: instruction, assignedTo: (i % options.helpers) + 1, isParallel: options.helpers > 1 && i > 0 && i % 2 === 1 };\n  });\n}\nfunction pickCookingTime(index) {\n  const range = TIME_RANGES[options.timeCategory];\n  const step = Math.round(((range[1] - range[0]) / 2) * index);\n  return range[0] + step;\n}\nfunction buildNutrition() {\n  const base = { caloriesPerServing: 520, proteinGrams: 28, carbsGrams: 55, fatGrams: 18 };\n  if (options.diet === \"keto\") return Object.assign({}, base, { carbsGrams: 12, fatGrams: 38 });\n  if (options.diet === \"vegan\") return Object.assign({}, base, { proteinGrams: 18, fatGrams: 14 });\n  return base;\n}\nfunction buildRecipe(index) {\n  const title = buildTitle(index);\n  const missingIngredients = buildMissingIngredients();\n  return {\n    title: title,\n    description: buildDescription(title),\n    ingredients: scaleIngredients(),\n    missingIngredients: missingIngredients,\n    steps: buildSteps(missingIngredients),\n    difficulty: DIFFICULTY_SEQUENCE[options.timeCategory][index],\n    cookingTimeMinutes: pickCookingTime(index),\n    servings: options.servings,\n    cuisineStyle: options.cuisineStyle,\n    nutrition: buildNutrition()\n  };\n}\n\nconst recipes = [0, 1, 2].map(buildRecipe);\nconst counts = $node[\"Parse Quota Counts\"].json;\n\nreturn [{\n  json: {\n    recipes: recipes,\n    quota: {\n      ipRemaining: Math.max(0, 3 - (counts.ipCount + 1)),\n      totalRemaining: Math.max(0, 12 - (counts.totalCount + 1))\n    }\n  }\n}];"
+      },
+      "id": "6fb4d714-1d24-4cf8-8605-f7ca1ef89c88",
+      "name": "Generate Mock Recipes",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "3ad22559-754b-46ba-8860-cb483ab53eae",
+      "name": "Respond: 200 Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        672,
+        192
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook: Recipe Generation Request": {
+      "main": [
+        [
+          {
+            "node": "Extract Client IP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Client IP": {
+      "main": [
+        [
+          {
+            "node": "IP Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IP Valid?": {
+      "main": [
+        [
+          {
+            "node": "Validate Request Payload",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond: 400 Invalid IP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Request Payload": {
+      "main": [
+        [
+          {
+            "node": "Payload Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Payload Valid?": {
+      "main": [
+        [
+          {
+            "node": "Build & Sign Firestore JWT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond: 400 Invalid Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build & Sign Firestore JWT": {
+      "main": [
+        [
+          {
+            "node": "Exchange JWT for Access Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Exchange JWT for Access Token": {
+      "main": [
+        [
+          {
+            "node": "Store Access Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Access Token": {
+      "main": [
+        [
+          {
+            "node": "Compute Quota Keys",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Quota Keys": {
+      "main": [
+        [
+          {
+            "node": "Read IP Quota Counter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read IP Quota Counter": {
+      "main": [
+        [
+          {
+            "node": "Read Global Quota Counter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Global Quota Counter": {
+      "main": [
+        [
+          {
+            "node": "Parse Quota Counts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Quota Counts": {
+      "main": [
+        [
+          {
+            "node": "Check Quota Limits",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Quota Limits": {
+      "main": [
+        [
+          {
+            "node": "Build Quota Exceeded Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Increment IP Quota",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Quota Exceeded Response": {
+      "main": [
+        [
+          {
+            "node": "Respond: 429 Quota Exceeded",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Increment IP Quota": {
+      "main": [
+        [
+          {
+            "node": "Increment Global Quota",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Increment Global Quota": {
+      "main": [
+        [
+          {
+            "node": "Generate Mock Recipes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Mock Recipes": {
+      "main": [
+        [
+          {
+            "node": "Respond: 200 Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "5fc551f0-1db1-4010-afad-f393d00387e8",
+  "meta": {
+    "instanceId": "178e2aea3414a8776196d1eaa659ed3e085989989f4a0edffb60f4038b9bcd3b"
+  },
+  "nodeGroups": [],
+  "id": "bBp22hiN3lYEhYiS",
+  "tags": []
+}

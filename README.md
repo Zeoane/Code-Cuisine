@@ -1,6 +1,6 @@
 # Code à Cuisine
 
-**AI-Powered recipe generator** – Schulprojekt / school project.
+**AI-Powered recipe generator**
 
 ## Inhaltsverzeichnis / Table of Contents
 
@@ -41,17 +41,17 @@ Rezepte und speichert Favoriten in einem persönlichen Kochbuch.
 
 ### Features
 
-| Feature | Beschreibung |
-|---|---|
-| Hero-Landingpage | Pixelgenau nach Figma-Design (Dunkelgrün `#396039`, Ubuntu Bold, Quicksand, kreisförmige Teller-Bilder, Get-started-CTA) |
-| Zutaten-Eingabe | Zutaten einzeln hinzufügen/entfernen, Chip-/Tag-Darstellung |
-| Rezeptgenerierung | Erzeugt genau 3 Rezepte mit Zutaten, Schritten, Schwierigkeitsgrad, Kochzeit, Portionen, Nährwerten und fehlenden Basiszutaten |
+| Feature            | Beschreibung                                                                                                                                                               |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Hero-Landingpage   | Pixelgenau nach Figma-Design (Dunkelgrün `#396039`, Ubuntu Bold, Quicksand, kreisförmige Teller-Bilder, Get-started-CTA)                                                   |
+| Zutaten-Eingabe    | Zutaten einzeln hinzufügen/entfernen, Chip-/Tag-Darstellung                                                                                                                |
+| Rezeptgenerierung  | Erzeugt genau 3 Rezepte mit Zutaten, Schritten, Schwierigkeitsgrad, Kochzeit, Portionen, Nährwerten und fehlenden Basiszutaten                                             |
 | Generator-Optionen | Portionen, Zeitrahmen, Kochstil (Deutsch, Italienisch, Japanisch, Indisch, Gourmet, Fusion), Ernährungsweise und 1–3 Kochhelfer mit Arbeitsaufteilung (parallele Schritte) |
-| Rezeptanzeige | Rezeptkarten mit Metadaten-Badges, Nährwerten und aufklappbarer Schritt-für-Schritt-Anleitung; mobil als Swipe-Karten |
-| Rezept-Bibliothek | Alle generierten Rezepte öffentlich einsehbar, filterbar nach Küchen-Kategorie, mit Detailseite (`/library/:id`) |
-| Kochbuch | Rezepte speichern, abrufen und entfernen |
-| Impressum | Platzhalter-Impressum gemäß § 5 TMG (`/impressum`) |
-| Responsiv | Mobile-first bis 320 px Breite, Mindestschriftgröße 16 px auf Mobilgeräten, keine sichtbaren Scrollbalken, Swipe-Interaktionen, Touch-Ziele ≥ 44 px |
+| Rezeptanzeige      | Rezeptkarten mit Metadaten-Badges, Nährwerten und aufklappbarer Schritt-für-Schritt-Anleitung; mobil als Swipe-Karten                                                      |
+| Rezept-Bibliothek  | Alle generierten Rezepte öffentlich einsehbar, filterbar nach Küchen-Kategorie, mit Detailseite (`/library/:id`)                                                           |
+| Kochbuch           | Rezepte speichern, abrufen und entfernen                                                                                                                                   |
+| Impressum          | Platzhalter-Impressum gemäß § 5 TMG (`/impressum`)                                                                                                                         |
+| Responsiv          | Mobile-first bis 320 px Breite, Mindestschriftgröße 16 px auf Mobilgeräten, keine sichtbaren Scrollbalken, Swipe-Interaktionen, Touch-Ziele ≥ 44 px                        |
 
 <a id="de-aktueller-stand"></a>
 
@@ -171,17 +171,17 @@ recipes and lets you save favorites to a personal cookbook.
 
 ### Features
 
-| Feature | Description |
-|---|---|
-| Hero landing page | Pixel-accurate implementation of the Figma design (forest green `#396039`, Ubuntu Bold, Quicksand, overlapping circular plate images, "Get started" CTA) |
-| Ingredient input | Add/remove ingredients one by one, chip/tag display |
-| Recipe generation | Produces exactly 3 recipes with ingredients, steps, difficulty, cooking time, servings, nutrition facts and missing base ingredients |
+| Feature           | Description                                                                                                                                                              |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Hero landing page | Pixel-accurate implementation of the Figma design (forest green `#396039`, Ubuntu Bold, Quicksand, overlapping circular plate images, "Get started" CTA)                 |
+| Ingredient input  | Add/remove ingredients one by one, chip/tag display                                                                                                                      |
+| Recipe generation | Produces exactly 3 recipes with ingredients, steps, difficulty, cooking time, servings, nutrition facts and missing base ingredients                                     |
 | Generator options | Servings, time budget, cuisine style (German, Italian, Japanese, Indian, Gourmet, Fusion), diet preference and 1–3 cooking helpers with task assignment (parallel steps) |
-| Recipe display | Recipe cards with metadata badges, nutrition facts and a collapsible step-by-step guide; swipeable cards on mobile |
-| Recipe library | All generated recipes are publicly viewable, filterable by cuisine category, with a detail page (`/library/:id`) |
-| Cookbook | Save, view and remove recipes |
-| Imprint | Placeholder legal notice per § 5 TMG (German telemedia law) (`/impressum`) |
-| Responsive | Mobile-first down to 320 px width, minimum 16 px font size on mobile, no visible scrollbars, swipe interactions, touch targets ≥ 44 px |
+| Recipe display    | Recipe cards with metadata badges, nutrition facts and a collapsible step-by-step guide; swipeable cards on mobile                                                       |
+| Recipe library    | All generated recipes are publicly viewable, filterable by cuisine category, with a detail page (`/library/:id`)                                                         |
+| Cookbook          | Save, view and remove recipes                                                                                                                                            |
+| Imprint           | Placeholder legal notice per § 5 TMG (German telemedia law) (`/impressum`)                                                                                               |
+| Responsive        | Mobile-first down to 320 px width, minimum 16 px font size on mobile, no visible scrollbars, swipe interactions, touch targets ≥ 44 px                                   |
 
 <a id="en-current-status"></a>
 

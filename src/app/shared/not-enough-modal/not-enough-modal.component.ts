@@ -11,9 +11,11 @@ import { RouterLink } from "@angular/router";
 import { IconComponent } from "../icon/icon.component";
 
 /**
- * "Ups! Not quite enough..." popup shown when the entered ingredients do not
- * meet the criteria for the requested servings. Closes via the X, a click on
- * the backdrop or Escape, matching the Figma overlay interaction.
+ * Wizard notice popup, originally built for "Ups! Not quite enough..." but
+ * generalized (title/message/linkLabel inputs) so the loading step can reuse
+ * it for generation errors (e.g. quota exceeded) instead of a near-duplicate
+ * component. Closes via the X, a click on the backdrop or Escape, matching
+ * the Figma overlay interaction.
  */
 @Component({
   selector: "app-not-enough-modal",
@@ -24,6 +26,10 @@ import { IconComponent } from "../icon/icon.component";
 })
 export class NotEnoughModalComponent implements OnChanges {
   @Input() open = false;
+  @Input() title = "Ups! Not quite enough...";
+  @Input() message =
+    "It looks like some ingredients aren't sufficient for your selected servings. Please add or adjust quantities and try again.";
+  @Input() linkLabel = "Go back to ingredients";
   @Output() closed = new EventEmitter<void>();
 
   /** Locks page scrolling for as long as the popup is visible. */

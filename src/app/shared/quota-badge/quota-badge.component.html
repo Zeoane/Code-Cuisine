@@ -1,0 +1,10 @@
+@if (ipRemaining() !== null) {
+  <p
+    class="font-quicksand inline-flex items-center rounded-full border border-forest/25 px-3 py-1 text-base text-forest">
+    @if (ipRemaining() === 0) {
+      Daily limit reached — try again tomorrow.
+    } @else {
+      {{ ipRemaining() }} of 3 recipe generations left today.
+    }
+  </p>
+}

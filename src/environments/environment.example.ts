@@ -14,4 +14,14 @@ export const environment = {
   },
   /** Set to true to connect to the local Firebase Auth/Firestore emulators. */
   useFirebaseEmulators: false,
+  /**
+   * n8n webhook URLs (production, i.e. the workflow's "Active" toggle is on).
+   * Left empty until the n8n workflows are imported and activated — the app
+   * falls back to the local mock generator until then (see
+   * RecipeGeneratorService).
+   */
+  n8n: {
+    generateUrl: "",
+    quotaStatusUrl: "",
+  },
 };

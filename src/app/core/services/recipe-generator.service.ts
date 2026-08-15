@@ -1,4 +1,7 @@
-import { Injectable } from "@angular/core";
+import { HttpClient, HttpErrorResponse } from "@angular/common/http";
+import { Injectable, inject } from "@angular/core";
+import { firstValueFrom } from "rxjs";
+import { environment } from "../../../environments/environment";
 import { CUISINE_PRESETS, dietSafeStaples } from "../data/cuisine-presets";
 import {
   Difficulty,
@@ -8,6 +11,38 @@ import {
   RecipeStep,
   TimeCategory,
 } from "../models/recipe.models";
+import { QuotaService, QuotaStatus } from "./quota.service";
+
+/** True once a real n8n generate-recipe webhook URL has been configured. */
+export const isN8nGenerationConfigured = Boolean(environment.n8n.generateUrl);
+
+/** Error codes the n8n webhook can report, mirrored on the thrown Error. */
+export type GenerationErrorCode = "quota_exceeded" | "invalid_request" | "generation_failed";
+
+/** Error thrown by `generate()` when the n8n call fails; carries a `code` for the UI to branch on. */
+export class GenerationError extends Error {
+  constructor(
+    message: string,
+    readonly code: GenerationErrorCode,
+  ) {
+    super(message);
+  }
+}
+
+/** Shape of a successful /generate-recipe response. */
+interface GenerateResponse {
+  recipes: GeneratedRecipe[];
+  quota: QuotaStatus;
+}
+
+/** Shape of a 4xx/5xx /generate-recipe error response. */
+interface GenerateErrorResponse {
+  error: GenerationErrorCode;
+  message: string;
+  quota?: QuotaStatus;
+}
+
+const FALLBACK_ERROR_MESSAGE = "Something went wrong while generating recipes. Please try again.";
 
 /** Cooking time range (minutes) per time-budget category. */
 const TIME_RANGES: Record<TimeCategory, [number, number]> = {
@@ -24,16 +59,46 @@ const DIFFICULTY_SEQUENCE: Record<TimeCategory, Difficulty[]> = {
 };
 
 /**
- * Client-side mock recipe generator. Stands in for the real LLM call, which
- * will move behind an n8n workflow (with Firebase storage) once those are
- * wired in by the project owner; this keeps the app fully usable locally
- * until then.
+ * Recipe generator: calls the n8n webhook (IP-quota gate + generation) once
+ * `environment.n8n.generateUrl` is configured, otherwise falls back to the
+ * client-side mock below so the app keeps working without any external
+ * services set up — the same defensive pattern as AuthService/Firebase.
  */
 @Injectable({ providedIn: "root" })
 export class RecipeGeneratorService {
+  private readonly http = inject(HttpClient);
+  private readonly quota = inject(QuotaService);
+
   /** Generates exactly three recipe suggestions for the given options. */
-  generate(options: GenerationOptions): GeneratedRecipe[] {
-    return [0, 1, 2].map(index => this.buildRecipe(options, index));
+  async generate(options: GenerationOptions): Promise<GeneratedRecipe[]> {
+    if (!isN8nGenerationConfigured) {
+      return [0, 1, 2].map(index => this.buildRecipe(options, index));
+    }
+    return this.generateViaN8n(options);
+  }
+
+  /** Calls the n8n generate-recipe webhook, mapping errors to GenerationError. */
+  private async generateViaN8n(options: GenerationOptions): Promise<GeneratedRecipe[]> {
+    try {
+      const response = await firstValueFrom(
+        this.http.post<GenerateResponse>(environment.n8n.generateUrl, options),
+      );
+      this.quota.applyFromResponse(response.quota);
+      return response.recipes;
+    } catch (error) {
+      throw this.toGenerationError(error);
+    }
+  }
+
+  /** Maps an HTTP failure to a typed GenerationError, syncing quota if available. */
+  private toGenerationError(error: unknown): GenerationError {
+    if (!(error instanceof HttpErrorResponse)) {
+      return new GenerationError(FALLBACK_ERROR_MESSAGE, "generation_failed");
+    }
+    const body = error.error as GenerateErrorResponse | null;
+    if (body?.quota) this.quota.applyFromResponse(body.quota);
+    const code: GenerationErrorCode = body?.error ?? "generation_failed";
+    return new GenerationError(body?.message ?? FALLBACK_ERROR_MESSAGE, code);
   }
 
   /** Builds a single recipe suggestion for the given result index (0-2). */

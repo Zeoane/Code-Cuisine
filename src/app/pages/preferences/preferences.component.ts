@@ -1,4 +1,4 @@
-import { Component, computed, inject } from "@angular/core";
+import { Component, OnInit, computed, inject } from "@angular/core";
 import { Router, RouterLink } from "@angular/router";
 import {
   CUISINE_OPTIONS,
@@ -6,10 +6,12 @@ import {
   TIME_OPTIONS,
 } from "../../core/data/preference-options";
 import { CuisineStyle, DietPreference, TimeCategory } from "../../core/models/recipe.models";
+import { QuotaService } from "../../core/services/quota.service";
 import { WizardStateService } from "../../core/services/wizard-state.service";
 import { LogoComponent } from "../../hero/logo/logo.component";
 import { ChoiceChipComponent } from "../../recipes/choice-chip/choice-chip.component";
 import { IconComponent } from "../../shared/icon/icon.component";
+import { QuotaBadgeComponent } from "../../shared/quota-badge/quota-badge.component";
 
 /**
  * Step 2 of the recipe generator wizard ("Choose your preferences"):
@@ -18,12 +20,13 @@ import { IconComponent } from "../../shared/icon/icon.component";
 @Component({
   selector: "app-preferences",
   standalone: true,
-  imports: [RouterLink, LogoComponent, IconComponent, ChoiceChipComponent],
+  imports: [RouterLink, LogoComponent, IconComponent, ChoiceChipComponent, QuotaBadgeComponent],
   templateUrl: "./preferences.component.html",
 })
-export class PreferencesComponent {
+export class PreferencesComponent implements OnInit {
   private readonly wizard = inject(WizardStateService);
   private readonly router = inject(Router);
+  private readonly quota = inject(QuotaService);
 
   protected readonly timeOptions = TIME_OPTIONS;
   protected readonly cuisineOptions = CUISINE_OPTIONS;
@@ -31,11 +34,17 @@ export class PreferencesComponent {
 
   protected readonly preferences = this.wizard.preferences;
 
-  /** True once cooking time, cuisine and diet have all been picked. */
+  /** True once cooking time, cuisine and diet are picked and quota isn't exhausted. */
   protected readonly canGenerate = computed(() => {
     const { timeCategory, cuisineStyle, diet } = this.preferences();
-    return timeCategory !== null && cuisineStyle !== null && diet !== null;
+    const hasPreferences = timeCategory !== null && cuisineStyle !== null && diet !== null;
+    return hasPreferences && this.quota.ipRemaining() !== 0;
   });
+
+  /** Fetches the current quota status so the badge is fresh when this step opens. */
+  ngOnInit(): void {
+    void this.quota.refresh();
+  }
 
   /** Adjusts the portion count within the allowed 1-12 range. */
   stepServings(delta: number): void {

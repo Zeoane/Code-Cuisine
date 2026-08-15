@@ -43,5 +43,9 @@
     </p>
   </main>
 
-  <app-not-enough-modal [open]="notEnough()" (closed)="closeNotEnough()" />
+  <app-not-enough-modal
+    [open]="notice()"
+    [title]="noticeTitle()"
+    [message]="noticeMessage()"
+    (closed)="closeNotice()" />
 </div>

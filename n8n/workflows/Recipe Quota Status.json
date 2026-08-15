@@ -1,0 +1,371 @@
+{
+  "name": "Recipe Quota Status",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "quota-status",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "fd9f7e80-fe0e-45d1-a9f0-16b30e20e928",
+      "name": "Webhook: Quota Status Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -208,
+        128
+      ],
+      "webhookId": "quota-status"
+    },
+    {
+      "parameters": {
+        "jsCode": "function firstIp(value) {\n  if (!value) return null;\n  return String(value).split(',')[0].trim();\n}\n\nconst headers = $json.headers || {};\nconst candidate =\n  $json.ip ||\n  firstIp(headers['x-forwarded-for']) ||\n  headers['x-real-ip'] ||\n  headers['cf-connecting-ip'] ||\n  null;\n\nconst IPV4 = /^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$/;\nconst IPV6 = /^[0-9a-fA-F:]+$/;\n\nfunction isValidIp(ip) {\n  if (!ip) return false;\n  const m = ip.match(IPV4);\n  if (m) return m.slice(1).every(function (o) { return Number(o) <= 255; });\n  return ip.indexOf(':') !== -1 && IPV6.test(ip);\n}\n\nreturn [{\n  json: Object.assign({}, $json, {\n    clientIp: candidate,\n    clientIpValid: isValidIp(candidate),\n  })\n}];"
+      },
+      "id": "84098333-c893-406c-9e20-ac7b46876808",
+      "name": "Extract Client IP",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        16,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "ip-valid-cond",
+              "leftValue": "={{ $json.clientIpValid }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "733633b0-e131-4770-90bf-3fbe060eb27a",
+      "name": "IP Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        240,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { error: \"invalid_request\", message: \"Could not determine a valid client IP address for this request.\" } }}",
+        "options": {}
+      },
+      "id": "c876e73e-1da5-4194-b399-6292fd124188",
+      "name": "Respond: 400 Invalid IP",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const crypto = require('crypto');\n\n// Not secret – fine to commit. From the downloaded service account JSON's \"client_email\" field.\nconst SERVICE_ACCOUNT_EMAIL = 'firebase-adminsdk-fbsvc@code-a-cuisine-3d1e0.iam.gserviceaccount.com';\n// SECRET – paste locally in n8n after import, never commit this filled in. From the JSON's \"private_key\" field (paste exactly, including the \\n sequences – JS turns them into real newlines inside a template literal).\nconst PRIVATE_KEY = '0ec2d7ffde40d7259631b564ca6a663062b6f0a1'.trim().replace(/^\"|\"$/g, '').replace(/\\\\n/g, '\\n');\n\nfunction base64url(input) {\n  return Buffer.from(input).toString('base64').replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '');\n}\n\nconst now = Math.floor(Date.now() / 1000);\nconst header = { alg: 'RS256', typ: 'JWT' };\nconst payload = {\n  iss: SERVICE_ACCOUNT_EMAIL,\n  scope: 'https://www.googleapis.com/auth/datastore',\n  aud: 'https://oauth2.googleapis.com/token',\n  iat: now,\n  exp: now + 3600,\n};\n\nconst unsigned = base64url(JSON.stringify(header)) + '.' + base64url(JSON.stringify(payload));\nconst signer = crypto.createSign('RSA-SHA256');\nsigner.update(unsigned);\nsigner.end();\nconst signature = signer.sign(PRIVATE_KEY).toString('base64').replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '');\n\nreturn [{\n  json: Object.assign({}, $json, {\n    firestoreJwt: unsigned + '.' + signature,\n  })\n}];"
+      },
+      "id": "6f85e8aa-43cd-4fa3-b5dd-82a52589af54",
+      "name": "Build & Sign Firestore JWT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://oauth2.googleapis.com/token",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "grant_type",
+              "value": "urn:ietf:params:oauth:grant-type:jwt-bearer"
+            },
+            {
+              "name": "assertion",
+              "value": "={{ $json.firestoreJwt }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "22c2fdaf-2c0e-42f5-ac90-13187fc181fc",
+      "name": "Exchange JWT for Access Token",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        672,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const jwtStep = $node[\"Build & Sign Firestore JWT\"].json;\nconst accessToken = $json.access_token;\n\nreturn [{\n  json: Object.assign({}, jwtStep, { accessToken: accessToken })\n}];"
+      },
+      "id": "b2e55356-4e4c-4310-880a-f2003c996619",
+      "name": "Store Access Token",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\nconst date = now.toISOString().slice(0, 10);\nconst ip = $json.clientIp;\n\nreturn [{\n  json: Object.assign({}, $json, {\n    quotaDate: date,\n    ipDocId: date + '_' + ip,\n    totalDocId: date,\n  })\n}];"
+      },
+      "id": "9fbf6508-ce62-4293-a9a4-3b0a6e0461f5",
+      "name": "Compute Quota Keys",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://firestore.googleapis.com/v1/projects/code-a-cuisine-3d1e0/databases/(default)/documents/quota_ip/{{ encodeURIComponent($node[\"Compute Quota Keys\"].json.ipDocId) }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $node[\"Store Access Token\"].json.accessToken }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "f725cd33-17da-4871-b701-25559f2272d3",
+      "name": "Read IP Quota Counter",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1328,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://firestore.googleapis.com/v1/projects/code-a-cuisine-3d1e0/databases/(default)/documents/quota_total/{{ encodeURIComponent($node[\"Compute Quota Keys\"].json.totalDocId) }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $node[\"Store Access Token\"].json.accessToken }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "74b89fb7-f36b-435b-8469-da93f3647dee",
+      "name": "Read Global Quota Counter",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1552,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "function extractCount(doc) {\n  if (!doc || !doc.fields || !doc.fields.count) return 0;\n  return Number(doc.fields.count.integerValue || 0);\n}\n\nconst ipDoc = $node[\"Read IP Quota Counter\"].json;\nconst totalDoc = $node[\"Read Global Quota Counter\"].json;\nconst ipCount = extractCount(ipDoc);\nconst totalCount = extractCount(totalDoc);\n\nreturn [{\n  json: {\n    ipRemaining: Math.max(0, 3 - ipCount),\n    totalRemaining: Math.max(0, 12 - totalCount),\n  }\n}];"
+      },
+      "id": "703e7b08-50f1-4f8b-81f2-58763b8263fc",
+      "name": "Build Status Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "b68463bb-f3c0-4911-bfce-317d05d024c8",
+      "name": "Respond: 200 Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1984,
+        -112
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook: Quota Status Request": {
+      "main": [
+        [
+          {
+            "node": "Extract Client IP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Client IP": {
+      "main": [
+        [
+          {
+            "node": "IP Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IP Valid?": {
+      "main": [
+        [
+          {
+            "node": "Build & Sign Firestore JWT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond: 400 Invalid IP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build & Sign Firestore JWT": {
+      "main": [
+        [
+          {
+            "node": "Exchange JWT for Access Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Exchange JWT for Access Token": {
+      "main": [
+        [
+          {
+            "node": "Store Access Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Access Token": {
+      "main": [
+        [
+          {
+            "node": "Compute Quota Keys",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Quota Keys": {
+      "main": [
+        [
+          {
+            "node": "Read IP Quota Counter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read IP Quota Counter": {
+      "main": [
+        [
+          {
+            "node": "Read Global Quota Counter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Global Quota Counter": {
+      "main": [
+        [
+          {
+            "node": "Build Status Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Status Response": {
+      "main": [
+        [
+          {
+            "node": "Respond: 200 Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "6bbf5b99-a08b-4fa6-bdad-66fdc6314ecf",
+  "meta": {
+    "instanceId": "178e2aea3414a8776196d1eaa659ed3e085989989f4a0edffb60f4038b9bcd3b"
+  },
+  "nodeGroups": [],
+  "id": "hboDsphIhdr7KZU0",
+  "tags": []
+}

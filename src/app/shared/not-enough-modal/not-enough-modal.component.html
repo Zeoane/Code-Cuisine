@@ -17,19 +17,18 @@
       </button>
 
       <h2 id="not-enough-title" class="font-quicksand pr-8 text-[28px] leading-none font-semibold">
-        Ups! Not quite enough...
+        {{ title }}
       </h2>
 
       <p class="font-quicksand text-xl leading-7 font-medium">
-        It looks like some ingredients aren't sufficient for your selected servings. Please add or
-        adjust quantities and try again.
+        {{ message }}
       </p>
 
       <a
         routerLink="/generator"
         (click)="closed.emit()"
         class="font-quicksand mt-6 flex w-fit items-center gap-2.5 text-xl font-medium underline-offset-4 transition-colors hover:underline">
-        Go back to ingredients
+        {{ linkLabel }}
         <span aria-hidden="true">&#8594;</span>
       </a>
     </div>
