@@ -5,18 +5,18 @@
       routerLink="/library"
       class="font-quicksand mb-6 inline-flex min-h-11 items-center gap-1.5 text-base text-forest hover:underline">
       <img src="assets/img/arrow-back.svg" alt="" class="h-[14px] w-5" />
-      Zurück zur Bibliothek
+      Back to library
     </a>
     @if (recipe(); as r) {
       <app-recipe-card [recipe]="r" />
     } @else {
       <section
         class="font-quicksand flex flex-col items-start gap-4 rounded-lg border border-dashed border-forest/30 p-8 text-forest">
-        <p class="text-lg">Dieses Rezept wurde nicht gefunden.</p>
+        <p class="text-lg">This recipe wasn't found.</p>
         <a
           routerLink="/library"
           class="font-quicksand flex min-h-11 items-center rounded-md bg-forest px-4 text-creme hover:bg-[#2d4c2d]">
-          Zurück zur Bibliothek
+          Back to library
         </a>
       </section>
     }

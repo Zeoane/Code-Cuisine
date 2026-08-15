@@ -59,7 +59,7 @@
                 class="font-quicksand flex h-8 items-center gap-1 rounded-[30px] bg-mist px-3 py-1.5 text-lg leading-none font-medium text-deep-green"
               >
                 <app-heart-icon [filled]="liked()" klass="h-4 w-[18px]" />
-                <span class="sr-only">Herzen:</span>
+                <span class="sr-only">Likes:</span>
                 {{ likes() }}
               </li>
             </ul>
@@ -73,7 +73,7 @@
                 <dt
                   class="font-quicksand flex h-7 items-center justify-center text-[22px] leading-none font-bold text-deep-green"
                 >
-                  Energie
+                  Energy
                 </dt>
                 <dt
                   class="font-quicksand flex h-7 items-center justify-center text-[22px] leading-none font-bold text-deep-green"
@@ -198,7 +198,7 @@
             type="button"
             (click)="toggleLike()"
             [attr.aria-pressed]="liked()"
-            aria-label="Rezept mit einem Herz markieren"
+            aria-label="Mark recipe with a heart"
             class="flex h-10 w-10 items-center justify-center"
           >
             <app-heart-icon [filled]="liked()" klass="h-9 w-10" />
@@ -232,7 +232,7 @@
   } @else {
     <main class="mx-auto flex w-full max-w-[1248px] flex-col gap-6 px-4">
       <p class="font-quicksand text-xl font-medium text-deep-green">
-        Dieses Rezept ist nicht mehr verfügbar. Bitte starte eine neue Suche.
+        This recipe is no longer available. Please start a new search.
       </p>
       <button
         type="button"

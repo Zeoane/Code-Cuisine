@@ -13,7 +13,7 @@
             type="number"
             min="0"
             [(ngModel)]="editQuantity"
-            aria-label="Menge bearbeiten"
+            aria-label="Edit quantity"
             class="h-7 w-14 rounded-full bg-creme px-1 text-center text-base text-forest-dark focus-visible:outline-none" />
           <app-unit-select [value]="editUnit" (valueChange)="editUnit = $event" size="sm" />
         } @else {
@@ -27,7 +27,7 @@
             <button
               type="button"
               (click)="confirmEdit(entry)"
-              aria-label="Änderung bestätigen"
+              aria-label="Confirm change"
               class="flex h-6 w-6 items-center justify-center rounded-[6px] text-deep-green transition-colors hover:bg-creme">
               <app-icon name="check" klass="h-4 w-4" />
             </button>
@@ -35,7 +35,7 @@
             <button
               type="button"
               (click)="startEdit(entry)"
-              aria-label="Zutat bearbeiten"
+              aria-label="Edit ingredient"
               class="flex h-6 w-6 items-center justify-center rounded-[6px] transition-colors hover:bg-forest/30">
               <img src="assets/img/Generate-Page/edit.svg" alt="" class="h-[14px] w-[13px]" />
             </button>
@@ -43,7 +43,7 @@
           <button
             type="button"
             (click)="remove.emit(entry.id)"
-            aria-label="Zutat entfernen"
+            aria-label="Remove ingredient"
             class="flex h-6 w-6 items-center justify-center rounded-[6px] transition-colors hover:bg-forest/30">
             <img src="assets/img/Generate-Page/delete.svg" alt="" class="h-[15px] w-[13px]" />
           </button>

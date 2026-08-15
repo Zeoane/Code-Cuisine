@@ -13,42 +13,42 @@ export interface CuisinePreset {
 /** Dish templates, spices and staples for every selectable cuisine style. */
 export const CUISINE_PRESETS: Record<CuisineStyle, CuisinePreset> = {
   german: {
-    nameTemplates: ["%s-Pfanne nach Hausmacher-Art", "Deftiger %s-Eintopf", "%s-Auflauf"],
-    spices: ["Majoran", "Kümmel", "Senf", "Petersilie"],
-    staples: ["Butter", "Mehl", "Sahne", "Speck"],
+    nameTemplates: ["%s Pan, Home-Style", "Hearty %s Stew", "%s Bake"],
+    spices: ["Marjoram", "Caraway", "Mustard", "Parsley"],
+    staples: ["Butter", "Flour", "Cream", "Bacon"],
   },
   italian: {
-    nameTemplates: ["Pasta al %s", "%s-Risotto", "Ofen-%s alla Italiana"],
-    spices: ["Basilikum", "Oregano", "Knoblauch", "Chiliflocken"],
-    staples: ["Olivenöl", "Parmesan", "Pasta", "Passierte Tomaten"],
+    nameTemplates: ["Pasta al %s", "%s Risotto", "Oven-Baked %s alla Italiana"],
+    spices: ["Basil", "Oregano", "Garlic", "Chili flakes"],
+    staples: ["Olive oil", "Parmesan", "Pasta", "Tomato passata"],
   },
   japanese: {
-    nameTemplates: ["%s-Teriyaki-Pfanne", "%s-Donburi", "Miso-Suppe mit %s"],
-    spices: ["Sojasauce", "Ingwer", "Sesam", "Mirin"],
-    staples: ["Reis", "Sojasauce", "Sesamöl", "Nori"],
+    nameTemplates: ["%s Teriyaki Pan", "%s Donburi", "Miso Soup with %s"],
+    spices: ["Soy sauce", "Ginger", "Sesame", "Mirin"],
+    staples: ["Rice", "Soy sauce", "Sesame oil", "Nori"],
   },
   indian: {
-    nameTemplates: ["%s-Curry", "%s-Masala-Pfanne", "Würziges %s-Dal"],
-    spices: ["Kurkuma", "Garam Masala", "Kreuzkümmel", "Koriander"],
-    staples: ["Basmatireis", "Kokosmilch", "Linsen", "Ghee"],
+    nameTemplates: ["%s Curry", "%s Masala Pan", "Spicy %s Dal"],
+    spices: ["Turmeric", "Garam masala", "Cumin", "Coriander"],
+    staples: ["Basmati rice", "Coconut milk", "Lentils", "Ghee"],
   },
   gourmet: {
-    nameTemplates: ["%s fein pochiert mit Beurre Blanc", "Confierte %s-Komposition", "%s Fine-Dining-Teller"],
-    spices: ["Thymian", "Meersalz", "Butter", "Weißwein"],
-    staples: ["Butter", "Sahne", "Weißwein", "Schalotten"],
+    nameTemplates: ["%s Finely Poached with Beurre Blanc", "Confit %s Composition", "%s Fine-Dining Plate"],
+    spices: ["Thyme", "Sea salt", "Butter", "White wine"],
+    staples: ["Butter", "Cream", "White wine", "Shallots"],
   },
   fusion: {
-    nameTemplates: ["%s-Fusion-Bowl", "Street-Food-Wrap mit %s", "Ofenpfanne %s Fusion-Style"],
-    spices: ["Sojasauce", "Limette", "Chili", "Koriander"],
-    staples: ["Sojasauce", "Limette", "Sesamöl", "Frühlingszwiebeln"],
+    nameTemplates: ["%s Fusion Bowl", "Street Food Wrap with %s", "Pan-Seared %s Fusion-Style"],
+    spices: ["Soy sauce", "Lime", "Chili", "Coriander"],
+    staples: ["Soy sauce", "Lime", "Sesame oil", "Spring onions"],
   },
 };
 
 /** Staples considered unsuitable for a given diet preference. */
 const DIET_EXCLUDED_STAPLES: Record<DietPreference, string[]> = {
-  vegan: ["Butter", "Sahne", "Speck", "Parmesan", "Ghee"],
-  vegetarian: ["Speck"],
-  keto: ["Reis", "Basmatireis", "Pasta", "Mehl"],
+  vegan: ["Butter", "Cream", "Bacon", "Parmesan", "Ghee"],
+  vegetarian: ["Bacon"],
+  keto: ["Rice", "Basmati rice", "Pasta", "Flour"],
   none: [],
 };
 

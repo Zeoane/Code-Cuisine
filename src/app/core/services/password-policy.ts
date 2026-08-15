@@ -3,7 +3,7 @@ export const MIN_PASSWORD_LENGTH = 8;
 
 /** Requirement text shown next to the password field while registering. */
 export const PASSWORD_REQUIREMENTS_HINT =
-  "Mindestens 8 Zeichen, mit Groß- und Kleinbuchstaben, einer Zahl und einem Sonderzeichen.";
+  "At least 8 characters, with uppercase and lowercase letters, a number, and a special character.";
 
 /**
  * Checks a new account's password against the app's minimum complexity

@@ -1,33 +1,33 @@
 import { CuisineStyle, DietPreference, Difficulty, TimeCategory } from "../models/recipe.models";
 
-/** German display labels for each cuisine style. */
+/** Display labels for each cuisine style, matching CUISINE_OPTIONS in preference-options.ts. */
 export const CUISINE_LABELS: Record<CuisineStyle, string> = {
-  german: "Deutsch",
-  italian: "Italienisch",
-  japanese: "Japanisch",
-  indian: "Indisch",
+  german: "German",
+  italian: "Italian",
+  japanese: "Japanese",
+  indian: "Indian",
   gourmet: "Gourmet",
   fusion: "Fusion",
 };
 
-/** German display labels for each diet preference. */
+/** Display labels for each diet preference. */
 export const DIET_LABELS: Record<DietPreference, string> = {
-  vegetarian: "Vegetarisch",
+  vegetarian: "Vegetarian",
   vegan: "Vegan",
   keto: "Keto",
-  none: "Keine Einschränkung",
+  none: "No preferences",
 };
 
-/** German display labels for each time budget category. */
+/** Display labels for each time budget category. */
 export const TIME_CATEGORY_LABELS: Record<TimeCategory, string> = {
-  quick: "Schnell (bis 20 Min)",
-  medium: "Mittel (20-45 Min)",
-  elaborate: "Aufwendig (45+ Min)",
+  quick: "Quick (up to 20 min)",
+  medium: "Medium (20-45 min)",
+  elaborate: "Complex (45+ min)",
 };
 
-/** German display labels for each difficulty level. */
+/** Display labels for each difficulty level. */
 export const DIFFICULTY_LABELS: Record<Difficulty, string> = {
-  easy: "Einfach",
-  medium: "Mittel",
-  hard: "Anspruchsvoll",
+  easy: "Easy",
+  medium: "Medium",
+  hard: "Hard",
 };

@@ -1,16 +1,16 @@
 <fieldset
   class="grid grid-cols-1 gap-4 rounded-lg border border-forest/15 bg-white/60 p-4 sm:grid-cols-2 lg:grid-cols-5"
   [disabled]="disabled">
-  <legend class="sr-only">Rezept-Optionen</legend>
+  <legend class="sr-only">Recipe options</legend>
 
   <div class="flex flex-col gap-1.5">
-    <label class="font-quicksand text-base text-forest">Portionen</label>
+    <label class="font-quicksand text-base text-forest">Servings</label>
     <div class="flex items-center gap-2">
       <button
         type="button"
         (click)="stepServings(-1)"
         [disabled]="disabled || values.servings <= 1"
-        aria-label="Portionen verringern"
+        aria-label="Decrease servings"
         class="flex h-11 w-11 items-center justify-center rounded-md border border-forest/30 bg-white text-forest disabled:opacity-50">
         <app-icon name="minus" klass="h-4 w-4" />
       </button>
@@ -19,7 +19,7 @@
         type="button"
         (click)="stepServings(1)"
         [disabled]="disabled || values.servings >= 12"
-        aria-label="Portionen erhöhen"
+        aria-label="Increase servings"
         class="flex h-11 w-11 items-center justify-center rounded-md border border-forest/30 bg-white text-forest disabled:opacity-50">
         <app-icon name="plus" klass="h-4 w-4" />
       </button>
@@ -27,7 +27,7 @@
   </div>
 
   <div class="flex flex-col gap-1.5">
-    <label class="font-quicksand text-base text-forest" for="timeCategory">Zeitrahmen</label>
+    <label class="font-quicksand text-base text-forest" for="timeCategory">Time budget</label>
     <select
       id="timeCategory"
       class="font-quicksand h-11 w-full rounded-md border border-forest/30 bg-white px-2 text-base text-forest-dark"
@@ -41,7 +41,7 @@
   </div>
 
   <div class="flex flex-col gap-1.5">
-    <label class="font-quicksand text-base text-forest" for="cuisineStyle">Kochstil</label>
+    <label class="font-quicksand text-base text-forest" for="cuisineStyle">Cuisine style</label>
     <select
       id="cuisineStyle"
       class="font-quicksand h-11 w-full rounded-md border border-forest/30 bg-white px-2 text-base text-forest-dark"
@@ -55,7 +55,7 @@
   </div>
 
   <div class="flex flex-col gap-1.5">
-    <label class="font-quicksand text-base text-forest" for="diet">Ernährungsweise</label>
+    <label class="font-quicksand text-base text-forest" for="diet">Diet preference</label>
     <select
       id="diet"
       class="font-quicksand h-11 w-full rounded-md border border-forest/30 bg-white px-2 text-base text-forest-dark"
@@ -69,13 +69,13 @@
   </div>
 
   <div class="flex flex-col gap-1.5">
-    <label class="font-quicksand text-base text-forest">Kochhelfer</label>
+    <label class="font-quicksand text-base text-forest">Cooking helpers</label>
     <div class="flex items-center gap-2">
       <button
         type="button"
         (click)="stepHelpers(-1)"
         [disabled]="disabled || values.helpers <= 1"
-        aria-label="Kochhelfer verringern"
+        aria-label="Decrease cooking helpers"
         class="flex h-11 w-11 items-center justify-center rounded-md border border-forest/30 bg-white text-forest disabled:opacity-50">
         <app-icon name="minus" klass="h-4 w-4" />
       </button>
@@ -84,7 +84,7 @@
         type="button"
         (click)="stepHelpers(1)"
         [disabled]="disabled || values.helpers >= 3"
-        aria-label="Kochhelfer erhöhen"
+        aria-label="Increase cooking helpers"
         class="flex h-11 w-11 items-center justify-center rounded-md border border-forest/30 bg-white text-forest disabled:opacity-50">
         <app-icon name="plus" klass="h-4 w-4" />
       </button>

@@ -11,21 +11,20 @@ import {
 } from "firebase/auth";
 import { auth } from "../firebase/firebase-app";
 
-const NOT_CONFIGURED_MESSAGE =
-  "Anmeldung ist noch nicht verfügbar (kein Firebase-Projekt konfiguriert).";
+const NOT_CONFIGURED_MESSAGE = "Login isn't available yet (no Firebase project configured).";
 
-/** Maps common Firebase Auth error codes to short, user-facing German messages. */
+/** Maps common Firebase Auth error codes to short, user-facing messages. */
 const ERROR_MESSAGES: Record<string, string> = {
-  "auth/email-already-in-use": "Diese E-Mail-Adresse ist bereits registriert.",
-  "auth/invalid-email": "Bitte gib eine gültige E-Mail-Adresse ein.",
-  "auth/weak-password": "Das Passwort muss mindestens 6 Zeichen lang sein.",
-  "auth/invalid-credential": "E-Mail oder Passwort ist falsch.",
-  "auth/user-not-found": "E-Mail oder Passwort ist falsch.",
-  "auth/wrong-password": "E-Mail oder Passwort ist falsch.",
-  "auth/too-many-requests": "Zu viele Versuche. Bitte warte einen Moment.",
-  "auth/popup-closed-by-user": "Anmeldung wurde abgebrochen.",
+  "auth/email-already-in-use": "This email address is already registered.",
+  "auth/invalid-email": "Please enter a valid email address.",
+  "auth/weak-password": "Password must be at least 6 characters long.",
+  "auth/invalid-credential": "Incorrect email or password.",
+  "auth/user-not-found": "Incorrect email or password.",
+  "auth/wrong-password": "Incorrect email or password.",
+  "auth/too-many-requests": "Too many attempts. Please wait a moment.",
+  "auth/popup-closed-by-user": "Sign-in was cancelled.",
 };
-const FALLBACK_ERROR_MESSAGE = "Etwas ist schiefgelaufen. Bitte versuche es erneut.";
+const FALLBACK_ERROR_MESSAGE = "Something went wrong. Please try again.";
 
 /**
  * Wraps Firebase Authentication (email/password + Google) behind a small,

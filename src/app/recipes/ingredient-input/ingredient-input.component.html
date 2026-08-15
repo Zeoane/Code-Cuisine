@@ -5,10 +5,10 @@
       name="ingredient"
       [(ngModel)]="value"
       (keydown)="handleKeydown($event)"
-      placeholder="z. B. Tomaten, Reis, Hähnchen …"
+      placeholder="e.g. tomatoes, rice, chicken …"
       maxlength="64"
       [disabled]="disabled"
-      aria-label="Zutat hinzufügen"
+      aria-label="Add ingredient"
       class="font-quicksand h-12 w-full rounded-md border border-forest/30 bg-white px-3 text-base focus-visible:ring-2 focus-visible:ring-forest focus-visible:outline-none" />
     <button
       type="button"
@@ -16,12 +16,12 @@
       [disabled]="disabled || !value.trim()"
       class="font-quicksand flex h-12 items-center justify-center gap-1 rounded-md bg-forest px-5 text-base text-creme hover:bg-[#2d4c2d] disabled:opacity-60">
       <app-icon name="plus" klass="h-4 w-4" />
-      Hinzufügen
+      Add
     </button>
   </div>
 
   @if (ingredients.length > 0) {
-    <ul class="flex flex-wrap gap-2" aria-label="Deine Zutaten">
+    <ul class="flex flex-wrap gap-2" aria-label="Your ingredients">
       @for (item of ingredients; track item) {
         <li
           class="font-quicksand flex items-center gap-1.5 rounded-full bg-forest py-2 pr-2 pl-4 text-base font-medium text-creme">
@@ -30,7 +30,7 @@
             type="button"
             (click)="removeIngredient(item)"
             [disabled]="disabled"
-            [attr.aria-label]="item + ' entfernen'"
+            [attr.aria-label]="'Remove ' + item"
             class="flex h-7 w-7 items-center justify-center rounded-full transition-colors hover:bg-creme/20">
             <app-icon name="close" klass="h-4 w-4" />
           </button>
@@ -39,7 +39,7 @@
     </ul>
   } @else {
     <p class="font-quicksand text-base text-forest/60">
-      Füge mindestens eine Zutat hinzu, um Rezepte zu generieren.
+      Add at least one ingredient to generate recipes.
     </p>
   }
 </div>

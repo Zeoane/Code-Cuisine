@@ -4,7 +4,7 @@ import { RecipeGeneratorService } from "./recipe-generator.service";
 /** Builds a minimal, valid set of generation options for tests. */
 function buildOptions(overrides: Partial<GenerationOptions> = {}): GenerationOptions {
   return {
-    ingredients: ["Reis", "Hähnchen", "Paprika"],
+    ingredients: ["Rice", "Chicken", "Bell pepper"],
     servings: 2,
     timeCategory: "medium",
     cuisineStyle: "fusion",
@@ -32,7 +32,7 @@ describe("RecipeGeneratorService", () => {
   });
 
   it("scales the ingredient list to one entry per user ingredient", () => {
-    const options = buildOptions({ ingredients: ["Tomaten", "Reis"] });
+    const options = buildOptions({ ingredients: ["Tomatoes", "Rice"] });
     const [recipe] = service.generate(options);
     expect(recipe.ingredients.length).toBe(2);
   });

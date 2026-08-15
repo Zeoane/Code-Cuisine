@@ -4,11 +4,11 @@ import { LibraryService } from "./library.service";
 /** Builds a minimal, valid generated recipe for tests. */
 function buildRecipe(overrides: Partial<GeneratedRecipe> = {}): GeneratedRecipe {
   return {
-    title: "Testrezept",
+    title: "Test recipe",
     description: null,
-    ingredients: ["100 g Reis"],
+    ingredients: ["100 g rice"],
     missingIngredients: [],
-    steps: [{ instruction: "Kochen.", assignedTo: 1, isParallel: false }],
+    steps: [{ instruction: "Cook.", assignedTo: 1, isParallel: false }],
     difficulty: "easy",
     cookingTimeMinutes: 20,
     servings: 2,
@@ -32,7 +32,7 @@ describe("LibraryService", () => {
   });
 
   it("paginates 20 recipes per page", () => {
-    const recipes = Array.from({ length: 25 }, (_, i) => buildRecipe({ title: `Rezept ${i}` }));
+    const recipes = Array.from({ length: 25 }, (_, i) => buildRecipe({ title: `Recipe ${i}` }));
     service.addGenerated(recipes, 1);
     expect(service.list(1).recipes.length).toBe(20);
     expect(service.list(2).recipes.length).toBe(5);
@@ -48,7 +48,7 @@ describe("LibraryService", () => {
 
   it("finds a recipe by id", () => {
     const [stored] = service.addGenerated([buildRecipe()], 1);
-    expect(service.getById(stored.id)?.title).toBe("Testrezept");
+    expect(service.getById(stored.id)?.title).toBe("Test recipe");
   });
 
   it("returns undefined for an unknown id", () => {

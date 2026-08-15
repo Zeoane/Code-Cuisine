@@ -9,7 +9,7 @@
       class="flex h-11 w-11 items-center justify-center text-creme md:hidden"
       (click)="toggleMenu()"
       [attr.aria-expanded]="open()"
-      [attr.aria-label]="open() ? 'Menü schließen' : 'Menü öffnen'">
+      [attr.aria-label]="open() ? 'Close menu' : 'Open menu'">
       <app-icon [name]="open() ? 'close' : 'menu'" klass="h-6 w-6" />
     </button>
 
@@ -25,10 +25,10 @@
           type="button"
           (click)="logout()"
           class="font-quicksand flex min-h-11 items-center text-lg font-medium text-creme/70 transition-colors hover:text-creme">
-          Abmelden
+          Log out
         </button>
       } @else {
-        <a routerLink="/login" [class]="navLinkClass(false)">Anmelden</a>
+        <a routerLink="/login" [class]="navLinkClass(false)">Log in</a>
       }
     </nav>
 
@@ -49,10 +49,10 @@
             type="button"
             (click)="logout()"
             class="font-quicksand flex min-h-11 items-center px-1 text-left text-lg font-medium text-creme/70">
-            Abmelden ({{ userEmail() }})
+            Log out ({{ userEmail() }})
           </button>
         } @else {
-          <a routerLink="/login" (click)="closeMenu()" [class]="navLinkClass(false, 'px-1')">Anmelden</a>
+          <a routerLink="/login" (click)="closeMenu()" [class]="navLinkClass(false, 'px-1')">Log in</a>
         }
       </nav>
     }

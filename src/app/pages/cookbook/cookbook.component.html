@@ -39,7 +39,7 @@
           appDragScroll
           class="scrollbar-none flex gap-3 overflow-x-auto overscroll-x-contain pr-5"
           tabindex="0"
-          aria-label="Beliebteste Rezepte, horizontal scrollbar"
+          aria-label="Most liked recipes, horizontal scrollbar"
         >
           @for (recipe of mostLiked(); track recipe.title) {
             <li
@@ -56,7 +56,7 @@
                   class="font-quicksand flex h-7 shrink-0 items-center gap-1 rounded-[30px] bg-sage px-2 text-base leading-none font-medium text-deep-green"
                 >
                   <app-heart-icon klass="h-3.5 w-4" />
-                  <span class="sr-only">Herzen:</span>
+                  <span class="sr-only">Likes:</span>
                   {{ recipe.likes }}
                 </span>
               </div>
@@ -72,7 +72,7 @@
 
     <section
       class="grid gap-x-[65px] gap-y-[52px] sm:grid-cols-2 xl:grid-cols-3"
-      aria-label="Küchen-Kategorien"
+      aria-label="Cuisine categories"
     >
       @for (cuisine of cuisines; track cuisine.value) {
         <button

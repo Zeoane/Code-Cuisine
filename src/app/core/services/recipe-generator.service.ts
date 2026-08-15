@@ -58,14 +58,14 @@ export class RecipeGeneratorService {
   private buildTitle(options: GenerationOptions, index: number): string {
     const templates = CUISINE_PRESETS[options.cuisineStyle].nameTemplates;
     const template = templates[index % templates.length];
-    const lead = capitalize(options.ingredients[0] ?? "Gemüse");
+    const lead = capitalize(options.ingredients[0] ?? "Vegetables");
     return template.replace("%s", lead);
   }
 
   /** Builds a short appetizing description mentioning a style-typical spice. */
   private buildDescription(options: GenerationOptions, title: string): string {
     const spice = pickRandom(CUISINE_PRESETS[options.cuisineStyle].spices);
-    return `${title} mit ${spice} verfeinert – schnell zubereitet aus deinen Zutaten.`;
+    return `${title}, finished with ${spice} – quickly prepared from your ingredients.`;
   }
 
   /** Scales quantity hints for each ingredient to the requested servings. */
@@ -94,13 +94,13 @@ export class RecipeGeneratorService {
   /** Builds the human-readable instruction texts in cooking order. */
   private stepTexts(options: GenerationOptions, missing: string[]): string[] {
     const spice = pickRandom(CUISINE_PRESETS[options.cuisineStyle].spices);
-    const main = options.ingredients.slice(0, 3).join(", ") || "die Zutaten";
+    const main = options.ingredients.slice(0, 3).join(", ") || "the ingredients";
     return [
-      `${main} waschen und vorbereiten.`,
-      missing.length ? `${missing.join(", ")} bereitstellen.` : "Alle Zutaten abwiegen.",
-      `Pfanne oder Topf erhitzen und mit ${spice} würzen.`,
-      "Zutaten nacheinander hinzufügen und unter Rühren garen.",
-      `Für ${options.servings} Portionen abschmecken und anrichten.`,
+      `Wash and prepare ${main}.`,
+      missing.length ? `Get ${missing.join(", ")} ready.` : "Weigh out all ingredients.",
+      `Heat a pan or pot and season with ${spice}.`,
+      "Add the ingredients one by one and cook while stirring.",
+      `Season to taste and plate for ${options.servings} servings.`,
     ];
   }
 

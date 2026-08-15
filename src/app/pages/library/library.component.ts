@@ -24,7 +24,7 @@ export class LibraryComponent {
   protected readonly cuisine = signal<CuisineFilter>("all");
   protected readonly page = signal(1);
   protected readonly filterEntries: [CuisineFilter, string][] = [
-    ["all", "Alle"],
+    ["all", "All"],
     ...(Object.entries(CUISINE_LABELS) as [CuisineStyle, string][]),
   ];
 

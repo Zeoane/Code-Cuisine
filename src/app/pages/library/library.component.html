@@ -3,16 +3,16 @@
   <main class="mx-auto w-full max-w-[1100px] flex-1 px-4 py-10 sm:px-8 sm:py-12">
     <div class="mb-6 flex items-center gap-3">
       <app-icon name="library" klass="h-8 w-8 text-forest" />
-      <h1 class="font-ubuntu text-3xl font-bold text-forest-dark sm:text-4xl">Rezept-Bibliothek</h1>
+      <h1 class="font-ubuntu text-3xl font-bold text-forest-dark sm:text-4xl">Recipe Library</h1>
     </div>
     <p class="font-quicksand mb-6 text-base text-forest/80 sm:text-lg">
-      Alle jemals generierten Rezepte – frei zugänglich für alle, ganz ohne Account.
+      All recipes ever generated – freely accessible to everyone, no account needed.
     </p>
 
     <div
       class="scrollbar-none -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0"
       role="group"
-      aria-label="Nach Kochstil filtern">
+      aria-label="Filter by cuisine style">
       @for (entry of filterEntries; track entry[0]) {
         <button
           type="button"
@@ -50,21 +50,21 @@
       </div>
 
       @if (totalPages() > 1) {
-        <nav class="mt-8 flex items-center justify-center gap-3" aria-label="Bibliotheks-Seiten">
+        <nav class="mt-8 flex items-center justify-center gap-3" aria-label="Library pages">
           <button
             type="button"
             (click)="setPage(page() - 1)"
             [disabled]="page() <= 1"
             class="font-quicksand flex min-h-11 items-center gap-1 rounded-md px-3 text-base text-forest disabled:pointer-events-none disabled:opacity-50">
-            <app-icon name="arrow-left" klass="h-4 w-4" /> Zurück
+            <app-icon name="arrow-left" klass="h-4 w-4" /> Back
           </button>
-          <span class="font-quicksand px-3 text-base text-forest">Seite {{ page() }} von {{ totalPages() }}</span>
+          <span class="font-quicksand px-3 text-base text-forest">Page {{ page() }} of {{ totalPages() }}</span>
           <button
             type="button"
             (click)="setPage(page() + 1)"
             [disabled]="page() >= totalPages()"
             class="font-quicksand flex min-h-11 items-center gap-1 rounded-md px-3 text-base text-forest disabled:pointer-events-none disabled:opacity-50">
-            Weiter <app-icon name="arrow-right" klass="h-4 w-4" />
+            Next <app-icon name="arrow-right" klass="h-4 w-4" />
           </button>
         </nav>
       }
@@ -72,13 +72,13 @@
       <section
         class="font-quicksand mt-6 flex flex-col items-start gap-4 rounded-lg border border-dashed border-forest/30 p-8 text-forest">
         <p class="text-lg">
-          Die Bibliothek ist noch leer. Generiere die ersten Rezepte – sie erscheinen automatisch hier für alle
-          sichtbar.
+          The library is still empty. Generate the first recipes – they'll automatically appear here for
+          everyone to see.
         </p>
         <a
           routerLink="/generator"
           class="font-quicksand flex min-h-11 items-center rounded-md bg-leaf px-4 text-white hover:bg-[#006a00]">
-          Zum Rezept-Generator
+          Go to the recipe generator
         </a>
       </section>
     }

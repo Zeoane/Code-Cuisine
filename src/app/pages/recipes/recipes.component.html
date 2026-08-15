@@ -74,7 +74,7 @@
                 class="font-quicksand flex h-8 items-center gap-1 rounded-[30px] bg-sage px-3 text-base leading-none font-medium text-deep-green"
               >
                 <app-heart-icon klass="h-3.5 w-4" />
-                <span class="sr-only">Herzen:</span>
+                <span class="sr-only">Likes:</span>
                 {{ recipe.likes }}
               </span>
             </span>
@@ -83,12 +83,12 @@
       }
     </ol>
 
-    <nav class="flex items-center justify-center gap-2" aria-label="Seiten">
+    <nav class="flex items-center justify-center gap-2" aria-label="Pages">
       <button
         type="button"
         (click)="step(-1)"
         [disabled]="page() <= 1"
-        aria-label="Vorherige Seite"
+        aria-label="Previous page"
         class="font-quicksand flex h-9 w-9 items-center justify-center rounded-full text-base font-medium text-forest transition-colors hover:bg-mist disabled:opacity-40 disabled:hover:bg-transparent"
       >
         &#8249;
@@ -118,7 +118,7 @@
         type="button"
         (click)="step(1)"
         [disabled]="page() >= totalPages()"
-        aria-label="Nächste Seite"
+        aria-label="Next page"
         class="font-quicksand flex h-9 w-9 items-center justify-center rounded-full text-base font-medium text-forest transition-colors hover:bg-mist disabled:opacity-40 disabled:hover:bg-transparent"
       >
         &#8250;

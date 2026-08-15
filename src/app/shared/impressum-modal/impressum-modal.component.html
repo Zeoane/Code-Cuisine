@@ -11,26 +11,26 @@
       <button
         type="button"
         (click)="closed.emit()"
-        aria-label="Impressum schließen"
+        aria-label="Close imprint"
         class="absolute top-3 right-3 flex h-11 w-11 items-center justify-center rounded-full text-forest hover:bg-forest/10">
         <app-icon name="close" klass="h-5 w-5" />
       </button>
 
       <h2 id="impressum-modal-title" class="font-ubuntu mb-4 pr-8 text-2xl font-bold text-forest-dark">
-        Impressum
+        Imprint
       </h2>
 
       <div class="space-y-4 text-base">
         <p>
           Code à Cuisine
           <br />
-          Gabriel [Nachname]
+          Gabriel [Last name]
           <br />
-          [Straße und Hausnummer], [PLZ und Ort]
+          [Street and number], [ZIP code and city]
         </p>
-        <p>Kontakt: [deine E-Mail-Adresse]</p>
+        <p>Contact: [your email address]</p>
         <p class="text-base text-forest/80">
-          Generierte Rezepte dienen ausschließlich der Inspiration – Angaben ohne Gewähr.
+          Generated recipes are for inspiration only – provided without guarantee.
         </p>
       </div>
 
@@ -38,7 +38,7 @@
         routerLink="/impressum"
         (click)="closed.emit()"
         class="font-quicksand mt-6 flex min-h-11 items-center text-base text-forest underline-offset-4 hover:underline">
-        Vollständiges Impressum ansehen →
+        View full imprint →
       </a>
     </div>
   </div>

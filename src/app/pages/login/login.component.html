@@ -9,7 +9,7 @@
         [class.bg-forest]="mode() === 'login'"
         [class.text-creme]="mode() === 'login'"
         [class.text-forest]="mode() !== 'login'">
-        Anmelden
+        Log in
       </button>
       <button
         type="button"
@@ -18,17 +18,17 @@
         [class.bg-forest]="mode() === 'register'"
         [class.text-creme]="mode() === 'register'"
         [class.text-forest]="mode() !== 'register'">
-        Registrieren
+        Sign up
       </button>
     </div>
 
     <h1 class="font-ubuntu mt-6 mb-4 text-2xl font-bold text-forest-dark">
-      {{ mode() === "register" ? "Konto erstellen" : "Willkommen zurück" }}
+      {{ mode() === "register" ? "Create an account" : "Welcome back" }}
     </h1>
 
     <form class="flex flex-col gap-4" (ngSubmit)="submit()">
       <label class="font-quicksand flex flex-col gap-1 text-base text-forest-dark">
-        E-Mail
+        Email
         <input
           type="email"
           name="email"
@@ -39,7 +39,7 @@
       </label>
 
       <label class="font-quicksand flex flex-col gap-1 text-base text-forest-dark">
-        Passwort
+        Password
         <input
           type="password"
           name="password"
@@ -61,13 +61,13 @@
         type="submit"
         [disabled]="loading()"
         class="font-quicksand mt-2 flex h-12 items-center justify-center rounded-md bg-forest px-5 text-base text-creme hover:bg-[#2d4c2d] disabled:opacity-60">
-        {{ mode() === "register" ? "Konto erstellen" : "Anmelden" }}
+        {{ mode() === "register" ? "Create account" : "Log in" }}
       </button>
     </form>
 
     <div class="my-6 flex items-center gap-3">
       <div class="h-px flex-1 bg-forest/20"></div>
-      <span class="font-quicksand text-base text-forest/60">oder</span>
+      <span class="font-quicksand text-base text-forest/60">or</span>
       <div class="h-px flex-1 bg-forest/20"></div>
     </div>
 
@@ -76,11 +76,11 @@
       (click)="submitWithGoogle()"
       [disabled]="loading()"
       class="font-quicksand flex h-12 items-center justify-center rounded-md border border-forest/30 bg-white px-5 text-base text-forest-dark hover:bg-sage/20 disabled:opacity-60">
-      Mit Google anmelden
+      Continue with Google
     </button>
 
     <a routerLink="/" class="font-quicksand mt-8 text-center text-base text-forest/70 hover:text-forest">
-      Zurück zur Startseite
+      Back to home
     </a>
   </main>
 </div>
