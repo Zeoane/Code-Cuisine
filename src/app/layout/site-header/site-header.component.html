@@ -19,6 +19,17 @@
           {{ item.label }}
         </a>
       }
+      @if (isLoggedIn()) {
+        <span class="font-quicksand text-base text-creme/70">{{ userEmail() }}</span>
+        <button
+          type="button"
+          (click)="logout()"
+          class="font-quicksand flex min-h-11 items-center text-lg font-medium text-creme/70 transition-colors hover:text-creme">
+          Abmelden
+        </button>
+      } @else {
+        <a routerLink="/login" [class]="navLinkClass(false)">Anmelden</a>
+      }
     </nav>
 
     @if (open()) {
@@ -32,6 +43,16 @@
             [class]="navLinkClass(rla.isActive, 'px-1')">
             {{ item.label }}
           </a>
+        }
+        @if (isLoggedIn()) {
+          <button
+            type="button"
+            (click)="logout()"
+            class="font-quicksand flex min-h-11 items-center px-1 text-left text-lg font-medium text-creme/70">
+            Abmelden ({{ userEmail() }})
+          </button>
+        } @else {
+          <a routerLink="/login" (click)="closeMenu()" [class]="navLinkClass(false, 'px-1')">Anmelden</a>
         }
       </nav>
     }

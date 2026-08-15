@@ -66,10 +66,16 @@ mit einem clientseitigen Mock-Generator statt einem echten LLM-Aufruf, und mit
 `localStorage` statt einer echten Datenbank. Das hält die App sofort lauffähig, ohne
 Server oder Zugangsdaten.
 
+**Firebase Auth ist bereits angebunden**: Registrierung/Login per E-Mail & Passwort
+sowie Google-Login (`AuthService`, `authGuard`, `/login`-Seite), aktuell ausschließlich
+zum Schützen der `/cookbook`-Route. Dazu eine echte Firebase-Projektkonfiguration in
+`src/environments/environment.ts` nötig (siehe `environment.example.ts`) – lokal ohne
+Firebase-Projekt startet die App weiterhin, Login schlägt dann lediglich fehl.
+
 Geplante nächste Schritte (bewusst noch offen, siehe Checkliste):
 
-- **Firebase**: Speicherung aller generierten Rezepte (Bibliothek) und des
-  persönlichen Kochbuchs inkl. Login, statt `localStorage`.
+- **Firebase Firestore**: Speicherung aller generierten Rezepte (Bibliothek) und des
+  persönlichen Kochbuchs, statt `localStorage`.
 - **n8n**: Workflow, der die eigentliche KI-Rezeptgenerierung übernimmt
   (Fehlerbehandlung/Logging, IP-basiertes Quota- und Rate-Limiting, erneute
   Datenvalidierung der Angular-Eingaben, klar definierte JSON-Struktur zwischen
@@ -189,10 +195,16 @@ backed by a client-side mock generator instead of a real LLM call, and by
 `localStorage` instead of a real database. That keeps the app immediately runnable,
 with no server or credentials required.
 
+**Firebase Auth is already wired in**: email/password registration and login plus
+Google sign-in (`AuthService`, `authGuard`, the `/login` page), currently only
+gating the `/cookbook` route. This needs a real Firebase project config in
+`src/environments/environment.ts` (see `environment.example.ts`) – without one the
+app still starts locally, login attempts simply fail.
+
 Planned next steps (intentionally still open, see the project checklist):
 
-- **Firebase**: storage for all generated recipes (library) and the personal
-  cookbook, including login, replacing `localStorage`.
+- **Firebase Firestore**: storage for all generated recipes (library) and the
+  personal cookbook, replacing `localStorage`.
 - **n8n**: a workflow that takes over the actual AI recipe generation
   (error handling/logging, IP-based quota and rate limiting, re-validating the
   data coming from Angular, a clearly defined JSON structure between Angular

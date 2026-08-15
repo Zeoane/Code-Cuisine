@@ -5,26 +5,74 @@
 /dist
 /out-tsc
 /.angular
+*.tsbuildinfo
 
-# IDE
+# IDE / tooling
 /.vscode/*
 !/.vscode/settings.json
 !/.vscode/tasks.json
 !/.vscode/launch.json
 !/.vscode/extensions.json
 .idea/
+.claude/
 
 # System files
 .DS_Store
 Thumbs.db
-
-# Env
-.env
-.env.local
+desktop.ini
 
 # Logs
 *.log
 npm-debug.log*
+yarn-error.log*
 
 # Testing
 /coverage
+
+# ---------------------------------------------------------------------------
+# Secrets – nothing below this line belongs on GitHub
+# ---------------------------------------------------------------------------
+
+# Environment variables in every flavour (.env, .env.local, .env.production …)
+.env
+.env.*
+!.env.example
+
+# Angular environment files that hold real keys.
+# Commit src/environments/environment.example.ts with placeholders instead.
+/src/environments/environment*.ts
+!/src/environments/environment.example.ts
+
+# Firebase
+.firebase/
+.firebaserc
+firebase-debug.log*
+firestore-debug.log*
+database-debug.log*
+pubsub-debug.log*
+ui-debug.log*
+*firebase-adminsdk*.json
+serviceAccountKey*.json
+service-account*.json
+google-services.json
+GoogleService-Info.plist
+
+# n8n
+.n8n/
+n8n-data/
+*.n8n.json
+**/n8n/credentials*.json
+**/n8n/*credentials*
+workflows/**/credentials*.json
+
+# Generic credential material
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+secrets/
+credentials/
+*secret*.json
+*credentials*.json
+apikeys*.json
