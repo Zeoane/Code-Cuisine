@@ -3,6 +3,7 @@ import { Router } from "@angular/router";
 import { cuisineLabel, timeLabel } from "../../core/data/preference-options";
 import { WizardStateService } from "../../core/services/wizard-state.service";
 import { LogoComponent } from "../../hero/logo/logo.component";
+import { LogoutButtonComponent } from "../../shared/logout-button/logout-button.component";
 
 /**
  * Step 3 of the generator wizard ("The recipe results"): the three suggestions
@@ -11,7 +12,7 @@ import { LogoComponent } from "../../hero/logo/logo.component";
 @Component({
   selector: "app-results",
   standalone: true,
-  imports: [LogoComponent],
+  imports: [LogoComponent, LogoutButtonComponent],
   templateUrl: "./results.component.html",
 })
 export class ResultsComponent {

@@ -11,6 +11,7 @@ import { CuisineStyle } from "../../core/models/recipe.models";
 import { ToastService } from "../../core/services/toast.service";
 import { LogoComponent } from "../../hero/logo/logo.component";
 import { HeartIconComponent } from "../../shared/heart-icon/heart-icon.component";
+import { LogoutButtonComponent } from "../../shared/logout-button/logout-button.component";
 
 /** Ellipsis marker used between distant page numbers. */
 const GAP = "…";
@@ -22,7 +23,7 @@ const GAP = "…";
 @Component({
   selector: "app-recipes",
   standalone: true,
-  imports: [RouterLink, LogoComponent, HeartIconComponent],
+  imports: [RouterLink, LogoComponent, HeartIconComponent, LogoutButtonComponent],
   templateUrl: "./recipes.component.html",
 })
 export class RecipesComponent {

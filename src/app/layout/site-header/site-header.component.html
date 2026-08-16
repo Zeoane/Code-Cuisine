@@ -20,12 +20,13 @@
         </a>
       }
       @if (isLoggedIn()) {
-        <span class="font-quicksand text-base text-creme/70">{{ userEmail() }}</span>
+        <span class="font-quicksand hidden text-base text-creme/70 lg:inline">{{ userEmail() }}</span>
         <button
           type="button"
           (click)="logout()"
-          class="font-quicksand flex min-h-11 items-center text-lg font-medium text-creme/70 transition-colors hover:text-creme">
-          Log out
+          [attr.aria-label]="'Log out (' + userEmail() + ')'"
+          class="flex h-11 w-11 shrink-0 items-center justify-center text-creme/70 transition-colors hover:text-creme">
+          <app-icon name="log-out" klass="h-5 w-5" />
         </button>
       } @else {
         <a routerLink="/login" [class]="navLinkClass(false)">Log in</a>
@@ -48,8 +49,9 @@
           <button
             type="button"
             (click)="logout()"
-            class="font-quicksand flex min-h-11 items-center px-1 text-left text-lg font-medium text-creme/70">
-            Log out ({{ userEmail() }})
+            class="font-quicksand flex min-h-11 items-center gap-2 px-1 text-left text-lg font-medium text-creme/70">
+            <app-icon name="log-out" klass="h-5 w-5" />
+            {{ userEmail() }}
           </button>
         } @else {
           <a routerLink="/login" (click)="closeMenu()" [class]="navLinkClass(false, 'px-1')">Log in</a>

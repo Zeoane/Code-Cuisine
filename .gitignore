@@ -65,6 +65,14 @@ n8n-data/
 **/n8n/*credentials*
 workflows/**/credentials*.json
 
+# Raw n8n workflow downloads can contain real credentials pasted into Code
+# nodes (this project signs a Firestore JWT inline rather than using an n8n
+# credential object, so the private key ends up in the exported JSON).
+# Only the sanitized *.example.json templates are meant for Git - re-download
+# from n8n into n8n/workflows/ freely, it's ignored regardless of filename.
+n8n/workflows/*.json
+!n8n/workflows/*.example.json
+
 # Generic credential material
 *.pem
 *.key

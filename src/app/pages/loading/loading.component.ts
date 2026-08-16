@@ -5,6 +5,7 @@ import { hasEnoughIngredients } from "../../core/services/ingredient-check";
 import { GenerationError, RecipeGeneratorService } from "../../core/services/recipe-generator.service";
 import { WizardStateService } from "../../core/services/wizard-state.service";
 import { LogoComponent } from "../../hero/logo/logo.component";
+import { LogoutButtonComponent } from "../../shared/logout-button/logout-button.component";
 import { NotEnoughModalComponent } from "../../shared/not-enough-modal/not-enough-modal.component";
 
 /** One illustration element that drops into the bowl, in animation order. */
@@ -55,7 +56,7 @@ const GENERATION_FAILED_TITLE = "Something went wrong";
 @Component({
   selector: "app-loading",
   standalone: true,
-  imports: [LogoComponent, NotEnoughModalComponent],
+  imports: [LogoComponent, NotEnoughModalComponent, LogoutButtonComponent],
   templateUrl: "./loading.component.html",
   styleUrl: "./loading.component.css",
 })

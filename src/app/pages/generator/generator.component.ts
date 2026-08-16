@@ -5,6 +5,7 @@ import { WizardStateService } from "../../core/services/wizard-state.service";
 import { LogoComponent } from "../../hero/logo/logo.component";
 import { IngredientEntryListComponent } from "../../recipes/ingredient-entry-list/ingredient-entry-list.component";
 import { IngredientQuantityFormComponent } from "../../recipes/ingredient-quantity-form/ingredient-quantity-form.component";
+import { LogoutButtonComponent } from "../../shared/logout-button/logout-button.component";
 
 /** Session-wide counter so freshly added ingredients get a stable, unique id. */
 let nextId = 1;
@@ -18,7 +19,13 @@ let nextId = 1;
 @Component({
   selector: "app-generator",
   standalone: true,
-  imports: [RouterLink, LogoComponent, IngredientQuantityFormComponent, IngredientEntryListComponent],
+  imports: [
+    RouterLink,
+    LogoComponent,
+    IngredientQuantityFormComponent,
+    IngredientEntryListComponent,
+    LogoutButtonComponent,
+  ],
   templateUrl: "./generator.component.html",
 })
 export class GeneratorComponent {

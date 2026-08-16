@@ -1,5 +1,6 @@
 import { provideHttpClient } from "@angular/common/http";
 import { TestBed } from "@angular/core/testing";
+import { environment } from "../../../environments/environment";
 import { GenerationOptions } from "../models/recipe.models";
 import { RecipeGeneratorService } from "./recipe-generator.service";
 
@@ -18,10 +19,20 @@ function buildOptions(overrides: Partial<GenerationOptions> = {}): GenerationOpt
 
 describe("RecipeGeneratorService", () => {
   let service: RecipeGeneratorService;
+  let originalGenerateUrl: string;
 
   beforeEach(() => {
+    // These tests exercise the local mock generator, not a live n8n call -
+    // force the "not configured" path regardless of the real deployed
+    // environment.ts (which may have a real webhook URL set).
+    originalGenerateUrl = environment.n8n.generateUrl;
+    environment.n8n.generateUrl = "";
     TestBed.configureTestingModule({ providers: [provideHttpClient()] });
     service = TestBed.inject(RecipeGeneratorService);
+  });
+
+  afterEach(() => {
+    environment.n8n.generateUrl = originalGenerateUrl;
   });
 
   it("generates exactly three recipes", async () => {

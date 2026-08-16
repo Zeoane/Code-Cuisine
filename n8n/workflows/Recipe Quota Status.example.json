@@ -80,7 +80,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const crypto = require('crypto');\n\n// Not secret – fine to commit. From the downloaded service account JSON's \"client_email\" field.\nconst SERVICE_ACCOUNT_EMAIL = 'firebase-adminsdk-fbsvc@code-a-cuisine-3d1e0.iam.gserviceaccount.com';\n// SECRET – paste locally in n8n after import, never commit this filled in. From the JSON's \"private_key\" field (paste exactly, including the \\n sequences – JS turns them into real newlines inside a template literal).\nconst PRIVATE_KEY = '0ec2d7ffde40d7259631b564ca6a663062b6f0a1'.trim().replace(/^\"|\"$/g, '').replace(/\\\\n/g, '\\n');\n\nfunction base64url(input) {\n  return Buffer.from(input).toString('base64').replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '');\n}\n\nconst now = Math.floor(Date.now() / 1000);\nconst header = { alg: 'RS256', typ: 'JWT' };\nconst payload = {\n  iss: SERVICE_ACCOUNT_EMAIL,\n  scope: 'https://www.googleapis.com/auth/datastore',\n  aud: 'https://oauth2.googleapis.com/token',\n  iat: now,\n  exp: now + 3600,\n};\n\nconst unsigned = base64url(JSON.stringify(header)) + '.' + base64url(JSON.stringify(payload));\nconst signer = crypto.createSign('RSA-SHA256');\nsigner.update(unsigned);\nsigner.end();\nconst signature = signer.sign(PRIVATE_KEY).toString('base64').replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '');\n\nreturn [{\n  json: Object.assign({}, $json, {\n    firestoreJwt: unsigned + '.' + signature,\n  })\n}];"
+        "jsCode": "const crypto = require('crypto');\n\nconst SERVICE_ACCOUNT_EMAIL = $json.serviceAccountEmail;\nconst rawKeyBlob = $json.serviceAccountPrivateKey;\n\nfunction normalizePemKey(blob) {\n  const match = blob.match(/BEGIN (?:RSA )?PRIVATE KEY-{2,}([\\s\\S]*?)-{2,}END (?:RSA )?PRIVATE KEY/);\n  if (!match) {\n    throw new Error('Could not find BEGIN/END PRIVATE KEY markers - check the Set node field value.');\n  }\n  const cleaned = match[1].replace(/\\\\n/g, '\\n');\n  const base64 = cleaned.replace(/[^A-Za-z0-9+/=]/g, '');\n  const lines = base64.match(/.{1,64}/g) || [];\n  return '-----BEGIN PRIVATE KEY-----\\n' + lines.join('\\n') + '\\n-----END PRIVATE KEY-----\\n';\n}\n\nconst PRIVATE_KEY = normalizePemKey(rawKeyBlob);\n\nfunction base64url(input) {\n  return Buffer.from(input).toString('base64').replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '');\n}\n\nconst now = Math.floor(Date.now() / 1000);\nconst header = { alg: 'RS256', typ: 'JWT' };\nconst payload = {\n  iss: SERVICE_ACCOUNT_EMAIL,\n  scope: 'https://www.googleapis.com/auth/datastore',\n  aud: 'https://oauth2.googleapis.com/token',\n  iat: now,\n  exp: now + 3600,\n};\n\nconst unsigned = base64url(JSON.stringify(header)) + '.' + base64url(JSON.stringify(payload));\nconst signer = crypto.createSign('RSA-SHA256');\nsigner.update(unsigned);\nsigner.end();\nconst signature = signer.sign(PRIVATE_KEY).toString('base64').replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '');\n\nreturn [{\n  json: Object.assign({}, $json, {\n    firestoreJwt: unsigned + '.' + signature,\n  })\n}];"
       },
       "id": "6f85e8aa-43cd-4fa3-b5dd-82a52589af54",
       "name": "Build & Sign Firestore JWT",
@@ -231,6 +231,35 @@
         1984,
         -112
       ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "sa-email-field",
+              "name": "serviceAccountEmail",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "sa-key-field",
+              "name": "serviceAccountPrivateKey",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-service-account-credentials",
+      "name": "Set Service Account Credentials",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        248,
+        -112
+      ]
     }
   ],
   "pinData": {},
@@ -261,7 +290,7 @@
       "main": [
         [
           {
-            "node": "Build & Sign Firestore JWT",
+            "node": "Set Service Account Credentials",
             "type": "main",
             "index": 0
           }
@@ -351,6 +380,17 @@
           }
         ]
       ]
+    },
+    "Set Service Account Credentials": {
+      "main": [
+        [
+          {
+            "node": "Build & Sign Firestore JWT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
@@ -361,7 +401,7 @@
     "timeSavedMode": "fixed",
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "6bbf5b99-a08b-4fa6-bdad-66fdc6314ecf",
+  "versionId": "d0a036d9-5d7f-4603-b798-a301e2d254bf",
   "meta": {
     "instanceId": "178e2aea3414a8776196d1eaa659ed3e085989989f4a0edffb60f4038b9bcd3b"
   },

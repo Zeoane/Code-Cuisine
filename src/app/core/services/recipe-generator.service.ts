@@ -14,7 +14,9 @@ import {
 import { QuotaService, QuotaStatus } from "./quota.service";
 
 /** True once a real n8n generate-recipe webhook URL has been configured. */
-export const isN8nGenerationConfigured = Boolean(environment.n8n.generateUrl);
+export function isN8nGenerationConfigured(): boolean {
+  return Boolean(environment.n8n.generateUrl);
+}
 
 /** Error codes the n8n webhook can report, mirrored on the thrown Error. */
 export type GenerationErrorCode = "quota_exceeded" | "invalid_request" | "generation_failed";
@@ -71,7 +73,7 @@ export class RecipeGeneratorService {
 
   /** Generates exactly three recipe suggestions for the given options. */
   async generate(options: GenerationOptions): Promise<GeneratedRecipe[]> {
-    if (!isN8nGenerationConfigured) {
+    if (!isN8nGenerationConfigured()) {
       return [0, 1, 2].map(index => this.buildRecipe(options, index));
     }
     return this.generateViaN8n(options);
@@ -81,11 +83,24 @@ export class RecipeGeneratorService {
   private async generateViaN8n(options: GenerationOptions): Promise<GeneratedRecipe[]> {
     try {
       const response = await firstValueFrom(
-        this.http.post<GenerateResponse>(environment.n8n.generateUrl, options),
+        this.http.post<GenerateResponse | GenerateErrorResponse>(environment.n8n.generateUrl, options),
       );
-      this.quota.applyFromResponse(response.quota);
-      return response.recipes;
+      // n8n's error-response nodes don't reliably set their configured HTTP
+      // status code, so a "successful" call can still carry an error-shaped
+      // body - check the actual shape rather than trusting the HTTP status.
+      if (!Array.isArray((response as GenerateResponse).recipes)) {
+        const errorBody = response as GenerateErrorResponse;
+        if (errorBody.quota) this.quota.applyFromResponse(errorBody.quota);
+        throw new GenerationError(
+          errorBody.message ?? FALLBACK_ERROR_MESSAGE,
+          errorBody.error ?? "generation_failed",
+        );
+      }
+      const successBody = response as GenerateResponse;
+      this.quota.applyFromResponse(successBody.quota);
+      return successBody.recipes;
     } catch (error) {
+      if (error instanceof GenerationError) throw error;
       throw this.toGenerationError(error);
     }
   }

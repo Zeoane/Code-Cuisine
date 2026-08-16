@@ -1,8 +1,11 @@
 <div class="flex min-h-screen flex-col gap-16 bg-white pb-16">
   <header class="flex w-full flex-col gap-9 px-4 pt-6 sm:px-[68px] sm:pt-10">
-    <a routerLink="/" aria-label="Code à Cuisine – Home" class="w-fit">
-      <app-logo variant="color" klass="h-10 w-auto sm:h-12" />
-    </a>
+    <div class="flex w-full items-center justify-between">
+      <a routerLink="/" aria-label="Code à Cuisine – Home" class="w-fit">
+        <app-logo variant="color" klass="h-10 w-auto sm:h-12" />
+      </a>
+      <app-logout-button klass="flex h-11 w-11 shrink-0 items-center justify-center text-forest transition-colors hover:text-deep-green" />
+    </div>
     <button
       type="button"
       (click)="goBack()"

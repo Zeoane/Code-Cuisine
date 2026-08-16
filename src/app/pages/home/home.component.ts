@@ -4,6 +4,7 @@ import { HeroPlatesComponent } from "../../hero/hero-plates/hero-plates.componen
 import { LogoComponent } from "../../hero/logo/logo.component";
 import { IconComponent } from "../../shared/icon/icon.component";
 import { ImpressumModalComponent } from "../../shared/impressum-modal/impressum-modal.component";
+import { LogoutButtonComponent } from "../../shared/logout-button/logout-button.component";
 
 /**
  * Hero landing page - pixel-faithful implementation of the Figma design
@@ -12,7 +13,14 @@ import { ImpressumModalComponent } from "../../shared/impressum-modal/impressum-
 @Component({
   selector: "app-home",
   standalone: true,
-  imports: [RouterLink, LogoComponent, HeroPlatesComponent, IconComponent, ImpressumModalComponent],
+  imports: [
+    RouterLink,
+    LogoComponent,
+    HeroPlatesComponent,
+    IconComponent,
+    ImpressumModalComponent,
+    LogoutButtonComponent,
+  ],
   templateUrl: "./home.component.html",
 })
 export class HomeComponent {

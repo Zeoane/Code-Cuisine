@@ -6,6 +6,7 @@ import { WizardStateService } from "../../core/services/wizard-state.service";
 import { LogoComponent } from "../../hero/logo/logo.component";
 import { HeartIconComponent } from "../../shared/heart-icon/heart-icon.component";
 import { IconComponent } from "../../shared/icon/icon.component";
+import { LogoutButtonComponent } from "../../shared/logout-button/logout-button.component";
 
 /** Short display suffix appended directly after the quantity number. */
 const UNIT_SUFFIX: Record<IngredientUnit, string> = {
@@ -25,7 +26,7 @@ const BASE_LIKES = 66;
 @Component({
   selector: "app-recipe-view",
   standalone: true,
-  imports: [RouterLink, LogoComponent, IconComponent, HeartIconComponent],
+  imports: [RouterLink, LogoComponent, IconComponent, HeartIconComponent, LogoutButtonComponent],
   templateUrl: "./recipe-view.component.html",
 })
 export class RecipeViewComponent {

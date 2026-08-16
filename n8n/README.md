@@ -4,15 +4,27 @@ Three workflows implement the IP-based quota system: **3 recipes per IP per
 day, 12 per day system-wide**, enforced server-side as a cost airbag (not
 just in the Angular frontend).
 
-- [`workflows/generate-recipe.workflow.json`](workflows/generate-recipe.workflow.json) —
+- [`workflows/Recipe Generation.example.json`](workflows/Recipe%20Generation.example.json) —
   the main webhook: validates the request, checks/increments quota, returns
   (currently mock) recipes.
-- [`workflows/quota-status.workflow.json`](workflows/quota-status.workflow.json) —
+- [`workflows/Recipe Quota Status.example.json`](workflows/Recipe%20Quota%20Status.example.json) —
   read-only webhook so the Angular app can show "X of 3 left today" before
   the user even tries to generate.
-- [`workflows/error-notifications.workflow.json`](workflows/error-notifications.workflow.json) —
+- [`workflows/Error Notifications.example.json`](workflows/Error%20Notifications.example.json) —
   Error Trigger + email, referenced as the other two workflows' Error
   Workflow.
+
+**Why `.example.json`:** this project signs the Firestore JWT inline in a
+Code node rather than using an n8n credential object (see below), so a raw
+"Download" from n8n includes whatever real client_email/private_key you've
+pasted in. `.gitignore` excludes every other `.json` file under
+`n8n/workflows/` — **download from n8n into this folder as often as you
+like**, using n8n's own filenames; it's ignored automatically. Only these
+three sanitized `*.example.json` files (placeholders instead of real
+credentials) are meant to be committed. If you change the workflow logic and
+want to update the committed template, copy your real export over the
+`.example.json` file and manually put the two placeholder lines back in
+"Build & Sign Firestore JWT" before saving.
 
 **Import caveat:** these JSON files were written by hand (no live n8n
 instance was available to build/test against), following n8n's documented
@@ -47,21 +59,29 @@ credential needed — it's a public token endpoint) → **Store Access Token**
 header parameter — no n8n credential object at all, so this works on any
 n8n instance/plan.
 
-**After importing (or building) `generate-recipe` and `quota-status`**, open
-each workflow's **"Build & Sign Firestore JWT"** Code node and fill in two
-placeholders from the downloaded service account JSON:
-- `SERVICE_ACCOUNT_EMAIL` ← the JSON's `client_email` field (not secret).
-- `PRIVATE_KEY` (the backtick string) ← the JSON's `private_key` field.
-  Copy everything between the quotes in the JSON file (not the quotes
-  themselves) and paste it between the backticks. The code normalizes it
-  afterwards (`.trim().replace(/^"|"$/g, '').replace(/\\n/g, '\n')`), so it
-  works whether you accidentally included the surrounding quotes or pasted
-  literal `\n` sequences instead of real line breaks — both common causes of
-  a `DECODER routines::unsupported` error from `crypto.createSign`.
+**After importing (or building) `generate-recipe` and `quota-status`**, fill
+in the credentials via a **Set node's form fields**, not by editing code —
+pasting a multi-line secret into a JS code editor kept breaking on stray
+quotes/commas/escaping picked up along the way; a plain n8n text field takes
+any paste as-is, no escaping rules to get wrong:
 
-**Do this only inside n8n, never in the committed JSON files** — the
-placeholders in `workflows/*.json` must stay as placeholders; only the copy
-living in your n8n workspace should hold the real key.
+1. Both workflows have a **"Set Service Account Credentials"** node (an
+   "Edit Fields (Set)" node) right before **"Build & Sign Firestore JWT"**.
+   Open it and fill in its two fields directly from the downloaded service
+   account JSON — paste each value as-is, with or without the surrounding
+   quotes, it doesn't matter:
+   - `serviceAccountEmail` ← the JSON's `client_email` field (not secret).
+   - `serviceAccountPrivateKey` ← the JSON's `private_key` field, pasted in
+     any form (one line, multi-line, literal `\n` text or real line breaks).
+2. **"Build & Sign Firestore JWT"** reads both fields from `$json` and
+   normalizes the key itself: it locates the `BEGIN`/`END PRIVATE KEY`
+   markers and keeps only the Base64 characters between them, rebuilding a
+   clean PEM — so however the key was pasted, only the meaningful payload
+   is used.
+
+**Do this only inside n8n, never in the committed JSON files** — the Set
+node's fields in `workflows/*.example.json` must stay empty; only the copy
+living in your n8n workspace should hold the real values.
 
 ## 2. Import (or build manually)
 

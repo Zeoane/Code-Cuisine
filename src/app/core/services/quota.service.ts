@@ -10,7 +10,9 @@ export interface QuotaStatus {
 }
 
 /** True once a real n8n quota-status webhook URL has been configured. */
-export const isQuotaStatusConfigured = Boolean(environment.n8n.quotaStatusUrl);
+export function isQuotaStatusConfigured(): boolean {
+  return Boolean(environment.n8n.quotaStatusUrl);
+}
 
 /**
  * Tracks the signed-in network's remaining daily recipe generations
@@ -29,7 +31,7 @@ export class QuotaService {
 
   /** Fetches the current quota status from n8n; silently no-ops on failure. */
   async refresh(): Promise<void> {
-    if (!isQuotaStatusConfigured) return;
+    if (!isQuotaStatusConfigured()) return;
     try {
       const status = await firstValueFrom(
         this.http.get<QuotaStatus>(environment.n8n.quotaStatusUrl),

@@ -11,6 +11,7 @@ import { WizardStateService } from "../../core/services/wizard-state.service";
 import { LogoComponent } from "../../hero/logo/logo.component";
 import { ChoiceChipComponent } from "../../recipes/choice-chip/choice-chip.component";
 import { IconComponent } from "../../shared/icon/icon.component";
+import { LogoutButtonComponent } from "../../shared/logout-button/logout-button.component";
 import { QuotaBadgeComponent } from "../../shared/quota-badge/quota-badge.component";
 
 /**
@@ -20,7 +21,14 @@ import { QuotaBadgeComponent } from "../../shared/quota-badge/quota-badge.compon
 @Component({
   selector: "app-preferences",
   standalone: true,
-  imports: [RouterLink, LogoComponent, IconComponent, ChoiceChipComponent, QuotaBadgeComponent],
+  imports: [
+    RouterLink,
+    LogoComponent,
+    IconComponent,
+    ChoiceChipComponent,
+    QuotaBadgeComponent,
+    LogoutButtonComponent,
+  ],
   templateUrl: "./preferences.component.html",
 })
 export class PreferencesComponent implements OnInit {
