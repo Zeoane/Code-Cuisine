@@ -16,7 +16,7 @@ const UNIT_SUFFIX: Record<IngredientUnit, string> = {
 };
 
 /** Starting like count shown next to the heart, as in the Figma design. */
-const BASE_LIKES = 66;
+const BASE_LIKES = 82;
 
 /**
  * "One recipe view": the full recipe with nutrition facts, the ingredients
@@ -86,8 +86,8 @@ export class RecipeViewComponent {
     this.router.navigate([this.fromCookbook ? "/cookbook" : "/results"]);
   }
 
-  /** Starts a new run at the ingredient step. */
+  /** Discards the finished run and starts over with empty ingredients. */
   generateNew(): void {
-    this.router.navigate(["/generator"]);
+    this.wizard.startNewRun();
   }
 }

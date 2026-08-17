@@ -1,5 +1,6 @@
-import { Component, signal } from "@angular/core";
+import { Component, inject, signal } from "@angular/core";
 import { RouterLink } from "@angular/router";
+import { WizardStateService } from "../../core/services/wizard-state.service";
 import { HeroPlatesComponent } from "../../hero/hero-plates/hero-plates.component";
 import { LogoComponent } from "../../hero/logo/logo.component";
 import { IconComponent } from "../../shared/icon/icon.component";
@@ -24,5 +25,12 @@ import { LogoutButtonComponent } from "../../shared/logout-button/logout-button.
   templateUrl: "./home.component.html",
 })
 export class HomeComponent {
+  private readonly wizard = inject(WizardStateService);
+
   protected readonly impressumOpen = signal(false);
+
+  /** "Get started" always opens an empty generator, never a half-finished run. */
+  startFresh(): void {
+    this.wizard.reset();
+  }
 }

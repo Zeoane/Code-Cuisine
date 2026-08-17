@@ -9,7 +9,7 @@ export interface CuisineRecipe {
   likes: number;
 }
 
-/** Banner artwork shown above each cuisine's recipe list. */
+/** Banner artwork shown above each cuisine's recipe list (1146x144). */
 export const CUISINE_BANNERS: Record<CuisineStyle, string> = {
   italian: "banner-italian.webp",
   german: "banner-german.svg",

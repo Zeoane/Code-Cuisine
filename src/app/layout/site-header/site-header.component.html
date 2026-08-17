@@ -15,7 +15,12 @@
 
     <nav class="hidden items-center gap-6 md:flex" aria-label="Hauptnavigation">
       @for (item of navItems; track item.path) {
-        <a [routerLink]="item.path" routerLinkActive #rla="routerLinkActive" [class]="navLinkClass(rla.isActive)">
+        <a
+          [routerLink]="item.path"
+          routerLinkActive
+          #rla="routerLinkActive"
+          (click)="handleNavClick(item)"
+          [class]="navLinkClass(rla.isActive)">
           {{ item.label }}
         </a>
       }
@@ -40,7 +45,7 @@
             [routerLink]="item.path"
             routerLinkActive
             #rla="routerLinkActive"
-            (click)="closeMenu()"
+            (click)="handleNavClick(item)"
             [class]="navLinkClass(rla.isActive, 'px-1')">
             {{ item.label }}
           </a>

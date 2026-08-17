@@ -1,4 +1,5 @@
-import { Injectable, signal } from "@angular/core";
+import { Injectable, inject, signal } from "@angular/core";
+import { Router } from "@angular/router";
 import {
   CuisineStyle,
   DietPreference,
@@ -32,6 +33,8 @@ const INITIAL_PREFERENCES: WizardPreferences = {
  */
 @Injectable({ providedIn: "root" })
 export class WizardStateService {
+  private readonly router = inject(Router);
+
   readonly ingredients = signal<IngredientEntry[]>([]);
   readonly preferences = signal<WizardPreferences>({ ...INITIAL_PREFERENCES });
   readonly results = signal<GeneratedRecipe[]>([]);
@@ -46,5 +49,15 @@ export class WizardStateService {
     this.ingredients.set([]);
     this.preferences.set({ ...INITIAL_PREFERENCES });
     this.results.set([]);
+  }
+
+  /**
+   * Entry point for every "Generate a recipe" shortcut: discards the previous
+   * run and opens step 1 with empty fields, so the user never starts on top of
+   * the ingredients of a finished recipe.
+   */
+  startNewRun(): void {
+    this.reset();
+    this.router.navigate(["/generator"]);
   }
 }

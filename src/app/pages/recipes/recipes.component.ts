@@ -9,6 +9,7 @@ import {
 } from "../../core/data/cuisine-recipes";
 import { CuisineStyle } from "../../core/models/recipe.models";
 import { ToastService } from "../../core/services/toast.service";
+import { WizardStateService } from "../../core/services/wizard-state.service";
 import { LogoComponent } from "../../hero/logo/logo.component";
 import { HeartIconComponent } from "../../shared/heart-icon/heart-icon.component";
 import { LogoutButtonComponent } from "../../shared/logout-button/logout-button.component";
@@ -30,6 +31,7 @@ export class RecipesComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
+  private readonly wizard = inject(WizardStateService);
 
   /** Cuisine addressed by the route, falling back to Italian. */
   protected readonly cuisine = computed<CuisineStyle>(() => {
@@ -44,6 +46,7 @@ export class RecipesComponent {
   protected readonly banner = computed(
     () => `assets/img/Recipe-Page/${CUISINE_BANNERS[this.cuisine()]}`,
   );
+
 
   private readonly all = computed(() => recipesFor(this.cuisine()));
 
@@ -104,8 +107,8 @@ export class RecipesComponent {
     this.router.navigate(["/cookbook"]);
   }
 
-  /** Shortcut into the generator. */
+  /** Shortcut into the generator, always starting with empty ingredients. */
   generate(): void {
-    this.router.navigate(["/generator"]);
+    this.wizard.startNewRun();
   }
 }

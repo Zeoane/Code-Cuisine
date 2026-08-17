@@ -54,18 +54,6 @@ export const routes: Routes = [
       import("./pages/cookbook/cookbook.component").then(m => m.CookbookComponent),
   },
   {
-    path: "library",
-    loadComponent: () =>
-      import("./pages/library/library.component").then(m => m.LibraryComponent),
-  },
-  {
-    path: "library/:id",
-    loadComponent: () =>
-      import("./pages/recipe-detail/recipe-detail.component").then(
-        m => m.RecipeDetailComponent,
-      ),
-  },
-  {
     path: "impressum",
     loadComponent: () =>
       import("./pages/imprint/imprint.component").then(m => m.ImprintComponent),

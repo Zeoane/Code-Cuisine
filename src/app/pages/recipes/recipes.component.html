@@ -1,6 +1,6 @@
 <div class="flex min-h-screen flex-col gap-16 bg-white pb-16">
   <header
-    class="mx-auto flex w-full max-w-[1466px] flex-col gap-9 px-4 pt-6 sm:px-[68px] sm:pt-10"
+    class="mx-auto flex w-full max-w-[1466px] flex-col gap-6 px-4 pt-6 sm:gap-9 sm:px-[68px] sm:pt-10"
   >
     <div class="flex w-full items-center justify-between">
       <a routerLink="/" aria-label="Code à Cuisine – Home" class="w-fit">
@@ -22,7 +22,7 @@
       <button
         type="button"
         (click)="generate()"
-        class="font-quicksand flex items-center gap-2.5 self-end bg-forest px-[26px] py-4 text-2xl leading-[30px] font-semibold text-creme transition-colors hover:bg-[#2d4c2d]"
+        class="font-quicksand hidden items-center gap-2.5 self-end bg-forest px-[26px] py-4 text-2xl leading-[30px] font-semibold text-creme transition-colors hover:bg-[#2d4c2d] sm:flex"
       >
         Generate a recipe
       </button>
@@ -30,10 +30,35 @@
   </header>
 
   <main class="mx-auto flex w-full max-w-[1466px] flex-col gap-10 px-4 sm:px-[68px]">
-    <div class="relative">
-      <img [src]="banner()" alt="" class="w-full" />
+    <!--
+      The banner artwork carries its own creme bar, so scaling it by width made
+      the bar collapse on narrow screens. Instead the bar is this container
+      (same colour, height under our control) and the artwork is shown through
+      two edge slices that are scaled by height - the illustrations therefore
+      keep their proportions at every width, and the artwork's own bar simply
+      blends into the container.
+    -->
+    <div
+      class="relative flex h-[45px] items-center justify-center rounded-[10px] bg-creme sm:h-20"
+    >
+      <div
+        class="pointer-events-none absolute top-1/2 left-0 h-[90%] w-1/2 -translate-y-1/2 overflow-hidden sm:h-[180%]"
+      >
+        <img [src]="banner()" alt="" class="absolute top-0 left-0 h-full w-auto max-w-none" />
+      </div>
+      <div
+        class="pointer-events-none absolute top-1/2 right-0 h-[90%] w-1/2 -translate-y-1/2 overflow-hidden sm:h-[180%]"
+      >
+        <img
+          [src]="banner()"
+          alt=""
+          aria-hidden="true"
+          class="absolute top-0 right-0 h-full w-auto max-w-none"
+        />
+      </div>
+
       <h1
-        class="font-quicksand absolute inset-0 flex items-center justify-center text-[40px] leading-[1.04] font-bold text-deep-green"
+        class="font-quicksand relative px-[70px] text-center text-[18px] leading-none font-semibold text-deep-green sm:px-0 sm:text-[40px] sm:leading-[1.04] sm:font-bold"
       >
         {{ category().label }}
       </h1>
@@ -45,27 +70,29 @@
           <button
             type="button"
             (click)="openRecipe(recipe)"
-            class="flex w-full items-center gap-4 rounded-2xl px-4 py-3 text-left transition-colors hover:bg-mist/40"
+            class="flex w-full flex-col gap-2 rounded-2xl px-3 py-3 text-left transition-colors hover:bg-creme sm:flex-row sm:items-center sm:gap-4 sm:px-4"
           >
-            <span
-              class="font-quicksand flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-peach text-base leading-none font-semibold text-deep-green"
-            >
-              {{ rowNumber(i) }}
-            </span>
-
-            <span class="flex min-w-0 flex-1 flex-col gap-1">
+            <span class="flex min-w-0 items-center gap-3 sm:contents">
               <span
-                class="font-quicksand flex items-center gap-1.5 text-base leading-5 font-medium text-forest"
+                class="font-quicksand flex h-[30px] min-w-[30px] shrink-0 items-center justify-center rounded-full bg-[#f6e3cf] px-1 text-base leading-none font-semibold text-mid-green"
               >
-                <img src="assets/img/OneRecipe-Page/schedule.svg" alt="" class="h-5 w-5" />
-                Cooking time: {{ recipe.cookingTimeMinutes }}min
+                {{ rowNumber(i) }}.
               </span>
-              <span class="font-quicksand text-xl leading-6 font-medium text-mid-green">
-                {{ recipe.title }}
+
+              <span class="flex min-w-0 flex-1 flex-col gap-1">
+                <span
+                  class="font-quicksand flex items-center gap-1.5 text-base leading-5 font-medium text-forest"
+                >
+                  <img src="assets/img/OneRecipe-Page/schedule.svg" alt="" class="h-5 w-5 shrink-0" />
+                  Cooking time: {{ recipe.cookingTimeMinutes }}min
+                </span>
+                <span class="font-quicksand text-xl leading-6 font-medium text-mid-green">
+                  {{ recipe.title }}
+                </span>
               </span>
             </span>
 
-            <span class="flex shrink-0 flex-wrap items-center justify-end gap-2.5">
+            <span class="flex flex-wrap items-center gap-2.5 sm:shrink-0 sm:justify-end">
               @for (tag of recipe.tags; track tag) {
                 <span
                   class="font-quicksand flex h-8 items-center rounded-[30px] bg-mist px-3 text-base leading-none font-medium text-deep-green"
@@ -127,5 +154,13 @@
         &#8250;
       </button>
     </nav>
+
+    <button
+      type="button"
+      (click)="generate()"
+      class="font-quicksand flex items-center justify-center gap-2.5 self-center bg-forest px-[26px] py-4 text-xl leading-6 font-semibold text-creme transition-colors hover:bg-[#2d4c2d] sm:hidden"
+    >
+      Generate a recipe
+    </button>
   </main>
 </div>

@@ -1,6 +1,7 @@
 import { Component, inject, signal } from "@angular/core";
 import { Router, RouterLink, RouterLinkActive } from "@angular/router";
 import { AuthService } from "../../core/services/auth.service";
+import { WizardStateService } from "../../core/services/wizard-state.service";
 import { LogoComponent } from "../../hero/logo/logo.component";
 import { IconComponent } from "../../shared/icon/icon.component";
 
@@ -12,7 +13,6 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { path: "/generator", label: "Generator" },
-  { path: "/library", label: "Library" },
   { path: "/cookbook", label: "Cookbook" },
 ];
 
@@ -29,6 +29,7 @@ const NAV_ITEMS: NavItem[] = [
 export class SiteHeaderComponent {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly wizard = inject(WizardStateService);
 
   protected readonly navItems = NAV_ITEMS;
   protected readonly open = signal(false);
@@ -50,6 +51,15 @@ export class SiteHeaderComponent {
   /** Closes the mobile navigation panel, e.g. after a link click. */
   closeMenu(): void {
     this.open.set(false);
+  }
+
+  /**
+   * Reaching the generator through the navigation always means "start over",
+   * so the previous run is discarded; the routerLink handles the navigation.
+   */
+  handleNavClick(item: NavItem): void {
+    this.closeMenu();
+    if (item.path === "/generator") this.wizard.reset();
   }
 
   /** Builds the class list for a nav link depending on its active state. */

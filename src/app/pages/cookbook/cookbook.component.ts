@@ -4,6 +4,7 @@ import { Router, RouterLink } from "@angular/router";
 import { CUISINE_CATEGORIES, CuisineCategory } from "../../core/data/cuisine-categories";
 import { StoredRecipe } from "../../core/models/recipe.models";
 import { CookbookService } from "../../core/services/cookbook.service";
+import { WizardStateService } from "../../core/services/wizard-state.service";
 import { LogoComponent } from "../../hero/logo/logo.component";
 import { DragScrollDirective } from "../../shared/drag-scroll/drag-scroll.directive";
 import { HeartIconComponent } from "../../shared/heart-icon/heart-icon.component";
@@ -51,6 +52,7 @@ export class CookbookComponent {
   private readonly cookbook = inject(CookbookService);
   private readonly location = inject(Location);
   private readonly router = inject(Router);
+  private readonly wizard = inject(WizardStateService);
 
   protected readonly recipes = signal<StoredRecipe[]>(this.cookbook.list());
   protected readonly cuisines = CUISINE_CATEGORIES;
@@ -71,9 +73,9 @@ export class CookbookComponent {
     this.router.navigate(["/recipes", cuisine.value]);
   }
 
-  /** Starts a new run at the ingredient step. */
+  /** Starts a fresh run at the ingredient step. */
   generateNew(): void {
-    this.router.navigate(["/generator"]);
+    this.wizard.startNewRun();
   }
 
   /** Returns to wherever the user came from. */

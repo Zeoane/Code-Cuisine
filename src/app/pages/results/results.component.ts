@@ -34,8 +34,8 @@ export class ResultsComponent {
     this.router.navigate(["/recipe", index]);
   }
 
-  /** Starts over at the ingredient step, keeping what was entered. */
+  /** Discards this run and starts over with empty ingredients. */
   generateNew(): void {
-    this.router.navigate(["/generator"]);
+    this.wizard.startNewRun();
   }
 }
