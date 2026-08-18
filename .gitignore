@@ -29,6 +29,10 @@ yarn-error.log*
 # Testing
 /coverage
 
+# Papierkorb für Dateien, die per Claude-Bridge nicht direkt gelöscht werden
+# können – Inhalt manuell entfernen, nichts davon gehört ins Repo.
+_to_delete/
+
 # ---------------------------------------------------------------------------
 # Secrets – nothing below this line belongs on GitHub
 # ---------------------------------------------------------------------------
