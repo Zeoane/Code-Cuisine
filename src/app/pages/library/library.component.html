@@ -1,11 +1,11 @@
-<div class="flex min-h-screen flex-col overflow-x-hidden bg-creme">
+<div class="flex min-h-screen flex-col overflow-x-hidden bg-forest">
   <app-site-header />
   <main class="mx-auto w-full max-w-[1100px] flex-1 px-4 py-10 sm:px-8 sm:py-12">
     <div class="mb-6 flex items-center gap-3">
-      <app-icon name="library" klass="h-8 w-8 text-forest" />
-      <h1 class="font-ubuntu text-3xl font-bold text-forest-dark sm:text-4xl">Recipe Library</h1>
+      <app-icon name="library" klass="h-8 w-8 text-creme" />
+      <h1 class="font-ubuntu text-3xl font-bold text-creme sm:text-4xl">Recipe Library</h1>
     </div>
-    <p class="font-quicksand mb-6 text-base text-forest/80 sm:text-lg">
+    <p class="font-quicksand mb-6 text-base text-creme/80 sm:text-lg">
       All recipes ever generated – freely accessible to everyone, no account needed.
     </p>
 
@@ -21,8 +21,8 @@
           [class]="
             'font-quicksand min-h-11 shrink-0 rounded-full border px-4 text-base transition-colors ' +
             (cuisine() === entry[0]
-              ? 'border-forest bg-forest text-creme'
-              : 'border-forest/30 bg-white text-forest hover:bg-forest/10')
+              ? 'border-creme bg-creme text-forest'
+              : 'border-creme/30 bg-forest text-creme hover:bg-creme/10')
           ">
           {{ entry[1] }}
         </button>
@@ -55,22 +55,22 @@
             type="button"
             (click)="setPage(page() - 1)"
             [disabled]="page() <= 1"
-            class="font-quicksand flex min-h-11 items-center gap-1 rounded-md px-3 text-base text-forest disabled:pointer-events-none disabled:opacity-50">
+            class="font-quicksand flex min-h-11 items-center gap-1 rounded-md px-3 text-base text-creme disabled:pointer-events-none disabled:opacity-50">
             <app-icon name="arrow-left" klass="h-4 w-4" /> Back
           </button>
-          <span class="font-quicksand px-3 text-base text-forest">Page {{ page() }} of {{ totalPages() }}</span>
+          <span class="font-quicksand px-3 text-base text-creme">Page {{ page() }} of {{ totalPages() }}</span>
           <button
             type="button"
             (click)="setPage(page() + 1)"
             [disabled]="page() >= totalPages()"
-            class="font-quicksand flex min-h-11 items-center gap-1 rounded-md px-3 text-base text-forest disabled:pointer-events-none disabled:opacity-50">
+            class="font-quicksand flex min-h-11 items-center gap-1 rounded-md px-3 text-base text-creme disabled:pointer-events-none disabled:opacity-50">
             Next <app-icon name="arrow-right" klass="h-4 w-4" />
           </button>
         </nav>
       }
     } @else {
       <section
-        class="font-quicksand mt-6 flex flex-col items-start gap-4 rounded-lg border border-dashed border-forest/30 p-8 text-forest">
+        class="font-quicksand mt-6 flex flex-col items-start gap-4 rounded-lg border border-dashed border-creme/30 p-8 text-creme">
         <p class="text-lg">
           The library is still empty. Generate the first recipes – they'll automatically appear here for
           everyone to see.
