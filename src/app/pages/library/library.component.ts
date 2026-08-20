@@ -1,6 +1,6 @@
 import { Component, computed, signal } from "@angular/core";
 import { RouterLink } from "@angular/router";
-import { CUISINE_LABELS } from "../../core/data/recipe-labels";
+import { CUISINE_OPTIONS } from "../../core/data/preference-options";
 import { CuisineStyle } from "../../core/models/recipe.models";
 import { LibraryService } from "../../core/services/library.service";
 import { SiteHeaderComponent } from "../../layout/site-header/site-header.component";
@@ -25,7 +25,7 @@ export class LibraryComponent {
   protected readonly page = signal(1);
   protected readonly filterEntries: [CuisineFilter, string][] = [
     ["all", "All"],
-    ...(Object.entries(CUISINE_LABELS) as [CuisineStyle, string][]),
+    ...CUISINE_OPTIONS.map((option): [CuisineFilter, string] => [option.value, option.label]),
   ];
 
   protected readonly result = computed(() => {

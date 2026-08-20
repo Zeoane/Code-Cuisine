@@ -13,6 +13,7 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { path: "/generator", label: "Generator" },
+  { path: "/library", label: "Library" },
   { path: "/cookbook", label: "Cookbook" },
 ];
 

@@ -13,5 +13,27 @@ service cloud.firestore {
     match /quota_total/{docId} {
       allow read, write: if false;
     }
+
+    // Public recipe library (User Story 12): every generated recipe is
+    // written directly from the browser, by anyone, no account required.
+    // Entries are append-only - once published a recipe can't be edited or
+    // deleted from the client, only created.
+    match /library_recipes/{recipeId} {
+      allow read: if true;
+      allow create: if request.resource.data.title is string
+        && request.resource.data.cookingTimeMinutes is number
+        && request.resource.data.cuisineStyle is string
+        && request.resource.data.id is number
+        && recipeId == string(request.resource.data.id);
+      allow update, delete: if false;
+    }
+
+    // Sequential id counter backing the library above, advanced inside the
+    // same transaction that creates the recipe docs.
+    match /library_meta/counter {
+      allow read: if true;
+      allow create, update: if request.resource.data.value is int;
+      allow delete: if false;
+    }
   }
 }

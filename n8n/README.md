@@ -73,6 +73,12 @@ any paste as-is, no escaping rules to get wrong:
    - `serviceAccountEmail` ← the JSON's `client_email` field (not secret).
    - `serviceAccountPrivateKey` ← the JSON's `private_key` field, pasted in
      any form (one line, multi-line, literal `\n` text or real line breaks).
+   - `quotaIpSalt` ← a random string of at least 16 characters, e.g. from
+     `node -e "console.log(require('crypto').randomBytes(24).toString('hex'))"`.
+     **Both workflows must use the exact same value**, otherwise
+     `quota-status` reads a different document than `generate-recipe` writes
+     and the badge always shows 3 of 3. Treat it as a secret: whoever knows
+     it can re-derive which IP a counter belongs to.
 2. **"Build & Sign Firestore JWT"** reads both fields from `$json` and
    normalizes the key itself: it locates the `BEGIN`/`END PRIVATE KEY`
    markers and keeps only the Base64 characters between them, rebuilding a
@@ -112,7 +118,7 @@ you can copy from there instead of retyping).
 | 6 | Build & Sign Firestore JWT | Code | signs a JWT assertion with the service account key (see setup above) |
 | 7 | Exchange JWT for Access Token | HTTP Request | POST `oauth2.googleapis.com/token`, no credential needed |
 | 8 | Store Access Token | Code | carries `access_token` forward as `accessToken` |
-| 9 | Compute Quota Keys | Code | UTC `date`, `ipDocId = date_ip`, `totalDocId = date` |
+| 9 | Compute Quota Keys | Code | UTC `date`, `ipDocId = date_sha256(salt\|ip)`, `totalDocId = date`; drops `clientIp` from the item |
 | 10 | Read IP Quota Counter | HTTP Request | GET Firestore doc `quota_ip/{ipDocId}`, header `Authorization: Bearer {accessToken}`, **Never Error** on (missing doc ⇒ handled as 0 downstream) |
 | 11 | Read Global Quota Counter | HTTP Request | GET Firestore doc `quota_total/{totalDocId}`, same header, Never Error on |
 | 12 | Parse Quota Counts | Code | reads nodes 9–11 by name, defaults missing docs to `count: 0` |
@@ -161,6 +167,30 @@ After building/importing, open both `generate-recipe` and `quota-status`'s
    "3 of 3 recipe generations left today"; generating should increment it,
    and a 4th generation from the same network within a day should be
    blocked with a clear message.
+
+## Privacy: no raw IP addresses are stored
+
+IP addresses are personal data under the GDPR, and a counter does not need
+them. The quota therefore keys on a **salted SHA-256 of the IP**, truncated
+to 32 hex characters:
+
+- Document id is `2026-08-24_9f2c…` instead of `2026-08-24_84.123.45.67`.
+- The `quota_ip` document holds only `count` and `date` — no IP field.
+- `Extract Client IP` drops the request headers from the item immediately,
+  so `x-forwarded-for` does not travel through the rest of the run.
+- The salt lives only in the n8n Set node, never in this repository.
+
+The behaviour is unchanged: the same IP produces the same hash for the day,
+so a shared office network still shares its 3 recipes. Without the salt the
+hash would be pointless — there are only ~4 billion IPv4 addresses, so an
+unsalted SHA-256 is brute-forced in seconds. That is why the Code node
+throws if the salt is missing or shorter than 16 characters.
+
+**Remaining caveat:** n8n stores the full execution data, including the
+original webhook headers, for every run. If you want the raw IP gone
+end-to-end, set the workflows' **Settings → Save successful/failed
+production executions** to *Do not save* (or shorten the data retention in
+the n8n instance settings).
 
 ## JSON request/response contract
 

@@ -48,6 +48,15 @@ export const routes: Routes = [
     loadComponent: () => import("./pages/recipes/recipes.component").then(m => m.RecipesComponent),
   },
   {
+    path: "library",
+    loadComponent: () => import("./pages/library/library.component").then(m => m.LibraryComponent),
+  },
+  {
+    path: "library/:id",
+    loadComponent: () =>
+      import("./pages/recipe-detail/recipe-detail.component").then(m => m.RecipeDetailComponent),
+  },
+  {
     path: "cookbook",
     canActivate: [authGuard],
     loadComponent: () =>

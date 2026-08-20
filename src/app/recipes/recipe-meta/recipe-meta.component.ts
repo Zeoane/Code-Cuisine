@@ -1,5 +1,5 @@
 import { Component, Input } from "@angular/core";
-import { CUISINE_LABELS, DIFFICULTY_LABELS } from "../../core/data/recipe-labels";
+import { CUISINE_OPTIONS } from "../../core/data/preference-options";
 import { CuisineStyle, Difficulty } from "../../core/models/recipe.models";
 import { IconComponent } from "../../shared/icon/icon.component";
 
@@ -9,6 +9,18 @@ const DIFFICULTY_CLASSES: Record<Difficulty, string> = {
   medium: "bg-[#fdf3d7] text-[#a07400]",
   hard: "bg-[#fbe4e0] text-[#b3341f]",
 };
+
+/** Display labels for each difficulty level. */
+const DIFFICULTY_LABELS: Record<Difficulty, string> = {
+  easy: "Easy",
+  medium: "Medium",
+  hard: "Hard",
+};
+
+/** Cuisine style label lookup, derived from CUISINE_OPTIONS. */
+const CUISINE_LABELS: Record<CuisineStyle, string> = Object.fromEntries(
+  CUISINE_OPTIONS.map(option => [option.value, option.label]),
+) as Record<CuisineStyle, string>;
 
 /** Badge row showing difficulty, cooking time, servings and cuisine style. */
 @Component({

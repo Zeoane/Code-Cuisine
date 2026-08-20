@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit, inject, signal } from "@angular/core";
 import { Router } from "@angular/router";
 import { GenerationOptions } from "../../core/models/recipe.models";
 import { hasEnoughIngredients } from "../../core/services/ingredient-check";
+import { LibraryService } from "../../core/services/library.service";
 import { GenerationError, RecipeGeneratorService } from "../../core/services/recipe-generator.service";
 import { WizardStateService } from "../../core/services/wizard-state.service";
 import { LogoComponent } from "../../hero/logo/logo.component";
@@ -63,6 +64,7 @@ const GENERATION_FAILED_TITLE = "Something went wrong";
 export class LoadingComponent implements OnInit, OnDestroy {
   private readonly wizard = inject(WizardStateService);
   private readonly generator = inject(RecipeGeneratorService);
+  private readonly library = inject(LibraryService);
   private readonly router = inject(Router);
 
   private timer: ReturnType<typeof setTimeout> | null = null;
@@ -131,6 +133,9 @@ export class LoadingComponent implements OnInit, OnDestroy {
     try {
       const recipes = await this.generator.generate(options);
       this.wizard.results.set(recipes);
+      // Fire-and-forget: the library is a nice-to-have, so a Firestore hiccup
+      // here must never block the user from seeing their own results.
+      void this.library.addGenerated(recipes, options.helpers).catch(() => {});
     } catch (e) {
       error = e;
     }

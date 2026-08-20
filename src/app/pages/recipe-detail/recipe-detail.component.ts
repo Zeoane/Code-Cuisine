@@ -1,6 +1,5 @@
-import { Component, OnInit, signal } from "@angular/core";
+import { Component, computed, inject } from "@angular/core";
 import { ActivatedRoute, RouterLink } from "@angular/router";
-import { StoredRecipe } from "../../core/models/recipe.models";
 import { LibraryService } from "../../core/services/library.service";
 import { SiteHeaderComponent } from "../../layout/site-header/site-header.component";
 import { RecipeCardComponent } from "../../recipes/recipe-card/recipe-card.component";
@@ -16,17 +15,17 @@ import { IconComponent } from "../../shared/icon/icon.component";
   imports: [RouterLink, SiteHeaderComponent, RecipeCardComponent, IconComponent],
   templateUrl: "./recipe-detail.component.html",
 })
-export class RecipeDetailComponent implements OnInit {
-  protected readonly recipe = signal<StoredRecipe | undefined>(undefined);
+export class RecipeDetailComponent {
+  private readonly route = inject(ActivatedRoute);
+  private readonly library = inject(LibraryService);
+  private readonly id = Number(this.route.snapshot.paramMap.get("id"));
 
-  constructor(
-    private readonly route: ActivatedRoute,
-    private readonly library: LibraryService,
-  ) {}
-
-  /** Resolves the recipe for the :id route parameter on init. */
-  ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get("id"));
-    this.recipe.set(Number.isFinite(id) && id > 0 ? this.library.getById(id) : undefined);
-  }
+  /**
+   * Resolves the recipe for the :id route parameter reactively, since the
+   * library loads from Firestore asynchronously and may not have delivered
+   * this recipe yet on first render.
+   */
+  protected readonly recipe = computed(() =>
+    Number.isFinite(this.id) && this.id > 0 ? this.library.getById(this.id) : undefined,
+  );
 }

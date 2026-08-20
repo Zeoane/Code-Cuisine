@@ -1,9 +1,9 @@
-import { GeneratedRecipe } from "../models/recipe.models";
-import { LibraryService } from "./library.service";
+import { GeneratedRecipe, StoredRecipe } from "../models/recipe.models";
+import { paginateLibrary } from "./library.service";
 
-/** Builds a minimal, valid generated recipe for tests. */
-function buildRecipe(overrides: Partial<GeneratedRecipe> = {}): GeneratedRecipe {
-  return {
+/** Builds a minimal, valid stored recipe for tests. */
+function buildRecipe(overrides: Partial<StoredRecipe> = {}): StoredRecipe {
+  const base: GeneratedRecipe = {
     title: "Test recipe",
     description: null,
     ingredients: ["100 g rice"],
@@ -14,44 +14,34 @@ function buildRecipe(overrides: Partial<GeneratedRecipe> = {}): GeneratedRecipe 
     servings: 2,
     cuisineStyle: "fusion",
     nutrition: null,
-    ...overrides,
   };
+  return { ...base, id: 1, helpers: 1, createdAt: new Date().toISOString(), ...overrides };
 }
 
-describe("LibraryService", () => {
-  let service: LibraryService;
-
-  beforeEach(() => {
-    localStorage.clear();
-    service = new LibraryService();
-  });
-
-  it("assigns sequential ids to newly added recipes", () => {
-    const stored = service.addGenerated([buildRecipe(), buildRecipe()], 1);
-    expect(stored.map(r => r.id)).toEqual([1, 2]);
-  });
-
+// LibraryService itself talks to Firestore (see library.service.ts), so its
+// pagination/filtering logic is exercised here as the pure `paginateLibrary`
+// helper instead of through the service - no live Firestore connection needed.
+describe("paginateLibrary", () => {
   it("paginates 20 recipes per page", () => {
-    const recipes = Array.from({ length: 25 }, (_, i) => buildRecipe({ title: `Recipe ${i}` }));
-    service.addGenerated(recipes, 1);
-    expect(service.list(1).recipes.length).toBe(20);
-    expect(service.list(2).recipes.length).toBe(5);
-    expect(service.list(1).total).toBe(25);
+    const recipes = Array.from({ length: 25 }, (_, i) => buildRecipe({ id: i + 1, title: `Recipe ${i}` }));
+    expect(paginateLibrary(recipes, 1).recipes.length).toBe(20);
+    expect(paginateLibrary(recipes, 2).recipes.length).toBe(5);
+    expect(paginateLibrary(recipes, 1).total).toBe(25);
   });
 
   it("filters the library by cuisine style", () => {
-    service.addGenerated([buildRecipe({ cuisineStyle: "german" }), buildRecipe({ cuisineStyle: "italian" })], 1);
-    const filtered = service.list(1, "german");
+    const recipes = [
+      buildRecipe({ id: 1, cuisineStyle: "german" }),
+      buildRecipe({ id: 2, cuisineStyle: "italian" }),
+    ];
+    const filtered = paginateLibrary(recipes, 1, "german");
     expect(filtered.recipes.length).toBe(1);
     expect(filtered.recipes[0].cuisineStyle).toBe("german");
   });
 
-  it("finds a recipe by id", () => {
-    const [stored] = service.addGenerated([buildRecipe()], 1);
-    expect(service.getById(stored.id)?.title).toBe("Test recipe");
-  });
-
-  it("returns undefined for an unknown id", () => {
-    expect(service.getById(9999)).toBeUndefined();
+  it("returns an empty page for an empty library", () => {
+    const page = paginateLibrary([], 1);
+    expect(page.recipes).toEqual([]);
+    expect(page.total).toBe(0);
   });
 });

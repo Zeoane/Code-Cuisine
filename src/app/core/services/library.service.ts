@@ -1,8 +1,18 @@
-import { Injectable } from "@angular/core";
+import { Injectable, signal } from "@angular/core";
+import {
+  collection,
+  doc,
+  onSnapshot,
+  orderBy,
+  query,
+  runTransaction,
+} from "firebase/firestore";
+import { firestore } from "../firebase/firebase-app";
 import { CuisineStyle, GeneratedRecipe, StoredRecipe } from "../models/recipe.models";
-import { readJson, writeJson } from "./local-storage.util";
 
-const STORAGE_KEY = "cac_library_recipes";
+const LIBRARY_COLLECTION = "library_recipes";
+const COUNTER_COLLECTION = "library_meta";
+const COUNTER_DOC = "counter";
 const PAGE_SIZE = 20;
 
 /** One page of the public recipe library. */
@@ -13,60 +23,71 @@ export interface LibraryPage {
   page: number;
 }
 
+/** Slices a cuisine-filtered page out of a full recipe list. Pure, so it's unit-testable without Firestore. */
+export function paginateLibrary(recipes: StoredRecipe[], page: number, cuisine?: CuisineStyle): LibraryPage {
+  const filtered = recipes.filter(r => !cuisine || r.cuisineStyle === cuisine);
+  const start = (page - 1) * PAGE_SIZE;
+  return {
+    recipes: filtered.slice(start, start + PAGE_SIZE),
+    total: filtered.length,
+    pageSize: PAGE_SIZE,
+    page,
+  };
+}
+
 /**
- * Public recipe library (User Stories 12-14), persisted to localStorage for
- * now. Every generated recipe lands here so it stays visible to everyone
- * using this browser; a Firebase-backed shared library follows later.
+ * Public recipe library (User Stories 12-14), backed by Firestore so every
+ * generated recipe is visible to everyone, on every device, with no account
+ * needed. Kept live via `onSnapshot`; `list`/`getById` read a local signal
+ * cache so callers stay synchronous, matching how the components use them.
  */
 @Injectable({ providedIn: "root" })
 export class LibraryService {
-  /** Appends newly generated recipes to the library and returns them with ids. */
-  addGenerated(recipes: GeneratedRecipe[], helpers: number): StoredRecipe[] {
-    const all = this.readAll();
-    const stored = this.assignIds(recipes, helpers, all);
-    this.writeAll([...stored, ...all]);
-    return stored;
+  private readonly recipes = signal<StoredRecipe[]>([]);
+
+  constructor() {
+    if (!firestore) return;
+    const recipesQuery = query(collection(firestore, LIBRARY_COLLECTION), orderBy("id", "desc"));
+    onSnapshot(recipesQuery, snapshot => {
+      this.recipes.set(snapshot.docs.map(d => d.data() as StoredRecipe));
+    });
+  }
+
+  /**
+   * Appends newly generated recipes to the shared library and returns them
+   * with ids. Ids are assigned from a Firestore-side counter inside a
+   * transaction so concurrent writers from different browsers never collide.
+   */
+  async addGenerated(recipes: GeneratedRecipe[], helpers: number): Promise<StoredRecipe[]> {
+    if (!firestore) return [];
+    const db = firestore;
+    const createdAt = new Date().toISOString();
+
+    return runTransaction(db, async transaction => {
+      const counterRef = doc(db, COUNTER_COLLECTION, COUNTER_DOC);
+      const counterSnap = await transaction.get(counterRef);
+      let nextId = (counterSnap.data()?.["value"] as number | undefined) ?? 0;
+
+      const stored: StoredRecipe[] = recipes.map(recipe => {
+        nextId += 1;
+        return { ...recipe, id: nextId, helpers, createdAt };
+      });
+
+      transaction.set(counterRef, { value: nextId });
+      for (const recipe of stored) {
+        transaction.set(doc(db, LIBRARY_COLLECTION, String(recipe.id)), recipe);
+      }
+      return stored;
+    });
   }
 
   /** Returns a paginated, optionally cuisine-filtered slice of the library. */
   list(page: number, cuisine?: CuisineStyle): LibraryPage {
-    const filtered = this.readAll().filter(r => !cuisine || r.cuisineStyle === cuisine);
-    const start = (page - 1) * PAGE_SIZE;
-    return {
-      recipes: filtered.slice(start, start + PAGE_SIZE),
-      total: filtered.length,
-      pageSize: PAGE_SIZE,
-      page,
-    };
+    return paginateLibrary(this.recipes(), page, cuisine);
   }
 
   /** Finds a single library recipe by its id. */
   getById(id: number): StoredRecipe | undefined {
-    return this.readAll().find(r => r.id === id);
-  }
-
-  /** Assigns sequential ids to newly generated recipes. */
-  private assignIds(
-    recipes: GeneratedRecipe[],
-    helpers: number,
-    existing: StoredRecipe[],
-  ): StoredRecipe[] {
-    let nextId = existing.reduce((max, r) => Math.max(max, r.id), 0) + 1;
-    return recipes.map(recipe => ({
-      ...recipe,
-      id: nextId++,
-      helpers,
-      createdAt: new Date().toISOString(),
-    }));
-  }
-
-  /** Reads the full library array from localStorage. */
-  private readAll(): StoredRecipe[] {
-    return readJson<StoredRecipe[]>(STORAGE_KEY, []);
-  }
-
-  /** Persists the full library array to localStorage. */
-  private writeAll(recipes: StoredRecipe[]): void {
-    writeJson(STORAGE_KEY, recipes);
+    return this.recipes().find(r => r.id === id);
   }
 }
