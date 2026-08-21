@@ -21,25 +21,61 @@ interface FallingItem {
   width: number;
   /** Rotation at rest, in degrees. */
   rotate: number;
+  /** Delay before this item starts falling, in seconds. */
+  delay: number;
+  /**
+   * Which stir animation to play once the spoon lands: the veggies get a
+   * small side-to-side nudge, the spoon itself sweeps further and rocks.
+   */
+  stir?: "veg" | "spoon";
+  /** Stir sweep distance in px (ignored when `stir` is unset). */
+  stirDistance?: number;
+  /**
+   * Plays a tip-and-settle wobble right after this item lands, as if it just
+   * poured out its contents (the salt shaker and pepper mill). The wobble
+   * adds to the item's own resting tilt, so the two combine into one clear
+   * dip toward the bowl (roughly 58° total at the peak).
+   */
+  pour?: boolean;
+  /** Extra rotation at the pour's peak, in degrees (sign gives the direction). */
+  pourRotate?: number;
 }
 
+/** Duration of the item-drop keyframe, in seconds (must match the CSS). */
+const DROP_DURATION_S = 0.6;
+/** When the spoon lands and the stir wiggle starts, in seconds. */
+const SPOON_DELAY_S = 3.9;
+
 /**
- * Elements dropping into the bowl, in the order used by the Figma prototype.
- * Positions are tuned for the 253x309 loader card and can be nudged once the
- * final SVG exports are in place.
+ * Elements dropping into the bowl, in order: the carrot, salad and tomato
+ * land first as the base ingredients, sitting low enough that the bowl's
+ * front rim (see the template) covers roughly their bottom half; the salt
+ * shaker and pepper mill then arrive, dip toward the bowl to pour, and the
+ * salt/pepper grains fall right as each peaks its dip; the spoon arrives
+ * last to stir everything together.
  */
 const FALLING_ITEMS: FallingItem[] = [
-  { file: "salad.svg", left: 66, top: 176, width: 66, rotate: -6 },
-  { file: "carrot.svg", left: 112, top: 158, width: 46, rotate: 12 },
-  { file: "cucumber.svg", left: 90, top: 182, width: 46, rotate: -8 },
-  { file: "broccoli.svg", left: 144, top: 166, width: 54, rotate: 6 },
-  { file: "pepper.svg", left: 46, top: 36, width: 38, rotate: -12 },
-  { file: "salt.svg", left: 160, top: 52, width: 40, rotate: 18 },
-  { file: "spoon.svg", left: 150, top: 152, width: 34, rotate: 205 },
+  { file: "carrot.svg", left: 78, top: 148, width: 44, rotate: 8, delay: 0.4, stir: "veg", stirDistance: 8 },
+  { file: "salad.svg", left: 118, top: 138, width: 52, rotate: -6, delay: 0.55, stir: "veg", stirDistance: 8 },
+  { file: "tomato.svg", left: 150, top: 160, width: 40, rotate: -10, delay: 0.7, stir: "veg", stirDistance: 8 },
+  { file: "salt-shaker.svg", left: 86, top: 34, width: 30, rotate: 22, delay: 1.0, pour: true, pourRotate: 36 },
+  { file: "salt.svg", left: 96, top: 138, width: 24, rotate: 15, delay: 1.9 },
+  { file: "pepper-mill.svg", left: 150, top: 24, width: 26, rotate: -22, delay: 2.3, pour: true, pourRotate: 36 },
+  { file: "pepper.svg", left: 138, top: 134, width: 24, rotate: -12, delay: 3.2 },
+  {
+    file: "spoon.svg",
+    left: 112,
+    top: 92,
+    width: 28,
+    rotate: -18,
+    delay: SPOON_DELAY_S,
+    stir: "spoon",
+    stirDistance: 20,
+  },
 ];
 
 /** How long the loader stays on screen before the results view opens. */
-const LOADER_DURATION_MS = 5200;
+const LOADER_DURATION_MS = 6150;
 
 const NOT_ENOUGH_TITLE = "Ups! Not quite enough...";
 const NOT_ENOUGH_MESSAGE =
@@ -93,9 +129,14 @@ export class LoadingComponent implements OnInit, OnDestroy {
     if (this.timer) clearTimeout(this.timer);
   }
 
-  /** Delay before an item starts falling, staggered in list order. */
-  itemDelay(index: number): string {
-    return `${0.45 + index * 0.5}s`;
+  /** Delay before the stir wiggle starts: right when the spoon lands. */
+  stirDelay(): string {
+    return `${SPOON_DELAY_S + DROP_DURATION_S}s`;
+  }
+
+  /** Delay before a shaker/mill's pour wobble starts: right when it lands. */
+  pourDelay(item: FallingItem): string {
+    return `${item.delay + DROP_DURATION_S}s`;
   }
 
   /** Dismissing the popup returns to the ingredient step. */

@@ -1,8 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 92" fill="none">
-  <path d="M12 20h28a6 6 0 0 1 6 6v58a6 6 0 0 1-6 6H12a6 6 0 0 1-6-6V26a6 6 0 0 1 6-6z" fill="#C8D8B6" stroke="#2C452C" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M14 6h24a4 4 0 0 1 4 4v10H10V10a4 4 0 0 1 4-4z" fill="#7E9C60" stroke="#2C452C" stroke-width="4" stroke-linejoin="round"/>
-  <circle cx="19" cy="13" r="2.5" fill="#2C452C"/>
-  <circle cx="26" cy="13" r="2.5" fill="#2C452C"/>
-  <circle cx="33" cy="13" r="2.5" fill="#2C452C"/>
-  <path d="M14 36h24M14 50h24" stroke="#8FA96F" stroke-width="4" stroke-linecap="round"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 37.34 38.43">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #e4d8b6;
+      }
+    </style>
+  </defs>
+  <g id="salt">
+    <g>
+      <rect class="cls-1" x="13.38" y="12.65" width="5.11" height="5.11"/>
+      <rect class="cls-1" x="9.24" y="23.59" width="5.35" height="5.35"/>
+      <rect class="cls-1" x="24.08" y="19.22" width="5.96" height="5.96"/>
+      <rect class="cls-1" x="31.14" y="4.86" width="6.2" height="6.2"/>
+      <rect class="cls-1" x="22.68" y="10.52" width="4.26" height="4.26"/>
+      <rect class="cls-1" y="33.81" width="4.62" height="4.62"/>
+      <rect class="cls-1" x="18.49" width="4.2" height="4.2"/>
+    </g>
+  </g>
 </svg>

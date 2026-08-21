@@ -16,21 +16,33 @@
         class="loader-bowl absolute bottom-[46px] left-1/2 w-[150px] -translate-x-1/2"
         (error)="hideMissing($event)" />
 
-      @for (item of items; track item.file; let i = $index) {
-        <img
-          [src]="'assets/img/Loading-Page/' + item.file"
-          alt=""
-          class="loader-item absolute"
+      @for (item of items; track item.file) {
+        <div
+          class="loader-item-pos absolute"
           [style.left.px]="item.left"
           [style.top.px]="item.top"
-          [style.width.px]="item.width"
-          [style.--item-rotate]="item.rotate + 'deg'"
-          [style.animation-delay]="itemDelay(i)"
-          (error)="hideMissing($event)" />
+          [class.loader-stir-veg]="item.stir === 'veg'"
+          [class.loader-stir-spoon]="item.stir === 'spoon'"
+          [class.loader-pour]="item.pour"
+          [style.--stir-distance]="(item.stirDistance ?? 0) + 'px'"
+          [style.--pour-rotate]="(item.pourRotate ?? 0) + 'deg'"
+          [style.animation-delay]="item.pour ? pourDelay(item) : stirDelay()">
+          <img
+            [src]="'assets/img/Loading-Page/' + item.file"
+            alt=""
+            class="loader-item"
+            [style.width.px]="item.width"
+            [style.--item-rotate]="item.rotate + 'deg'"
+            [style.animation-delay]="item.delay + 's'"
+            (error)="hideMissing($event)" />
+        </div>
       }
 
+      <!-- Second, identical copy in front of the items: since bowl.svg is a
+           solid silhouette (not a real hollow bowl), whatever an item's
+           bottom overlaps here gets hidden, so it looks tucked into the bowl. -->
       <img
-        src="assets/img/Loading-Page/bowl-front.svg"
+        src="assets/img/Loading-Page/bowl.svg"
         alt=""
         class="loader-bowl absolute bottom-[46px] left-1/2 w-[150px] -translate-x-1/2"
         (error)="hideMissing($event)" />
