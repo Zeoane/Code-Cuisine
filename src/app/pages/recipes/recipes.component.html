@@ -31,37 +31,15 @@
 
   <main class="mx-auto flex w-full max-w-[1466px] flex-col gap-10 px-4 sm:px-[68px]">
     <!--
-      The banner artwork carries its own creme bar, so scaling it by width made
-      the bar collapse on narrow screens. Instead the bar is this container
-      (same colour, height under our control) and the artwork is shown through
-      two edge slices that are scaled by height - the illustrations therefore
-      keep their proportions at every width, and the artwork's own bar simply
-      blends into the container.
+      The banner artwork now carries its own creme bar and title text baked
+      in (Figma export), so it's shown directly rather than composited - the
+      h1 stays for a real heading landmark, visually hidden since the image
+      already renders the same text.
     -->
-    <div
-      class="relative flex h-[45px] items-center justify-center rounded-[10px] bg-creme sm:h-20"
-    >
-      <div
-        class="pointer-events-none absolute top-1/2 left-0 h-[90%] w-1/2 -translate-y-1/2 overflow-hidden sm:h-[180%]"
-      >
-        <img [src]="banner()" alt="" class="absolute top-0 left-0 h-full w-auto max-w-none" />
-      </div>
-      <div
-        class="pointer-events-none absolute top-1/2 right-0 h-[90%] w-1/2 -translate-y-1/2 overflow-hidden sm:h-[180%]"
-      >
-        <img
-          [src]="banner()"
-          alt=""
-          aria-hidden="true"
-          class="absolute top-0 right-0 h-full w-auto max-w-none"
-        />
-      </div>
-
-      <h1
-        class="font-quicksand relative px-[70px] text-center text-[18px] leading-none font-semibold text-deep-green sm:px-0 sm:text-[40px] sm:leading-[1.04] sm:font-bold"
-      >
-        {{ category().label }}
-      </h1>
+    <div class="overflow-hidden rounded-[10px]">
+      <h1 class="sr-only">{{ category().label }}</h1>
+      <img [src]="bannerMobile()" alt="" class="w-full sm:hidden" />
+      <img [src]="banner()" alt="" class="hidden w-full sm:block" />
     </div>
 
     <ol class="flex flex-col">

@@ -3,6 +3,7 @@ import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { CUISINE_CATEGORIES } from "../../core/data/cuisine-categories";
 import {
   CUISINE_BANNERS,
+  CUISINE_BANNERS_MOBILE,
   CuisineRecipe,
   RECIPES_PER_PAGE,
   recipesFor,
@@ -45,6 +46,10 @@ export class RecipesComponent {
 
   protected readonly banner = computed(
     () => `assets/img/Recipe-Page/${CUISINE_BANNERS[this.cuisine()]}`,
+  );
+
+  protected readonly bannerMobile = computed(
+    () => `assets/img/Recipe-Page/${CUISINE_BANNERS_MOBILE[this.cuisine()]}`,
   );
 
 

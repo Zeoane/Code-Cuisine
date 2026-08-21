@@ -1,21 +1,21 @@
-<div class="flex min-h-screen flex-col overflow-x-hidden bg-creme">
+<div class="flex min-h-screen flex-col overflow-x-hidden bg-forest">
   <app-site-header />
   <main class="mx-auto w-full max-w-[760px] flex-1 px-4 py-10 sm:px-8 sm:py-12">
     <a
       routerLink="/library"
-      class="font-quicksand mb-6 inline-flex min-h-11 items-center gap-1.5 text-base text-forest hover:underline">
-      <img src="assets/img/arrow-back.svg" alt="" class="h-[14px] w-5" />
+      class="font-quicksand mb-6 inline-flex min-h-11 items-center gap-1.5 text-base text-creme hover:underline">
+      <img src="assets/img/arrow-back.svg" alt="" class="h-[14px] w-5 brightness-0 invert" />
       Back to library
     </a>
     @if (recipe(); as r) {
       <app-recipe-card [recipe]="r" />
     } @else {
       <section
-        class="font-quicksand flex flex-col items-start gap-4 rounded-lg border border-dashed border-forest/30 p-8 text-forest">
+        class="font-quicksand flex flex-col items-start gap-4 rounded-lg border border-dashed border-creme/30 p-8 text-creme">
         <p class="text-lg">This recipe wasn't found.</p>
         <a
           routerLink="/library"
-          class="font-quicksand flex min-h-11 items-center rounded-md bg-forest px-4 text-creme hover:bg-[#2d4c2d]">
+          class="font-quicksand flex min-h-11 items-center rounded-md bg-creme px-4 text-forest hover:bg-white">
           Back to library
         </a>
       </section>

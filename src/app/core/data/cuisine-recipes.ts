@@ -9,14 +9,24 @@ export interface CuisineRecipe {
   likes: number;
 }
 
-/** Banner artwork shown above each cuisine's recipe list (1146x144). */
+/** Desktop banner artwork shown above each cuisine's recipe list (~1146x144), text baked in. */
 export const CUISINE_BANNERS: Record<CuisineStyle, string> = {
-  italian: "banner-italian.webp",
+  italian: "banner-italian.svg",
   german: "banner-german.svg",
   japanese: "banner-japanese.svg",
   gourmet: "banner-gourmet.svg",
   indian: "banner-indian.svg",
   fusion: "banner-fusion.svg",
+};
+
+/** Mobile banner artwork for the same section (~340x94), text baked in. */
+export const CUISINE_BANNERS_MOBILE: Record<CuisineStyle, string> = {
+  italian: "banner-italian-mobile.svg",
+  german: "banner-german-mobile.svg",
+  japanese: "banner-japanese-mobile.svg",
+  gourmet: "banner-gourmet-mobile.svg",
+  indian: "banner-indian-mobile.svg",
+  fusion: "banner-fusion-mobile.svg",
 };
 
 /** Recipes per page, matching the Figma list. */
