@@ -9,73 +9,15 @@ import { LogoComponent } from "../../hero/logo/logo.component";
 import { LogoutButtonComponent } from "../../shared/logout-button/logout-button.component";
 import { NotEnoughModalComponent } from "../../shared/not-enough-modal/not-enough-modal.component";
 
-/** One illustration element that drops into the bowl, in animation order. */
-interface FallingItem {
-  /** File name inside assets/img/Loading-Page/. */
-  file: string;
-  /** Horizontal resting position inside the 253x309 card, in px. */
-  left: number;
-  /** Vertical resting position inside the card, in px. */
-  top: number;
-  /** Rendered width in px (height follows the SVG aspect ratio). */
-  width: number;
-  /** Rotation at rest, in degrees. */
-  rotate: number;
-  /** Delay before this item starts falling, in seconds. */
-  delay: number;
-  /**
-   * Which stir animation to play once the spoon lands: the veggies get a
-   * small side-to-side nudge, the spoon itself sweeps further and rocks.
-   */
-  stir?: "veg" | "spoon";
-  /** Stir sweep distance in px (ignored when `stir` is unset). */
-  stirDistance?: number;
-  /**
-   * Plays a tip-and-settle wobble right after this item lands, as if it just
-   * poured out its contents (the salt shaker and pepper mill). The wobble
-   * adds to the item's own resting tilt, so the two combine into one clear
-   * dip toward the bowl (roughly 58° total at the peak).
-   */
-  pour?: boolean;
-  /** Extra rotation at the pour's peak, in degrees (sign gives the direction). */
-  pourRotate?: number;
-}
-
-/** Duration of the item-drop keyframe, in seconds (must match the CSS). */
-const DROP_DURATION_S = 0.6;
-/** When the spoon lands and the stir wiggle starts, in seconds. */
-const SPOON_DELAY_S = 3.9;
-
 /**
- * Elements dropping into the bowl, in order: the carrot, salad and tomato
- * land first as the base ingredients, sitting low enough that the bowl's
- * front rim (see the template) covers roughly their bottom half; the salt
- * shaker and pepper mill then arrive, dip toward the bowl to pour, and the
- * salt/pepper grains fall right as each peaks its dip; the spoon arrives
- * last to stir everything together.
+ * How long the loader stays on screen before the results view opens.
+ *
+ * Matches --loader-cycle in loading.component.css (11.2s) so the choreography
+ * plays through exactly once: bowl, vegetables, the pepper mill and salt shaker
+ * turning in and seasoning, and finally the spoon stirring. Keep the two in
+ * sync - a shorter value cuts the stir off, a longer one restarts the loop.
  */
-const FALLING_ITEMS: FallingItem[] = [
-  { file: "carrot.svg", left: 78, top: 148, width: 44, rotate: 8, delay: 0.4, stir: "veg", stirDistance: 8 },
-  { file: "salad.svg", left: 118, top: 138, width: 52, rotate: -6, delay: 0.55, stir: "veg", stirDistance: 8 },
-  { file: "tomato.svg", left: 150, top: 160, width: 40, rotate: -10, delay: 0.7, stir: "veg", stirDistance: 8 },
-  { file: "salt-shaker.svg", left: 86, top: 34, width: 30, rotate: 22, delay: 1.0, pour: true, pourRotate: 36 },
-  { file: "salt.svg", left: 96, top: 138, width: 24, rotate: 15, delay: 1.9 },
-  { file: "pepper-mill.svg", left: 150, top: 24, width: 26, rotate: -22, delay: 2.3, pour: true, pourRotate: 36 },
-  { file: "pepper.svg", left: 138, top: 134, width: 24, rotate: -12, delay: 3.2 },
-  {
-    file: "spoon.svg",
-    left: 112,
-    top: 92,
-    width: 28,
-    rotate: -18,
-    delay: SPOON_DELAY_S,
-    stir: "spoon",
-    stirDistance: 20,
-  },
-];
-
-/** How long the loader stays on screen before the results view opens. */
-const LOADER_DURATION_MS = 6150;
+const LOADER_DURATION_MS = 11200;
 
 const NOT_ENOUGH_TITLE = "Ups! Not quite enough...";
 const NOT_ENOUGH_MESSAGE =
@@ -84,11 +26,14 @@ const QUOTA_EXCEEDED_TITLE = "Daily limit reached";
 const GENERATION_FAILED_TITLE = "Something went wrong";
 
 /**
- * Loading view shown while the recipe generation runs: the bowl slides in,
- * the ingredients drop into it one by one, and the dots behind "Generating"
- * fade out and back in on a loop. Waits for the generation call to settle
- * (in addition to the animation's minimum runtime) before moving on, and
- * shows a notice popup instead of navigating on any failure.
+ * Loading view shown while the recipe generation runs: the bowl scene is built
+ * from SVGs and animated in CSS, and the dots behind "Generating" fade out and
+ * back in on a loop. Waits for the generation call to settle (in addition to
+ * the animation's minimum runtime) before moving on, and shows a notice popup
+ * instead of navigating on any failure.
+ *
+ * Reduced motion needs no special case here: the stylesheet switches the
+ * animations off and the scene's resting state is the finished bowl.
  */
 @Component({
   selector: "app-loading",
@@ -104,8 +49,6 @@ export class LoadingComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
 
   private timer: ReturnType<typeof setTimeout> | null = null;
-
-  protected readonly items = FALLING_ITEMS;
 
   /** Shows the notice popup (not-enough-ingredients or a generation failure). */
   protected readonly notice = signal(false);
@@ -129,25 +72,10 @@ export class LoadingComponent implements OnInit, OnDestroy {
     if (this.timer) clearTimeout(this.timer);
   }
 
-  /** Delay before the stir wiggle starts: right when the spoon lands. */
-  stirDelay(): string {
-    return `${SPOON_DELAY_S + DROP_DURATION_S}s`;
-  }
-
-  /** Delay before a shaker/mill's pour wobble starts: right when it lands. */
-  pourDelay(item: FallingItem): string {
-    return `${item.delay + DROP_DURATION_S}s`;
-  }
-
   /** Dismissing the popup returns to the ingredient step. */
   closeNotice(): void {
     this.notice.set(false);
     this.router.navigate(["/generator"]);
-  }
-
-  /** Hides an illustration whose SVG has not been exported yet. */
-  hideMissing(event: Event): void {
-    (event.target as HTMLImageElement).style.display = "none";
   }
 
   /**

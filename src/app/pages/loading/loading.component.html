@@ -9,43 +9,48 @@
     role="status"
     aria-live="polite"
     aria-label="Recipes are being generated">
-    <div class="loader-card relative h-[309px] w-[253px] overflow-hidden rounded-[20px] bg-sage">
-      <img
-        src="assets/img/Loading-Page/bowl.svg"
-        alt=""
-        class="loader-bowl absolute bottom-[46px] left-1/2 w-[150px] -translate-x-1/2"
-        (error)="hideMissing($event)" />
+    <!--
+      The bowl choreography - the ingredients dropping in, the pepper mill and
+      the salt shaker turning in from outside and seasoning, then the spoon
+      stirring - is assembled here from the single SVGs in
+      assets/img/Loading-Page. Every part is a vector, so the scene stays sharp
+      on any display, and its timing lives in loading.component.css
+      (see --loader-cycle there).
 
-      @for (item of items; track item.file) {
-        <div
-          class="loader-item-pos absolute"
-          [style.left.px]="item.left"
-          [style.top.px]="item.top"
-          [class.loader-stir-veg]="item.stir === 'veg'"
-          [class.loader-stir-spoon]="item.stir === 'spoon'"
-          [class.loader-pour]="item.pour"
-          [style.--stir-distance]="(item.stirDistance ?? 0) + 'px'"
-          [style.--pour-rotate]="(item.pourRotate ?? 0) + 'deg'"
-          [style.animation-delay]="item.pour ? pourDelay(item) : stirDelay()">
-          <img
-            [src]="'assets/img/Loading-Page/' + item.file"
-            alt=""
-            class="loader-item"
-            [style.width.px]="item.width"
-            [style.--item-rotate]="item.rotate + 'deg'"
-            [style.animation-delay]="item.delay + 's'"
-            (error)="hideMissing($event)" />
+      The mill, the shaker and the spoon reach past the card on purpose;
+      `overflow-hidden` clips them, which is what makes them appear from outside
+      the card instead of popping in at its edge.
+    -->
+    <div class="relative h-[309px] w-[253px] overflow-hidden rounded-[20px] bg-sage">
+      <!--
+        The bowl's own rim curve, taken from bowl.svg and expressed as a
+        fraction of the scene box. Everything inside .scene__fill is clipped
+        along it, which is what puts the ingredients in the bowl instead of
+        behind it. Recalculate this path if the bowl's size or position in
+        loading.component.css changes.
+      -->
+      <svg class="scene-defs" aria-hidden="true" focusable="false" width="0" height="0">
+        <clipPath id="loader-bowl-rim" clipPathUnits="objectBoundingBox">
+          <path d="M0,0 L1,0 L1,.5775 L.7984,.5775 C.7281,.6166 .6268,.6293 .5020,.6293 C.3772,.6293 .2783,.6156 .2056,.5775 L0,.5775 Z" />
+        </clipPath>
+      </svg>
+
+      <div class="scene" aria-hidden="true">
+        <img class="scene__item scene__bowl" src="assets/img/Loading-Page/bowl.svg" alt="" />
+
+        <div class="scene__fill">
+          <img class="scene__item scene__leaf--left" src="assets/img/Loading-Page/salad.svg" alt="" />
+          <img class="scene__item scene__leaf--center" src="assets/img/Loading-Page/salad.svg" alt="" />
+          <img class="scene__item scene__tomato" src="assets/img/Loading-Page/tomato.svg" alt="" />
+          <img class="scene__item scene__carrot" src="assets/img/Loading-Page/carrot.svg" alt="" />
+          <img class="scene__item scene__pepper-grains" src="assets/img/Loading-Page/pepper.svg" alt="" />
+          <img class="scene__item scene__salt-grains" src="assets/img/Loading-Page/salt.svg" alt="" />
+          <img class="scene__item scene__spoon" src="assets/img/Loading-Page/spoon.svg" alt="" />
         </div>
-      }
 
-      <!-- Second, identical copy in front of the items: since bowl.svg is a
-           solid silhouette (not a real hollow bowl), whatever an item's
-           bottom overlaps here gets hidden, so it looks tucked into the bowl. -->
-      <img
-        src="assets/img/Loading-Page/bowl.svg"
-        alt=""
-        class="loader-bowl absolute bottom-[46px] left-1/2 w-[150px] -translate-x-1/2"
-        (error)="hideMissing($event)" />
+        <img class="scene__item scene__mill" src="assets/img/Loading-Page/pepper-mill.svg" alt="" />
+        <img class="scene__item scene__shaker" src="assets/img/Loading-Page/salt-shaker.svg" alt="" />
+      </div>
     </div>
 
     <p class="font-quicksand text-[32px] leading-none font-bold text-creme">

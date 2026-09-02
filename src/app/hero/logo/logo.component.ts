@@ -9,7 +9,7 @@ const LOGO_SRC = {
 } as const;
 
 /**
- * "Code à Cuisine" logo (chef hat + wordmark), rendered as a single SVG
+ * "Code à Cuisine" logo rendered as a single SVG
  * image for crisp scaling at any size. Use `variant="color"` on light
  * backgrounds and the default `"cream"` on the dark forest-green ones.
  */

@@ -55,3 +55,4 @@ export class GeneratorComponent {
     this.router.navigate(["/preferences"]);
   }
 }
+

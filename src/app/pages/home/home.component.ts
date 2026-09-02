@@ -8,7 +8,7 @@ import { ImpressumModalComponent } from "../../shared/impressum-modal/impressum-
 import { LogoutButtonComponent } from "../../shared/logout-button/logout-button.component";
 
 /**
- * Hero landing page - pixel-faithful implementation of the Figma design
+ * Hero landing page
  * (forest green background), responsive down to 320px width.
  */
 @Component({
