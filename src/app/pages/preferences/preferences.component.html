@@ -30,7 +30,7 @@
             (click)="stepServings(-1)"
             [disabled]="preferences().servings <= 1"
             aria-label="Decrease servings"
-            class="flex h-5 w-5 items-center justify-center rounded-[3px] border border-deep-green text-deep-green transition-colors hover:bg-forest/20 disabled:opacity-40 disabled:hover:bg-transparent">
+            class="flex h-5 w-5 items-center justify-center rounded-[3px] border border-deep-green text-deep-green transition-colors hover:bg-creme disabled:opacity-40 disabled:hover:bg-transparent">
             <app-icon name="minus" klass="h-3 w-3" />
           </button>
           <span
@@ -43,7 +43,7 @@
             (click)="stepServings(1)"
             [disabled]="preferences().servings >= 12"
             aria-label="Increase servings"
-            class="flex h-5 w-5 items-center justify-center rounded-[3px] border border-deep-green text-deep-green transition-colors hover:bg-forest/20 disabled:opacity-40 disabled:hover:bg-transparent">
+            class="flex h-5 w-5 items-center justify-center rounded-[3px] border border-deep-green text-deep-green transition-colors hover:bg-creme disabled:opacity-40 disabled:hover:bg-transparent">
             <app-icon name="plus" klass="h-3 w-3" />
           </button>
         </div>
@@ -59,7 +59,7 @@
             (click)="stepHelpers(-1)"
             [disabled]="preferences().helpers <= 1"
             aria-label="Decrease cooking helpers"
-            class="flex h-5 w-5 items-center justify-center rounded-[3px] border border-deep-green text-deep-green transition-colors hover:bg-forest/20 disabled:opacity-40 disabled:hover:bg-transparent">
+            class="flex h-5 w-5 items-center justify-center rounded-[3px] border border-deep-green text-deep-green transition-colors hover:bg-creme disabled:opacity-40 disabled:hover:bg-transparent">
             <app-icon name="minus" klass="h-3 w-3" />
           </button>
           <span
@@ -72,7 +72,7 @@
             (click)="stepHelpers(1)"
             [disabled]="preferences().helpers >= 3"
             aria-label="Increase cooking helpers"
-            class="flex h-5 w-5 items-center justify-center rounded-[3px] border border-deep-green text-deep-green transition-colors hover:bg-forest/20 disabled:opacity-40 disabled:hover:bg-transparent">
+            class="flex h-5 w-5 items-center justify-center rounded-[3px] border border-deep-green text-deep-green transition-colors hover:bg-creme disabled:opacity-40 disabled:hover:bg-transparent">
             <app-icon name="plus" klass="h-3 w-3" />
           </button>
         </div>
