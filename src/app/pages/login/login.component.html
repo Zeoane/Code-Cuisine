@@ -39,7 +39,7 @@
           [(ngModel)]="email"
           required
           autocomplete="email"
-          class="font-quicksand h-12 w-full rounded-md border border-creme/30 bg-creme px-3 text-base text-deep-green focus-visible:ring-2 focus-visible:ring-creme focus-visible:outline-none" />
+          class="font-quicksand h-12 w-full rounded-md border border-creme/30 bg-creme px-3 text-base text-deep-green transition-colors focus-visible:border-deep-green focus-visible:outline-none" />
       </label>
 
       <label class="font-quicksand flex flex-col gap-1 text-base text-creme">
@@ -51,7 +51,7 @@
           required
           [minlength]="mode() === 'register' ? 8 : 1"
           [autocomplete]="mode() === 'register' ? 'new-password' : 'current-password'"
-          class="font-quicksand h-12 w-full rounded-md border border-creme/30 bg-creme px-3 text-base text-deep-green focus-visible:ring-2 focus-visible:ring-creme focus-visible:outline-none" />
+          class="font-quicksand h-12 w-full rounded-md border border-creme/30 bg-creme px-3 text-base text-deep-green transition-colors focus-visible:border-deep-green focus-visible:outline-none" />
         @if (mode() === "register") {
           <span class="font-quicksand text-base text-creme/70">{{ passwordHint }}</span>
         }

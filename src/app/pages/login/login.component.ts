@@ -17,6 +17,26 @@ type Mode = "login" | "register";
   standalone: true,
   imports: [FormsModule, RouterLink, SiteHeaderComponent],
   templateUrl: "./login.component.html",
+  styles: [
+    `
+      /*
+       * Chrome and Edge paint their own background into a field they filled from
+       * saved credentials. It sits inside the field's border and ignores its
+       * rounded corners, so after a reload the email field shows a second edge
+       * along the top and sides. An inset shadow in the field's own colour
+       * covers that background and does follow the radius, which makes a
+       * restored field look exactly like one that was typed into.
+       */
+      input:-webkit-autofill,
+      input:-webkit-autofill:hover,
+      input:-webkit-autofill:focus {
+        box-shadow: 0 0 0 1000px #faf0e6 inset;
+        -webkit-box-shadow: 0 0 0 1000px #faf0e6 inset;
+        -webkit-text-fill-color: #10310b;
+        caret-color: #10310b;
+      }
+    `,
+  ],
 })
 export class LoginComponent {
   protected readonly mode = signal<Mode>("login");
