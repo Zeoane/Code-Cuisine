@@ -18,6 +18,11 @@
  *    single clip is what makes the ingredients sit inside the bowl instead of
  *    behind it, and it is why no part needs its own masking.
  *
+ * Every ingredient makes the same three moves: it comes in from outside the
+ * card, holds for a moment where it is fully inside the card and clear of the
+ * bowl, and only then drops in. That hold is what the choreography lives from -
+ * shorten it and the ingredients flicker past half-cropped.
+ *
  * Coordinates are pixels inside the 253x309 card and were taken from the
  * original animation. They follow from the bowl being 150px wide (203.8 SVG
  * units), i.e. every sprite is drawn at 0.736 of its own viewBox, which is what
@@ -43,7 +48,6 @@
   left: 52px;
   top: 167px;
   width: 150px;
-  transform-origin: 50% 100%;
   animation-name: bowl-in;
 }
 
@@ -67,7 +71,7 @@
 /* --- the finished bowl, back to front ------------------------------------ */
 
 .scene__leaf--left {
-  left: 41px;
+  left: 45px;
   top: 113px;
   width: 82px;
   z-index: 1;
@@ -120,14 +124,20 @@
   animation-name: salt-fall;
 }
 
-/* Turning point is the spoon's head, so the handle swings while the head stays
-   in the salad. What reaches below the rim is cut off by the clip. */
+/*
+ * The spoon turns around a point just above the card, not around its own head.
+ * That is what lets the head travel across the bowl instead of staying put
+ * while only the handle waves: at 15 degrees it moves about 52px to either side
+ * of the middle, which is the bowl's full inner width. It also sits deep enough
+ * that the rim clip cuts its lower half - that is the spoon being in the salad
+ * rather than hovering over it.
+ */
 .scene__spoon {
-  left: 112px;
-  top: 7px;
-  width: 32px;
-  z-index: 6;
-  transform-origin: 50% 86%;
+  left: 107px;
+  top: 22px;
+  width: 42px;
+  z-index: 0;
+  transform-origin: 50% -15%;
   opacity: 0;
   animation-name: spoon-stir;
 }
@@ -156,174 +166,177 @@
 
 /* --- choreography --------------------------------------------------------- */
 
-/* 1-4%: the bowl rises into place. */
+/*
+ * 1-5%: the bowl fades in. Opacity only, on purpose - a bowl that also moves or
+ * scales while still half transparent reads as a second, offset bowl behind
+ * the real one.
+ */
 @keyframes bowl-in {
   0%,
   1% {
     opacity: 0;
-    transform: translateY(22px) scale(0.92);
   }
-  4%,
+  5%,
   100% {
     opacity: 1;
-    transform: none;
   }
 }
 
-/* 5-10%: the first leaf drops into the middle and settles. */
+/* 5-13%: the first leaf comes in from above, is held in full view, then drops
+   into the middle of the bowl. */
 @keyframes leaf-center-in {
   0%,
   5% {
     opacity: 0;
-    transform: translateY(-190px) rotate(9deg);
+    transform: translate(30px, -235px) rotate(16deg);
   }
-  6% {
+  6.5%,
+  9% {
     opacity: 1;
+    transform: translate(0, -110px) rotate(6deg);
   }
-  8.5% {
-    transform: translateY(0) rotate(5deg);
+  12% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(4deg);
   }
-  10%,
+  13%,
   100% {
     opacity: 1;
     transform: none;
   }
 }
 
-/* 10-16%: the carrot turns in from the upper right. */
+/* 14-22%: the carrot turns in from the upper right, is held, then drops in. */
 @keyframes carrot-in {
   0%,
-  10% {
+  14% {
     opacity: 0;
-    transform: translate(150px, -140px) rotate(-40deg);
+    transform: translate(125px, -190px) rotate(-56deg);
   }
-  11.5% {
+  15.5%,
+  18% {
     opacity: 1;
+    transform: translate(-25px, -104px) rotate(-16deg);
   }
-  15% {
-    transform: translate(0, 0) rotate(26deg);
+  21% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(24deg);
   }
-  16.5%,
+  22%,
   100% {
     opacity: 1;
     transform: rotate(18deg);
   }
 }
 
-/* 17-23%: the tomato slice drops in on the left. */
+/* 23-30%: the tomato slice comes in from the upper left, is held, then drops. */
 @keyframes tomato-in {
   0%,
-  17% {
+  23% {
     opacity: 0;
-    transform: translate(-30px, -185px) rotate(-26deg);
+    transform: translate(-90px, -175px) rotate(-34deg);
   }
-  18.5% {
+  24.5%,
+  26.5% {
     opacity: 1;
-  }
-  21.5% {
-    transform: translate(0, 0) rotate(-8deg);
-  }
-  23%,
-  100% {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-/* 24-31%: the last leaf lands on the left and closes the bowl. */
-@keyframes leaf-left-in {
-  0%,
-  24% {
-    opacity: 0;
-    transform: translateY(-200px) rotate(-11deg);
-  }
-  25.5% {
-    opacity: 1;
+    transform: translate(10px, -115px) rotate(-12deg);
   }
   29% {
-    transform: translateY(0) rotate(-6deg);
+    opacity: 1;
+    transform: translate(0, 0) rotate(-8deg);
   }
-  31%,
+  30%,
   100% {
     opacity: 1;
     transform: none;
   }
 }
 
-/* 40-57%: the pepper mill turns in on the left, tips over the bowl and leaves
-   again. The salt shaker does the same on the right, mirrored. */
+/* 31-39%: the last leaf comes in, is held, then closes the bowl on the left. */
+@keyframes leaf-left-in {
+  0%,
+  31% {
+    opacity: 0;
+    transform: translate(-55px, -240px) rotate(-22deg);
+  }
+  32.5%,
+  35% {
+    opacity: 1;
+    transform: translate(20px, -92px) rotate(-8deg);
+  }
+  38% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(-5deg);
+  }
+  39%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/*
+ * 43-57%: the pepper mill comes in past the left edge and the salt shaker past
+ * the right edge - opposite sides, same beats. Both travel horizontally so the
+ * side they come from is unmistakable, tip further over while they season, and
+ * leave the way they came.
+ */
 @keyframes mill-season {
   0%,
-  40% {
+  43% {
     opacity: 0;
-    transform: translate(-95px, 22px) rotate(-62deg);
+    transform: translate(-135px, 6px) rotate(-42deg);
   }
-  42% {
+  45% {
     opacity: 1;
   }
-  46% {
+  48% {
     opacity: 1;
     transform: translate(0, 0) rotate(-16deg);
   }
-  53% {
+  54% {
     opacity: 1;
     transform: translate(0, 0) rotate(-29deg);
   }
   57%,
   100% {
     opacity: 0;
-    transform: translate(-45px, -95px) rotate(-46deg);
+    transform: translate(-135px, 2px) rotate(-42deg);
   }
 }
 
 @keyframes shaker-season {
   0%,
-  40% {
+  43% {
     opacity: 0;
-    transform: translate(92px, 22px) rotate(88deg);
+    transform: translate(135px, 6px) rotate(-106deg);
   }
-  42% {
+  45% {
     opacity: 1;
   }
-  46% {
+  48% {
     opacity: 1;
-    transform: translate(0, 0) rotate(124deg);
+    transform: translate(0, 0) rotate(-124deg);
   }
-  53% {
+  54% {
     opacity: 1;
-    transform: translate(0, 0) rotate(141deg);
+    transform: translate(0, 0) rotate(-141deg);
   }
   57%,
   100% {
     opacity: 0;
-    transform: translate(48px, -90px) rotate(106deg);
+    transform: translate(135px, 2px) rotate(-106deg);
   }
 }
 
-/* 47-55%: the grains fall out of the two and stay on the salad. */
+/* 49-57%: the grains fall out of the two and stay on the salad. */
 @keyframes pepper-fall {
   0%,
-  47% {
+  49% {
     opacity: 0;
     transform: translate(-4px, -30px);
   }
-  49% {
-    opacity: 1;
-  }
-  53%,
-  100% {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-@keyframes salt-fall {
-  0%,
-  48.5% {
-    opacity: 0;
-    transform: translate(5px, -28px);
-  }
-  50.5% {
+  51% {
     opacity: 1;
   }
   55%,
@@ -333,37 +346,56 @@
   }
 }
 
-/* 56-91%: the spoon comes in, stirs twice and leaves again. */
+@keyframes salt-fall {
+  0%,
+  50.5% {
+    opacity: 0;
+    transform: translate(5px, -28px);
+  }
+  52.5% {
+    opacity: 1;
+  }
+  57%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/*
+ * 60-94%: the spoon comes down into the bowl, sweeps its full width twice -
+ * right, left, right, left - and lifts back out.
+ */
 @keyframes spoon-stir {
   0%,
-  56% {
+  60% {
     opacity: 0;
-    transform: translate(78px, -120px) rotate(42deg);
+    transform: translate(44px, -150px) rotate(-15deg);
   }
-  58% {
+  62% {
     opacity: 1;
   }
-  61% {
+  64% {
     opacity: 1;
+    transform: translate(0, 0) rotate(-15deg);
+  }
+  70% {
     transform: translate(0, 0) rotate(15deg);
   }
-  67% {
-    transform: translate(0, 0) rotate(-13deg);
+  76% {
+    transform: translate(0, 0) rotate(-15deg);
   }
-  73% {
+  82% {
     transform: translate(0, 0) rotate(15deg);
   }
-  79% {
-    transform: translate(0, 0) rotate(-13deg);
-  }
-  85% {
+  88% {
     opacity: 1;
-    transform: translate(0, 0) rotate(12deg);
+    transform: translate(0, 0) rotate(-15deg);
   }
-  91%,
+  94%,
   100% {
     opacity: 0;
-    transform: translate(78px, -120px) rotate(42deg);
+    transform: translate(44px, -150px) rotate(-15deg);
   }
 }
 
