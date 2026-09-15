@@ -1,7 +1,7 @@
 import { IngredientEntry } from "../models/recipe.models";
 
 /** Fewest distinct ingredients a recipe request needs. */
-export const MIN_INGREDIENTS = 3;
+export const MIN_INGREDIENTS = 1;
 
 /** Rough amount of food (g/ml) a single serving needs across all ingredients. */
 export const MIN_AMOUNT_PER_SERVING = 150;

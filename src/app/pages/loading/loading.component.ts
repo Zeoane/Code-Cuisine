@@ -55,6 +55,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
   protected readonly noticeTitle = signal(NOT_ENOUGH_TITLE);
   protected readonly noticeMessage = signal(NOT_ENOUGH_MESSAGE);
 
+  /** Checks the ingredients against the servings, then starts the generation. */
   ngOnInit(): void {
     const { servings } = this.wizard.preferences();
 
@@ -68,6 +69,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
     void this.runGeneration();
   }
 
+  /** Drops the minimum-runtime timer so it can't fire after the view is gone. */
   ngOnDestroy(): void {
     if (this.timer) clearTimeout(this.timer);
   }
