@@ -14,10 +14,10 @@ export class RecipeNutritionComponent {
   rows(): [string, string][] {
     const n = this.nutrition;
     return [
-      ["Kalorien", `${Math.round(n.caloriesPerServing)} kcal`],
+      ["Calories", `${Math.round(n.caloriesPerServing)} kcal`],
       ["Protein", `${Math.round(n.proteinGrams)} g`],
-      ["Kohlenhydrate", `${Math.round(n.carbsGrams)} g`],
-      ["Fett", `${Math.round(n.fatGrams)} g`],
+      ["Carbs", `${Math.round(n.carbsGrams)} g`],
+      ["Fat", `${Math.round(n.fatGrams)} g`],
     ];
   }
 }

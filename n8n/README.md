@@ -119,26 +119,36 @@ you can copy from there instead of retyping).
 | 7 | Exchange JWT for Access Token | HTTP Request | POST `oauth2.googleapis.com/token`, no credential needed |
 | 8 | Store Access Token | Code | carries `access_token` forward as `accessToken` |
 | 9 | Compute Quota Keys | Code | UTC `date`, `ipDocId = date_sha256(salt\|ip)`, `totalDocId = date`; drops `clientIp` from the item |
-| 10 | Read IP Quota Counter | HTTP Request | GET Firestore doc `quota_ip/{ipDocId}`, header `Authorization: Bearer {accessToken}`, **Never Error** on (missing doc ⇒ handled as 0 downstream) |
-| 11 | Read Global Quota Counter | HTTP Request | GET Firestore doc `quota_total/{totalDocId}`, same header, Never Error on |
-| 12 | Parse Quota Counts | Code | reads nodes 9–11 by name, defaults missing docs to `count: 0` |
-| 13 | Check Quota Limits | IF | `{{ $json.ipCount >= 3 || $json.totalCount >= 12 }}` |
-| 13a | Build Quota Exceeded Response → Respond: 429 | Code → Respond to Webhook | message differs depending on which limit tripped |
-| 13b | Increment IP Quota | HTTP Request | PATCH (upserts) `quota_ip/{ipDocId}` with `count = ipCount + 1`, same Bearer header |
-| 14 | Increment Global Quota | HTTP Request | PATCH (upserts) `quota_total/{totalDocId}` with `count = totalCount + 1`, same Bearer header |
-| 15 | Generate Mock Recipes | Code | ported from `recipe-generator.service.ts` + `cuisine-presets.ts` — same algorithm, same output shape |
-| 16 | Respond: 200 Success | Respond to Webhook | 200, `{ recipes, quota: { ipRemaining, totalRemaining } }` |
+| 10 | Reserve Quota Slot | HTTP Request | POST `documents:commit` — one atomic commit that raises `quota_ip/{ipDocId}` and `quota_total/{totalDocId}` by 1 via an `increment` transform and upserts `date`, same Bearer header |
+| 11 | Parse Quota Reservation | Code | reads the post-increment counts from `writeResults[].transformResults[0].integerValue` |
+| 12 | Check Quota Limits | IF | `{{ $json.ipCount > 3 \|\| $json.totalCount > 12 }}` — the counts already include this request, so the limit trips one step later than with a read-first gate |
+| 12a | Release Quota Slot | HTTP Request | same commit with `increment: -1`, handing the slot back before the 429 is sent |
+| 12b | Build Quota Exceeded Response → Respond: 429 | Code → Respond to Webhook | message differs depending on which limit tripped |
+| 13 | Generate Mock Recipes | Code | ported from `recipe-generator.service.ts` + `cuisine-presets.ts` — same algorithm, same output shape |
+| 14 | Respond: 200 Success | Respond to Webhook | 200, `{ recipes, quota: { ipRemaining, totalRemaining } }` |
 
 Firestore REST base URL used throughout:
 `https://firestore.googleapis.com/v1/projects/code-a-cuisine-3d1e0/databases/(default)/documents/...`
 
+**Why the counter is raised before the limit is checked.** Reading a count,
+adding one in the workflow and writing the result back loses an update
+whenever two requests overlap: both read 2, both write 3, and one generation
+is never billed. Firestore's `increment` transform does the addition inside
+the database, so overlapping requests get 3 and 4 and never collide. The
+price is that the check has to happen afterwards — a request over the limit
+has already taken its slot, so node 12a gives it back before answering 429.
+`update` + `updateMask: ["date"]` leaves `count` alone, which lets the same
+call create the document on the day's first request (a missing field
+increments from 0).
+
 ### `quota-status` — node chain
 
-Same as steps 1–3, 6–12 above (IP extract → validate → sign JWT → get
-access token → quota keys → read both counters → parse counts), no payload
-validation, no increments → **Build Status Response** (Code,
-`{ ipRemaining, totalRemaining }` from the parsed counts) → **Respond: 200
-Success**.
+Same as steps 1–3 and 6–9 above (IP extract → validate → sign JWT → get
+access token → quota keys), no payload validation. Then two read-only GETs
+on `quota_ip/{ipDocId}` and `quota_total/{totalDocId}` (**Never Error** on,
+a missing document counts as 0) → **Parse Quota Counts** (Code) → **Build
+Status Response** (Code, `{ ipRemaining, totalRemaining }`) → **Respond: 200
+Success**. This workflow never writes, so it needs no commit.
 
 ### `error-notifications`
 
@@ -186,11 +196,24 @@ hash would be pointless — there are only ~4 billion IPv4 addresses, so an
 unsalted SHA-256 is brute-forced in seconds. That is why the Code node
 throws if the salt is missing or shorter than 16 characters.
 
-**Remaining caveat:** n8n stores the full execution data, including the
-original webhook headers, for every run. If you want the raw IP gone
-end-to-end, set the workflows' **Settings → Save successful/failed
-production executions** to *Do not save* (or shorten the data retention in
-the n8n instance settings).
+**Execution data is not retained either.** n8n would otherwise store the
+full run of every request, including the original webhook headers with the
+raw `x-forwarded-for`. All workflows therefore ship with retention switched
+off in **Settings → …**, which the exported JSON carries as:
+
+```json
+"saveDataSuccessExecution": "none",
+"saveDataErrorExecution": "none",
+"saveManualExecutions": false,
+"saveExecutionProgress": false
+```
+
+The raw IP is thus gone end-to-end: it exists only in memory for the few
+nodes between the webhook and `Compute Quota Keys`. Error notifications are
+unaffected — the Error Trigger fires from the run itself, not from stored
+execution data. While debugging it can help to set
+`saveDataErrorExecution` back to `"all"` temporarily; remember to switch it
+off again before the workflows go live.
 
 ## JSON request/response contract
 
