@@ -13,7 +13,7 @@
       <app-icon [name]="open() ? 'close' : 'menu'" klass="h-6 w-6" />
     </button>
 
-    <nav class="hidden items-center gap-6 md:flex" aria-label="Hauptnavigation">
+    <nav class="hidden items-center gap-6 md:flex" aria-label="Main navigation">
       @for (item of navItems; track item.path) {
         <a
           [routerLink]="item.path"
@@ -39,7 +39,7 @@
     </nav>
 
     @if (open()) {
-      <nav class="flex w-full flex-col gap-2 pb-4 md:hidden" aria-label="Mobile Navigation">
+      <nav class="flex w-full flex-col gap-2 pb-4 md:hidden" aria-label="Mobile navigation">
         @for (item of navItems; track item.path) {
           <a
             [routerLink]="item.path"
