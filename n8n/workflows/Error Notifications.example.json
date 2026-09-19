@@ -10,7 +10,8 @@
       "position": [
         448,
         128
-      ]
+      ],
+      "notes": "Fires when a run of another workflow fails. Both webhook workflows name this workflow as their Error Workflow. It works independently of execution retention, which is switched off for data-protection reasons - so this mail is the only signal a failure leaves behind."
     },
     {
       "parameters": {
@@ -23,7 +24,8 @@
       "position": [
         672,
         128
-      ]
+      ],
+      "notes": "Collects workflow name, failed node, error message, execution URL and timestamp into a readable subject and body."
     },
     {
       "parameters": {
@@ -41,7 +43,8 @@
         128
       ],
       "webhookId": "abf7e8ea-1488-4142-9bc4-66c743734eb0",
-      "credentials": {}
+      "credentials": {},
+      "notes": "Sends the notification. Needs an SMTP credential in n8n; without one the workflow fails silently and no alert goes out."
     }
   ],
   "pinData": {},

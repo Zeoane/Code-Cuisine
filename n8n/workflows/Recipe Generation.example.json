@@ -17,7 +17,8 @@
         192
       ],
       "webhookId": "generate-recipe",
-      "retryOnFail": true
+      "retryOnFail": true,
+      "notes": "POST /generate-recipe, the entry point for the Angular app. Response mode is 'Using Respond to Webhook Node', so every branch sets its own status code instead of answering automatically."
     },
     {
       "parameters": {
@@ -30,7 +31,8 @@
       "position": [
         -2080,
         192
-      ]
+      ],
+      "notes": "Reads the caller's IP from $json.ip, falling back to the x-forwarded-for, x-real-ip and cf-connecting-ip headers, and checks its shape. Deletes the raw headers from the item right away so the address travels no further through the run than it has to."
     },
     {
       "parameters": {
@@ -63,7 +65,8 @@
       "position": [
         -1872,
         192
-      ]
+      ],
+      "notes": "Without a usable IP the quota cannot be keyed, so the request is turned away rather than let through unmetered."
     },
     {
       "parameters": {
@@ -78,7 +81,8 @@
       "position": [
         -1680,
         320
-      ]
+      ],
+      "notes": "400 with { error: 'invalid_request' }, the error shape recipe-generator.service.ts expects."
     },
     {
       "parameters": {
@@ -91,7 +95,8 @@
       "position": [
         -1648,
         144
-      ]
+      ],
+      "notes": "Re-checks ingredients, servings, helpers and the enum fields against the same ranges the Angular form enforces. Defence in depth: the webhook is public and anyone can post to it."
     },
     {
       "parameters": {
@@ -124,7 +129,8 @@
       "position": [
         -1440,
         144
-      ]
+      ],
+      "notes": "Splits into the 400 branch or into the Firestore chain."
     },
     {
       "parameters": {
@@ -139,7 +145,8 @@
       "position": [
         -1104,
         336
-      ]
+      ],
+      "notes": "400 listing the collected payloadErrors, so the client can say what was wrong instead of showing a generic failure."
     },
     {
       "parameters": {
@@ -152,7 +159,8 @@
       "position": [
         -1056,
         -64
-      ]
+      ],
+      "notes": "Signs an RS256 service-account assertion for the datastore scope. Hand-written because n8n has no Google service-account credential for the Firestore REST API. normalizePemKey repairs the line breaks that get lost when the private key is pasted into the Set node."
     },
     {
       "parameters": {
@@ -181,7 +189,8 @@
       "position": [
         -848,
         -64
-      ]
+      ],
+      "notes": "Trades the signed assertion at oauth2.googleapis.com for an access token valid for one hour. Needs no n8n credential - the assertion is the proof of identity."
     },
     {
       "parameters": {
@@ -194,7 +203,8 @@
       "position": [
         -656,
         -64
-      ]
+      ],
+      "notes": "Carries access_token on as accessToken, together with the fields from the JWT step, so every later Firestore call can read it by node name."
     },
     {
       "parameters": {
@@ -207,7 +217,8 @@
       "position": [
         -448,
         -64
-      ]
+      ],
+      "notes": "Builds the daily document ids: quota_ip/<date>_<salted SHA-256 of the IP> and quota_total/<date>, then drops clientIp. No raw address is ever written to Firestore. The date is UTC, so the limit resets at midnight UTC, not local midnight."
     },
     {
       "parameters": {
@@ -251,7 +262,8 @@
       "position": [
         352,
         -64
-      ]
+      ],
+      "notes": "ipCount > 3 or totalCount > 12. The counts already include this request, so the limit trips one step later than it would with a read-first gate."
     },
     {
       "parameters": {
@@ -264,7 +276,8 @@
       "position": [
         240,
         112
-      ]
+      ],
+      "notes": "Picks the message by which limit tripped - the caller's own three or the twelve shared across all users - and reports the counts as they stand after the release."
     },
     {
       "parameters": {
@@ -279,7 +292,8 @@
       "position": [
         464,
         112
-      ]
+      ],
+      "notes": "429 with error 'quota_exceeded'. The Angular loading view turns this into the 'Daily limit reached' notice instead of a generic error."
     },
     {
       "parameters": {
@@ -292,7 +306,8 @@
       "position": [
         16,
         560
-      ]
+      ],
+      "notes": "Port of recipe-generator.service.ts plus cuisine-presets.ts: same algorithm, same output shape. Placeholder until the real LLM call takes its place - everything around it stays as it is."
     },
     {
       "parameters": {
@@ -307,7 +322,8 @@
       "position": [
         240,
         560
-      ]
+      ],
+      "notes": "200 with { recipes, quota: { ipRemaining, totalRemaining } }, exactly the GenerateResponse shape the Angular service reads."
     },
     {
       "parameters": {
@@ -343,7 +359,8 @@
         80
       ],
       "id": "3b5294b1-db29-4e42-8bfb-6ddddff2b8ec",
-      "name": "Set Service Account  Credentials"
+      "name": "Set Service Account  Credentials",
+      "notes": "Holds the Firebase service-account e-mail, its private key and quotaIpSalt. The salt has to match the one in the Recipe Quota Status workflow character for character - otherwise this workflow counts up a different document than the status endpoint reads. 'Include Other Fields' is on so the values travel with the item."
     },
     {
       "parameters": {
@@ -370,7 +387,8 @@
       "position": [
         -784,
         304
-      ]
+      ],
+      "notes": "One atomic Firestore :commit that raises both counters by 1 with an increment transform. Reading a count and writing count+1 would lose an update whenever two requests overlap. updateMask ['date'] leaves count alone, which lets the same call create the document on the first request of the day."
     },
     {
       "parameters": {
@@ -383,7 +401,8 @@
       "position": [
         -528,
         304
-      ]
+      ],
+      "notes": "Reads the post-increment counts out of writeResults[].transformResults. These values are authoritative: overlapping requests get 3 and 4 instead of both getting 3."
     },
     {
       "parameters": {
@@ -410,7 +429,8 @@
       "position": [
         16,
         112
-      ]
+      ],
+      "notes": "The same commit with increment -1. The slot was taken before the limit was known, so a rejected request hands it back before the 429 goes out."
     }
   ],
   "pinData": {},

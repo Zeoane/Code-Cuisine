@@ -15,7 +15,8 @@
         -352,
         128
       ],
-      "webhookId": "quota-status"
+      "webhookId": "quota-status",
+      "notes": "GET /quota-status. Read-only endpoint behind the quota badge; it never changes a counter, it only reports them."
     },
     {
       "parameters": {
@@ -28,7 +29,8 @@
       "position": [
         -144,
         128
-      ]
+      ],
+      "notes": "Reads the caller's IP from $json.ip, falling back to the x-forwarded-for, x-real-ip and cf-connecting-ip headers, and checks its shape. Deletes the raw headers from the item right away so the address travels no further through the run than it has to."
     },
     {
       "parameters": {
@@ -61,7 +63,8 @@
       "position": [
         80,
         128
-      ]
+      ],
+      "notes": "Without an IP there is no counter to look up."
     },
     {
       "parameters": {
@@ -76,7 +79,8 @@
       "position": [
         288,
         256
-      ]
+      ],
+      "notes": "400 with { error: 'invalid_request' }, the error shape recipe-generator.service.ts expects."
     },
     {
       "parameters": {
@@ -89,7 +93,8 @@
       "position": [
         448,
         -112
-      ]
+      ],
+      "notes": "Signs an RS256 service-account assertion for the datastore scope. Hand-written because n8n has no Google service-account credential for the Firestore REST API. normalizePemKey repairs the line breaks that get lost when the private key is pasted into the Set node."
     },
     {
       "parameters": {
@@ -118,7 +123,8 @@
       "position": [
         672,
         -112
-      ]
+      ],
+      "notes": "Trades the signed assertion at oauth2.googleapis.com for an access token valid for one hour. Needs no n8n credential - the assertion is the proof of identity."
     },
     {
       "parameters": {
@@ -131,7 +137,8 @@
       "position": [
         896,
         -112
-      ]
+      ],
+      "notes": "Carries access_token on as accessToken, together with the fields from the JWT step, so every later Firestore call can read it by node name."
     },
     {
       "parameters": {
@@ -144,7 +151,8 @@
       "position": [
         1120,
         -112
-      ]
+      ],
+      "notes": "Hashes the IP exactly as the generation workflow does, so both address the same documents. Throws when the salt is missing or shorter than 16 characters - an unsalted hash of an IPv4 address is brute-forced in seconds."
     },
     {
       "parameters": {
@@ -173,7 +181,8 @@
       "position": [
         1328,
         -112
-      ]
+      ],
+      "notes": "GET on quota_ip/<ipDocId>. 'Never Error' is on: before the first generation of the day the document does not exist, and that 404 simply counts as 0."
     },
     {
       "parameters": {
@@ -202,7 +211,8 @@
       "position": [
         1552,
         -112
-      ]
+      ],
+      "notes": "The same for quota_total/<date>, the shared daily counter."
     },
     {
       "parameters": {
@@ -215,7 +225,8 @@
       "position": [
         1760,
         -112
-      ]
+      ],
+      "notes": "Turns the two counts into ipRemaining (3 per IP) and totalRemaining (12 across all users), clamped at 0."
     },
     {
       "parameters": {
@@ -230,7 +241,8 @@
       "position": [
         1984,
         -112
-      ]
+      ],
+      "notes": "200 with { ipRemaining, totalRemaining }, the QuotaStatus shape from quota.service.ts."
     },
     {
       "parameters": {
@@ -266,7 +278,8 @@
         -48
       ],
       "id": "0cee25cd-c172-47af-aea2-58280e9c6ea6",
-      "name": "Set Service Account Credentials"
+      "name": "Set Service Account Credentials",
+      "notes": "Same service account as the generation workflow. quotaIpSalt has to be identical there and here, otherwise this endpoint reads a different document than the one being counted up."
     }
   ],
   "pinData": {},

@@ -104,6 +104,11 @@ below — add nodes by name from n8n's node panel, then paste the exact
 parameter values/code shown (all of it is also inline in the JSON files, so
 you can copy from there instead of retyping).
 
+Every node also carries its own description inside the workflow (n8n: select
+the node → **Settings → Notes**). The tables below are the overview; the
+notes explain each node where you are actually looking at it. They travel
+with the exported JSON, so an import brings them along.
+
 ### `generate-recipe` — node chain
 
 | # | Node | Type | Notes |
