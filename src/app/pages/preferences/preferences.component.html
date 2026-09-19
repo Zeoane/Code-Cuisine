@@ -129,6 +129,28 @@
             </app-choice-chip>
           }
         </div>
+
+        @if (dietConflicts().length) {
+          <p
+            class="font-quicksand flex flex-wrap items-baseline gap-x-1.5 gap-y-1 rounded-md bg-peach/50 px-3 py-2.5 text-base text-deep-green"
+            role="status">
+            <span class="font-semibold">
+              {{ conflictNames() }} {{ dietConflicts().length === 1 ? "does" : "do" }} not fit
+              {{ dietName() }}.
+            </span>
+            @if (allIngredientsConflict()) {
+              <span>Please go back and adjust your ingredients.</span>
+            } @else {
+              <span>The recipe will be made without {{ conflictPronoun() }}.</span>
+            }
+            <button
+              type="button"
+              (click)="backToIngredients()"
+              class="font-medium underline underline-offset-4 hover:no-underline">
+              Edit ingredients
+            </button>
+          </p>
+        }
       </div>
     </section>
 

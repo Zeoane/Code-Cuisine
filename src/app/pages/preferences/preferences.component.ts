@@ -4,8 +4,10 @@ import {
   CUISINE_OPTIONS,
   DIET_OPTIONS,
   TIME_OPTIONS,
+  dietLabel,
 } from "../../core/data/preference-options";
 import { CuisineStyle, DietPreference, TimeCategory } from "../../core/models/recipe.models";
+import { conflictingIngredients } from "../../core/services/diet-check";
 import { QuotaService } from "../../core/services/quota.service";
 import { WizardStateService } from "../../core/services/wizard-state.service";
 import { LogoComponent } from "../../hero/logo/logo.component";
@@ -42,11 +44,42 @@ export class PreferencesComponent implements OnInit {
 
   protected readonly preferences = this.wizard.preferences;
 
-  /** True once cooking time, cuisine and diet are picked and quota isn't exhausted. */
+  /** Entered ingredients that clash with the selected diet. */
+  protected readonly dietConflicts = computed(() => {
+    const diet = this.preferences().diet;
+    return diet === null ? [] : conflictingIngredients(this.wizard.ingredients(), diet);
+  });
+
+  /** True when nothing the user entered survives the diet filter. */
+  protected readonly allIngredientsConflict = computed(
+    () =>
+      this.dietConflicts().length > 0 &&
+      this.dietConflicts().length === this.wizard.ingredients().length,
+  );
+
+  /** The clashing ingredient names as one readable list. */
+  protected readonly conflictNames = computed(() => {
+    const names = this.dietConflicts().map(entry => entry.name);
+    if (names.length <= 1) return names.join("");
+    return `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
+  });
+
+  /** "it" or "them", matching the number of clashing ingredients. */
+  protected readonly conflictPronoun = computed(() =>
+    this.dietConflicts().length === 1 ? "it" : "them",
+  );
+
+  /** Label of the selected diet, for the conflict notice. */
+  protected readonly dietName = computed(() => dietLabel(this.preferences().diet) ?? "this diet");
+
+  /**
+   * True once cooking time, cuisine and diet are picked, the quota isn't
+   * exhausted and at least one ingredient survives the diet filter.
+   */
   protected readonly canGenerate = computed(() => {
     const { timeCategory, cuisineStyle, diet } = this.preferences();
     const hasPreferences = timeCategory !== null && cuisineStyle !== null && diet !== null;
-    return hasPreferences && this.quota.ipRemaining() !== 0;
+    return hasPreferences && this.quota.ipRemaining() !== 0 && !this.allIngredientsConflict();
   });
 
   /** Fetches the current quota status so the badge is fresh when this step opens. */

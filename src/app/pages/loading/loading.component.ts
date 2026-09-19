@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit, inject, signal } from "@angular/core";
 import { Router } from "@angular/router";
-import { GenerationOptions } from "../../core/models/recipe.models";
+import { GenerationOptions, IngredientEntry } from "../../core/models/recipe.models";
+import { dietSafeIngredients } from "../../core/services/diet-check";
 import { hasEnoughIngredients } from "../../core/services/ingredient-check";
 import { LibraryService } from "../../core/services/library.service";
 import { GenerationError, RecipeGeneratorService } from "../../core/services/recipe-generator.service";
@@ -55,11 +56,20 @@ export class LoadingComponent implements OnInit, OnDestroy {
   protected readonly noticeTitle = signal(NOT_ENOUGH_TITLE);
   protected readonly noticeMessage = signal(NOT_ENOUGH_MESSAGE);
 
-  /** Checks the ingredients against the servings, then starts the generation. */
+  /**
+   * Entered ingredients minus the ones the selected diet rules out, so a vegan
+   * run never cooks with the bacon the user happened to have at home.
+   */
+  private usableIngredients(): IngredientEntry[] {
+    const { diet } = this.wizard.preferences();
+    return dietSafeIngredients(this.wizard.ingredients(), diet ?? "none");
+  }
+
+  /** Checks the usable ingredients against the servings, then starts the generation. */
   ngOnInit(): void {
     const { servings } = this.wizard.preferences();
 
-    if (!hasEnoughIngredients(this.wizard.ingredients(), servings)) {
+    if (!hasEnoughIngredients(this.usableIngredients(), servings)) {
       this.noticeTitle.set(NOT_ENOUGH_TITLE);
       this.noticeMessage.set(NOT_ENOUGH_MESSAGE);
       this.notice.set(true);
@@ -92,7 +102,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
     const { servings, helpers, timeCategory, cuisineStyle, diet } = this.wizard.preferences();
     const options: GenerationOptions = {
-      ingredients: this.wizard.ingredients().map(entry => entry.name),
+      ingredients: this.usableIngredients().map(entry => entry.name),
       servings,
       helpers,
       timeCategory: timeCategory ?? "medium",
