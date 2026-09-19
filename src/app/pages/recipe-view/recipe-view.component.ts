@@ -2,8 +2,10 @@ import { Component, computed, inject, signal } from "@angular/core";
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { dietLabel, timeLabel } from "../../core/data/preference-options";
 import { IngredientEntry, IngredientUnit } from "../../core/models/recipe.models";
+import { totalNutrition } from "../../core/services/nutrition-facts";
 import { WizardStateService } from "../../core/services/wizard-state.service";
 import { LogoComponent } from "../../hero/logo/logo.component";
+import { NutritionSplitComponent } from "../../recipes/nutrition-split/nutrition-split.component";
 import { HeartIconComponent } from "../../shared/heart-icon/heart-icon.component";
 import { IconComponent } from "../../shared/icon/icon.component";
 import { LogoutButtonComponent } from "../../shared/logout-button/logout-button.component";
@@ -26,7 +28,14 @@ const BASE_LIKES = 82;
 @Component({
   selector: "app-recipe-view",
   standalone: true,
-  imports: [RouterLink, LogoComponent, IconComponent, HeartIconComponent, LogoutButtonComponent],
+  imports: [
+    RouterLink,
+    LogoComponent,
+    IconComponent,
+    HeartIconComponent,
+    LogoutButtonComponent,
+    NutritionSplitComponent,
+  ],
   templateUrl: "./recipe-view.component.html",
 })
 export class RecipeViewComponent {
@@ -64,6 +73,19 @@ export class RecipeViewComponent {
 
   /** Like count shown next to the heart tag. */
   protected readonly likes = computed(() => BASE_LIKES + (this.liked() ? 1 : 0));
+
+  /** Rounded whole-recipe nutrition, or null when the recipe is a single portion. */
+  protected readonly wholeRecipe = computed(() => {
+    const recipe = this.recipe();
+    if (!recipe?.nutrition || recipe.servings <= 1) return null;
+    const whole = totalNutrition(recipe.nutrition, recipe.servings);
+    return {
+      calories: Math.round(whole.caloriesPerServing),
+      protein: Math.round(whole.proteinGrams),
+      fat: Math.round(whole.fatGrams),
+      carbs: Math.round(whole.carbsGrams),
+    };
+  });
 
   /** Quantity plus unit as shown in the "Your ingredients" column. */
   formatAmount(entry: IngredientEntry): string {

@@ -1,8 +1,22 @@
-<dl class="font-quicksand grid grid-cols-2 gap-x-4 gap-y-1 rounded-md bg-beige/60 p-3 text-base sm:grid-cols-4">
-  @for (row of rows(); track row[0]) {
-    <div>
-      <dt class="text-base text-forest/70">{{ row[0] }}</dt>
-      <dd class="font-semibold text-forest-dark">{{ row[1] }}</dd>
-    </div>
+<div class="font-quicksand flex flex-col gap-3 rounded-md bg-beige/60 p-3">
+  <dl class="grid grid-cols-2 gap-x-4 gap-y-1 text-base sm:grid-cols-4">
+    @for (row of rows(); track row[0]) {
+      <div>
+        <dt class="text-base text-forest/70">{{ row[0] }}</dt>
+        <dd class="font-semibold text-forest-dark">{{ row[1] }}</dd>
+      </div>
+    }
+  </dl>
+
+  @if (total(); as whole) {
+    <p class="text-base text-forest/70">
+      Whole recipe ({{ servingCount() }} servings):
+      <span class="font-semibold text-forest-dark">{{ whole.calories }} kcal</span>
+      · {{ whole.protein }} g protein · {{ whole.carbs }} g carbs · {{ whole.fat }} g fat
+    </p>
   }
-</dl>
+
+  @if (nutritionValue(); as facts) {
+    <app-nutrition-split [nutrition]="facts" />
+  }
+</div>

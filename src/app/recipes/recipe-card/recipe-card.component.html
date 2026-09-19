@@ -30,7 +30,7 @@
     </section>
 
     @if (recipe.nutrition) {
-      <app-recipe-nutrition [nutrition]="recipe.nutrition" />
+      <app-recipe-nutrition [nutrition]="recipe.nutrition" [servings]="recipe.servings" />
     }
 
     <section>

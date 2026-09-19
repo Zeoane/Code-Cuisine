@@ -26,6 +26,12 @@ module.exports = {
         "forest-dark": "#2c452c",
         "mid-green": "#1e5515",
         "deep-green": "#10310b",
+        // Chart-only hues for the macronutrient split. Kept apart from the
+        // brand palette because they have to stay distinguishable under
+        // protan/deutan/tritan vision, which the brand greens are not.
+        "macro-protein": "#2e7031",
+        "macro-fat": "#7a5aa8",
+        "macro-carbs": "#c9782b",
       },
     },
   },
