@@ -11,20 +11,33 @@ const FLESH_WORDS = [
   "mutton", "oxtail", "pancetta", "pastrami", "pepperoni", "pheasant", "pork",
   "prosciutto", "rabbit", "salami", "sausage", "sausages", "steak", "suet",
   "turkey", "veal", "venison",
-  "anchovies", "anchovy", "calamari", "clam", "clams", "cod", "crab", "crayfish",
-  "eel", "fish", "haddock", "halibut", "herring", "lobster", "mackerel", "monkfish",
-  "mussels", "octopus", "oyster", "oysters", "pilchards", "prawn", "prawns",
-  "salmon", "sardine", "sardines", "scallop", "scallops", "seafood", "shrimp",
-  "shrimps", "squid", "trout", "tuna",
+  "bison", "boar", "escargot", "escargots", "foie", "guanciale",
+  "jamon", "jerky", "kielbasa", "marshmallow", "marshmallows", "mincemeat",
+  "nduja", "partridge", "pigeon", "quail", "speck", "tripe",
+  "anchovies", "anchovy", "bass", "bream", "calamari", "carp", "caviar", "clam",
+  "clams", "cod", "crab", "crayfish", "eel", "fish", "haddock", "hake", "halibut",
+  "herring", "lobster", "mackerel", "monkfish", "mussels", "octopus", "oyster",
+  "oysters", "perch", "pike", "pilchards", "plaice", "pollock", "prawn", "prawns",
+  "roe", "salmon", "sardine", "sardines", "scallop", "scallops", "seafood",
+  "shrimp", "shrimps", "snapper", "sprat", "squid", "surimi", "tilapia", "trout",
+  "tuna", "whitebait",
 ];
+
+/** Names that are only animal food as a whole phrase, never word by word. */
+// prettier-ignore
+const FLESH_PHRASES = ["black pudding", "blood sausage", "parma ham", "serrano ham"];
 
 /** Words that mark an ingredient as an animal product but not as flesh. */
 // prettier-ignore
 const ANIMAL_PRODUCT_WORDS = [
-  "butter", "buttermilk", "cheddar", "cheese", "cream", "creme", "curd", "custard",
-  "egg", "eggs", "feta", "ghee", "gorgonzola", "gruyere", "halloumi", "honey",
-  "mascarpone", "milk", "mozzarella", "paneer", "parmesan", "pecorino", "ricotta",
-  "stilton", "yoghurt", "yogurt",
+  "aioli", "asiago", "brie", "burrata", "butter", "buttermilk", "camembert",
+  "casein", "cheddar", "cheese", "colby", "comte", "cream", "creme", "curd",
+  "custard", "edam", "egg", "eggs", "emmental", "emmentaler", "feta", "ghee",
+  "gorgonzola", "gouda", "gruyere", "halloumi", "havarti", "hollandaise", "honey",
+  "kefir", "labneh", "manchego", "mascarpone", "mayo", "mayonnaise", "meringue",
+  "milk", "mozzarella", "paneer", "parmesan", "parmigiano", "pecorino",
+  "provolone", "quark", "queso", "reggiano", "ricotta", "roquefort", "skyr",
+  "stilton", "taleggio", "whey", "yoghurt", "yogurt",
 ];
 
 /** Words that make an ingredient unsuitable for a ketogenic diet. */
@@ -36,6 +49,13 @@ const HIGH_CARB_WORDS = [
   "pasta", "pastry", "penne", "polenta", "potato", "potatoes", "rice", "risotto",
   "spaghetti", "sugar", "syrup", "tagliatelle", "tortilla", "tortillas", "wrap",
   "wraps",
+  "arrowroot", "barley", "bulgur", "cornflakes", "croissant", "crumpet",
+  "dextrose", "doughnut", "donut", "dumpling", "dumplings", "farro", "fructose",
+  "glucose", "gnocchi", "granola", "jam", "jelly", "ketchup", "maltodextrin",
+  "marmalade",
+  "millet", "molasses", "muesli", "pancake", "pancakes", "pretzel", "pretzels",
+  "quinoa", "ravioli", "scone", "semolina", "tapioca", "tortellini", "treacle",
+  "waffle", "wonton",
 ];
 
 /**
@@ -74,9 +94,15 @@ const PLANT_EXCEPTIONS = [
   "oyster mushroom", "oyster mushrooms",
 ];
 
-/** Lower-cases a name and reduces it to plain words, so matching is reliable. */
+/**
+ * Reduces a name to plain lower-case words. Accents are folded first, because
+ * stripping them naively turns "Jamón" into "jam" plus a stray "n" - which
+ * both hides the ham and looks like the sugar word "jam".
+ */
 function words(name: string): string[] {
   return name
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .replace(/[^a-z]+/g, " ")
     .trim()
@@ -116,7 +142,7 @@ export function conflictsWithDiet(name: string, diet: DietPreference): boolean {
   }
 
   // Meat, fish and seafood rule out both vegetarian and vegan.
-  if (hasWord(tokens, FLESH_WORDS)) return true;
+  if (hasWord(tokens, FLESH_WORDS) || FLESH_PHRASES.includes(tokens.join(" "))) return true;
   if (diet === "vegetarian") return false;
 
   return tokens.some(

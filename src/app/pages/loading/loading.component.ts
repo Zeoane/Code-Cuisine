@@ -87,7 +87,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
   /** Dismissing the popup returns to the ingredient step. */
   closeNotice(): void {
     this.notice.set(false);
-    this.router.navigate(["/generator"]);
+    this.router.navigate(["/generator"], { replaceUrl: true });
   }
 
   /**
@@ -126,7 +126,11 @@ export class LoadingComponent implements OnInit, OnDestroy {
       this.showGenerationError(error);
       return;
     }
-    this.router.navigate(["/results"]);
+    // Replace instead of push: this view starts a generation on every
+    // activation, so leaving it in the history means the browser's Back
+    // button runs a second one - spending another of the three daily
+    // generations and overwriting the results the user was just looking at.
+    this.router.navigate(["/results"], { replaceUrl: true });
   }
 
   /** Shows the notice popup with a title/message matching the failure kind. */

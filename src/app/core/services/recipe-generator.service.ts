@@ -88,8 +88,8 @@ export class RecipeGeneratorService {
       // n8n's error-response nodes don't reliably set their configured HTTP
       // status code, so a "successful" call can still carry an error-shaped
       // body - check the actual shape rather than trusting the HTTP status.
-      if (!Array.isArray((response as GenerateResponse).recipes)) {
-        const errorBody = response as GenerateErrorResponse;
+      if (!Array.isArray((response as GenerateResponse)?.recipes)) {
+        const errorBody = (response ?? {}) as GenerateErrorResponse;
         if (errorBody.quota) this.quota.applyFromResponse(errorBody.quota);
         throw new GenerationError(
           errorBody.message ?? FALLBACK_ERROR_MESSAGE,
@@ -97,7 +97,10 @@ export class RecipeGeneratorService {
         );
       }
       const successBody = response as GenerateResponse;
-      this.quota.applyFromResponse(successBody.quota);
+      // The recipes are what the user waited for, so nothing after this point
+      // may cost them the result: a response without a quota block is merely
+      // an outdated badge, not a failed generation.
+      if (successBody.quota) this.quota.applyFromResponse(successBody.quota);
       return successBody.recipes;
     } catch (error) {
       if (error instanceof GenerationError) throw error;

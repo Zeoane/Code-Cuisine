@@ -2,6 +2,7 @@ import { Component, computed, inject, signal } from "@angular/core";
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { dietLabel, timeLabel } from "../../core/data/preference-options";
 import { IngredientEntry, IngredientUnit } from "../../core/models/recipe.models";
+import { conflictingIngredients, dietSafeIngredients } from "../../core/services/diet-check";
 import { totalNutrition } from "../../core/services/nutrition-facts";
 import { WizardStateService } from "../../core/services/wizard-state.service";
 import { LogoComponent } from "../../hero/logo/logo.component";
@@ -54,7 +55,32 @@ export class RecipeViewComponent {
   });
 
   protected readonly preferences = this.wizard.preferences;
-  protected readonly ownIngredients = this.wizard.ingredients;
+
+  /**
+   * The entered ingredients the recipe was actually built from. Filtered the
+   * same way the generation filters, so a vegan recipe never lists the bacon
+   * that step 2 promised to leave out.
+   */
+  protected readonly ownIngredients = computed(() =>
+    dietSafeIngredients(this.wizard.ingredients(), this.preferences().diet ?? "none"),
+  );
+
+  /** Entered ingredients the selected diet ruled out, shown as a footnote. */
+  protected readonly skippedIngredients = computed(() =>
+    conflictingIngredients(this.wizard.ingredients(), this.preferences().diet ?? "none"),
+  );
+
+  /** The skipped ingredients as one readable list. */
+  protected readonly skippedNames = computed(() => {
+    const names = this.skippedIngredients().map(entry => entry.name);
+    if (names.length <= 1) return names.join("");
+    return `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
+  });
+
+  /** Label of the selected diet, for the skipped-ingredients footnote. */
+  protected readonly dietName = computed(() =>
+    (dietLabel(this.preferences().diet) ?? "diet").toLowerCase(),
+  );
 
   /** Cooks available for this run, rendered as Chef 1 / Chef 2 labels. */
   protected readonly cooks = computed(() =>
