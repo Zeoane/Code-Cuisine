@@ -3,7 +3,6 @@ import { ActivatedRoute, RouterLink } from "@angular/router";
 import { LibraryService } from "../../core/services/library.service";
 import { SiteHeaderComponent } from "../../layout/site-header/site-header.component";
 import { RecipeCardComponent } from "../../recipes/recipe-card/recipe-card.component";
-import { IconComponent } from "../../shared/icon/icon.component";
 
 /**
  * Full detail view of a single library recipe (User Story 14),
@@ -12,7 +11,7 @@ import { IconComponent } from "../../shared/icon/icon.component";
 @Component({
   selector: "app-recipe-detail",
   standalone: true,
-  imports: [RouterLink, SiteHeaderComponent, RecipeCardComponent, IconComponent],
+  imports: [RouterLink, SiteHeaderComponent, RecipeCardComponent],
   templateUrl: "./recipe-detail.component.html",
 })
 export class RecipeDetailComponent {

@@ -8,7 +8,6 @@ import { WizardStateService } from "../../core/services/wizard-state.service";
 import { LogoComponent } from "../../hero/logo/logo.component";
 import { NutritionSplitComponent } from "../../recipes/nutrition-split/nutrition-split.component";
 import { HeartIconComponent } from "../../shared/heart-icon/heart-icon.component";
-import { IconComponent } from "../../shared/icon/icon.component";
 import { LogoutButtonComponent } from "../../shared/logout-button/logout-button.component";
 
 /** Short display suffix appended directly after the quantity number. */
@@ -32,7 +31,6 @@ const BASE_LIKES = 82;
   imports: [
     RouterLink,
     LogoComponent,
-    IconComponent,
     HeartIconComponent,
     LogoutButtonComponent,
     NutritionSplitComponent,

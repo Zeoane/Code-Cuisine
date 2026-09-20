@@ -63,9 +63,18 @@ export class SiteHeaderComponent {
     if (item.path === "/generator") this.wizard.reset();
   }
 
-  /** Builds the class list for a nav link depending on its active state. */
+  /**
+   * Builds the class list for a nav link depending on its active state.
+   *
+   * The active item carries an underline on top of the brighter colour:
+   * full creme against creme/70 is a difference in lightness alone, which
+   * is exactly what "do not signal by colour only" rules out. The underline
+   * is the cue that survives a greyscale print or a low-contrast screen.
+   */
   navLinkClass(active: boolean, extra = ""): string {
-    const color = active ? "text-creme" : "text-creme/70 hover:text-creme";
-    return `font-quicksand flex min-h-11 items-center text-lg font-medium transition-colors ${color} ${extra}`;
+    const state = active
+      ? "text-creme underline decoration-2 underline-offset-[6px]"
+      : "text-creme/70 hover:text-creme";
+    return `font-quicksand flex min-h-11 items-center text-lg font-medium transition-colors ${state} ${extra}`;
   }
 }

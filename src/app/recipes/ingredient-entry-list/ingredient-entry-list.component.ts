@@ -29,8 +29,19 @@ export class IngredientEntryListComponent {
   @Output() remove = new EventEmitter<number>();
 
   protected readonly editingId = signal<number | null>(null);
-  protected editQuantity = 0;
+  /**
+   * Nullable on purpose: a cleared number field hands ngModel `null`, not 0.
+   * Typing this as plain `number` only hid that from the compiler - the
+   * value still reached the recipe page and rendered as "nullg Tomatoes".
+   */
+  protected editQuantity: number | null = 0;
   protected editUnit: IngredientUnit = "gram";
+
+  /** True while the edited amount is a real, positive number. */
+  protected isEditQuantityValid(): boolean {
+    const value = Number(this.editQuantity);
+    return this.editQuantity !== null && Number.isFinite(value) && value > 0;
+  }
 
   /** Suffix shown right after the quantity (e.g. "g", "ml", or none for pieces). */
   unitSuffix(unit: IngredientUnit): string {
@@ -44,9 +55,16 @@ export class IngredientEntryListComponent {
     this.editUnit = entry.unit;
   }
 
-  /** Confirms the edit and emits the updated entry. */
+  /**
+   * Confirms the edit and emits the updated entry. The confirm button is
+   * already disabled for an empty or non-positive amount; the guard here
+   * repeats that check because `min="0"` on a number input is not enforced
+   * for typed input, so an invalid value must never leave this component
+   * even if the button is reached by other means.
+   */
   confirmEdit(entry: IngredientEntry): void {
-    this.update.emit({ ...entry, quantity: this.editQuantity, unit: this.editUnit });
+    if (!this.isEditQuantityValid()) return;
+    this.update.emit({ ...entry, quantity: Number(this.editQuantity), unit: this.editUnit });
     this.editingId.set(null);
   }
 }

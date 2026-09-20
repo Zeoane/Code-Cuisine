@@ -13,9 +13,12 @@
   <main class="relative z-10 mx-auto w-full max-w-[1440px] flex-1">
     <div class="flex flex-col items-start gap-10 px-4 pt-16 sm:gap-16 sm:px-[65px] lg:pt-[152px]">
       <div class="flex w-full max-w-[240px] flex-col items-start sm:max-w-[755px]">
-        <h2 class="font-quicksand text-2xl font-semibold text-beige min-[400px]:text-[28px] sm:text-5xl">
+        <!-- A subtitle, not a section heading: as an h2 it came before the
+             h1 in the document, so a screen reader opened the page one level
+             down and then jumped back up. -->
+        <p class="font-quicksand text-2xl font-semibold text-beige min-[400px]:text-[28px] sm:text-5xl">
           AI-Powered recipe generator
-        </h2>
+        </p>
         <h1
           class="font-ubuntu text-[44px] leading-[1.15] font-bold text-creme min-[400px]:text-[52px] sm:text-[104px]">
           Code à Cuisine

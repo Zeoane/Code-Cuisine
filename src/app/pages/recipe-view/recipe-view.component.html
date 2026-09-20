@@ -134,7 +134,11 @@
 
         <!-- Ingredients -->
         <section class="flex flex-col gap-6">
-          <div>
+          <!-- The hero graphic *is* the section heading, so it lives in an
+               h2 and contributes its alt text as the heading's text. Only
+               one of the two variants is ever displayed, so nothing is
+               announced twice; without this the page went from h1 to h3. -->
+          <h2>
             <img
               src="assets/img/OneRecipe-Page/hero-ingredients-mobile.svg"
               alt="Ingredients"
@@ -143,7 +147,7 @@
               src="assets/img/OneRecipe-Page/hero-ingredients.svg"
               alt="Ingredients"
               class="hidden w-full sm:block" />
-          </div>
+          </h2>
 
           <div class="grid gap-8 px-4 sm:grid-cols-2 sm:px-12">
             <div class="flex flex-col gap-4">
@@ -189,7 +193,7 @@
 
         <!-- Directions -->
         <section class="flex flex-col gap-6">
-          <div>
+          <h2>
             <img
               src="assets/img/OneRecipe-Page/hero-directions-mobile.svg"
               alt="Directions"
@@ -198,7 +202,7 @@
               src="assets/img/OneRecipe-Page/hero-directions.svg"
               alt="Directions"
               class="hidden w-full sm:block" />
-          </div>
+          </h2>
 
           <ol class="grid gap-8 px-4 sm:grid-cols-2 sm:px-12">
             @for (step of recipe.steps; track $index) {
@@ -234,7 +238,7 @@
             (click)="toggleLike()"
             [attr.aria-pressed]="liked()"
             aria-label="Mark recipe with a heart"
-            class="flex h-10 w-10 items-center justify-center"
+            class="tap-target flex h-10 w-10 items-center justify-center"
           >
             <app-heart-icon [filled]="liked()" klass="h-9 w-10" />
           </button>

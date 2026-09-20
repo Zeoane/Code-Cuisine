@@ -1,7 +1,7 @@
 <h2 class="font-quicksand mb-4 text-xl font-medium text-deep-green">List of your Ingredients</h2>
 
 @if (entries.length > 0) {
-  <ul class="flex flex-col gap-3">
+  <ul class="flex flex-col gap-4">
     @for (entry of entries; track entry.id) {
       <li
         class="font-quicksand flex items-center gap-2 rounded-[10px] px-2 py-1 text-base text-deep-green transition-colors"
@@ -11,9 +11,10 @@
         @if (editingId() === entry.id) {
           <input
             type="number"
-            min="0"
+            min="1"
             [(ngModel)]="editQuantity"
             aria-label="Edit quantity"
+            [attr.aria-invalid]="isEditQuantityValid() ? null : 'true'"
             class="h-7 w-14 rounded-full bg-creme px-1 text-center text-base text-forest-dark focus-visible:outline-none" />
           <app-unit-select [value]="editUnit" (valueChange)="editUnit = $event" size="sm" />
         } @else {
@@ -22,13 +23,14 @@
 
         <span class="flex-1">{{ entry.name }}</span>
 
-        <span class="flex items-center gap-4">
+        <span class="flex items-center gap-5">
           @if (editingId() === entry.id) {
             <button
               type="button"
               (click)="confirmEdit(entry)"
+              [disabled]="!isEditQuantityValid()"
               aria-label="Confirm change"
-              class="flex h-6 w-6 items-center justify-center rounded-[6px] text-deep-green transition-colors hover:bg-creme">
+              class="tap-target flex h-6 w-6 items-center justify-center rounded-[6px] text-deep-green transition-colors hover:bg-creme disabled:opacity-40 disabled:hover:bg-transparent">
               <app-icon name="check" klass="h-4 w-4" />
             </button>
           } @else {
@@ -36,7 +38,7 @@
               type="button"
               (click)="startEdit(entry)"
               aria-label="Edit ingredient"
-              class="flex h-6 w-6 items-center justify-center rounded-[6px] transition-colors hover:bg-forest/30">
+              class="tap-target flex h-6 w-6 items-center justify-center rounded-[6px] transition-colors hover:bg-forest/30">
               <img src="assets/img/Generate-Page/edit.svg" alt="" class="h-[14px] w-[13px]" />
             </button>
           }
@@ -44,7 +46,7 @@
             type="button"
             (click)="remove.emit(entry.id)"
             aria-label="Remove ingredient"
-            class="flex h-6 w-6 items-center justify-center rounded-[6px] transition-colors hover:bg-forest/30">
+            class="tap-target flex h-6 w-6 items-center justify-center rounded-[6px] transition-colors hover:bg-forest/30">
             <img src="assets/img/Generate-Page/delete.svg" alt="" class="h-[15px] w-[13px]" />
           </button>
         </span>

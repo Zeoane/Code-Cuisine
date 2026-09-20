@@ -8,7 +8,6 @@ import { WizardStateService } from "../../core/services/wizard-state.service";
 import { LogoComponent } from "../../hero/logo/logo.component";
 import { DragScrollDirective } from "../../shared/drag-scroll/drag-scroll.directive";
 import { HeartIconComponent } from "../../shared/heart-icon/heart-icon.component";
-import { IconComponent } from "../../shared/icon/icon.component";
 import { LogoutButtonComponent } from "../../shared/logout-button/logout-button.component";
 
 /** One entry of the horizontally scrolling "Most liked recipes" row. */
@@ -41,7 +40,6 @@ const DEMO_LIKED: LikedRecipe[] = [
   imports: [
     RouterLink,
     LogoComponent,
-    IconComponent,
     HeartIconComponent,
     DragScrollDirective,
     LogoutButtonComponent,

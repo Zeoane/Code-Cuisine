@@ -20,6 +20,7 @@
           routerLinkActive
           #rla="routerLinkActive"
           (click)="handleNavClick(item)"
+          [attr.aria-current]="rla.isActive ? 'page' : null"
           [class]="navLinkClass(rla.isActive)">
           {{ item.label }}
         </a>
@@ -46,6 +47,7 @@
             routerLinkActive
             #rla="routerLinkActive"
             (click)="handleNavClick(item)"
+            [attr.aria-current]="rla.isActive ? 'page' : null"
             [class]="navLinkClass(rla.isActive, 'px-1')">
             {{ item.label }}
           </a>

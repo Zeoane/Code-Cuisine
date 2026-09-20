@@ -40,7 +40,9 @@
                 [cookingTimeMinutes]="recipe.cookingTimeMinutes"
                 [servings]="recipe.servings"
                 [cuisineStyle]="recipe.cuisineStyle" />
-              <h3 class="font-ubuntu mt-2 text-xl text-forest-dark">{{ recipe.title }}</h3>
+              <!-- h2 directly under the page's h1: as an h3 the list skipped
+                   a level, the same defect N6 describes for the other pages. -->
+              <h2 class="font-ubuntu mt-2 text-xl text-forest-dark">{{ recipe.title }}</h2>
               @if (recipe.description) {
                 <p class="font-quicksand mt-1 line-clamp-2 text-base text-forest/80">{{ recipe.description }}</p>
               }

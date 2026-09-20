@@ -30,7 +30,7 @@
             (click)="stepServings(-1)"
             [disabled]="preferences().servings <= 1"
             aria-label="Decrease servings"
-            class="flex h-5 w-5 items-center justify-center rounded-[3px] border border-deep-green text-deep-green transition-colors hover:bg-creme disabled:opacity-40 disabled:hover:bg-transparent">
+            class="tap-target flex h-5 w-5 items-center justify-center rounded-[3px] border border-deep-green text-deep-green transition-colors hover:bg-creme disabled:opacity-40 disabled:hover:bg-transparent">
             <app-icon name="minus" klass="h-3 w-3" />
           </button>
           <span
@@ -43,7 +43,7 @@
             (click)="stepServings(1)"
             [disabled]="preferences().servings >= 12"
             aria-label="Increase servings"
-            class="flex h-5 w-5 items-center justify-center rounded-[3px] border border-deep-green text-deep-green transition-colors hover:bg-creme disabled:opacity-40 disabled:hover:bg-transparent">
+            class="tap-target flex h-5 w-5 items-center justify-center rounded-[3px] border border-deep-green text-deep-green transition-colors hover:bg-creme disabled:opacity-40 disabled:hover:bg-transparent">
             <app-icon name="plus" klass="h-3 w-3" />
           </button>
         </div>
@@ -59,7 +59,7 @@
             (click)="stepHelpers(-1)"
             [disabled]="preferences().helpers <= 1"
             aria-label="Decrease cooking helpers"
-            class="flex h-5 w-5 items-center justify-center rounded-[3px] border border-deep-green text-deep-green transition-colors hover:bg-creme disabled:opacity-40 disabled:hover:bg-transparent">
+            class="tap-target flex h-5 w-5 items-center justify-center rounded-[3px] border border-deep-green text-deep-green transition-colors hover:bg-creme disabled:opacity-40 disabled:hover:bg-transparent">
             <app-icon name="minus" klass="h-3 w-3" />
           </button>
           <span
@@ -72,7 +72,7 @@
             (click)="stepHelpers(1)"
             [disabled]="preferences().helpers >= 3"
             aria-label="Increase cooking helpers"
-            class="flex h-5 w-5 items-center justify-center rounded-[3px] border border-deep-green text-deep-green transition-colors hover:bg-creme disabled:opacity-40 disabled:hover:bg-transparent">
+            class="tap-target flex h-5 w-5 items-center justify-center rounded-[3px] border border-deep-green text-deep-green transition-colors hover:bg-creme disabled:opacity-40 disabled:hover:bg-transparent">
             <app-icon name="plus" klass="h-3 w-3" />
           </button>
         </div>
@@ -85,7 +85,7 @@
           <img src="assets/img/Preferences-Page/clock.svg" alt="" class="h-6 w-6" />
           Cooking time:
         </h2>
-        <div class="flex flex-wrap items-start gap-2.5">
+        <div class="flex flex-wrap items-start gap-x-2.5 gap-y-4">
           @for (option of timeOptions; track option.value) {
             <div class="flex flex-col items-start gap-1">
               <app-choice-chip
@@ -104,7 +104,7 @@
           <img src="assets/img/Preferences-Page/world.svg" alt="" class="h-6 w-6" />
           Cuisine
         </h2>
-        <div class="flex flex-wrap gap-2.5">
+        <div class="flex flex-wrap gap-x-2.5 gap-y-4">
           @for (option of cuisineOptions; track option.value) {
             <app-choice-chip
               [selected]="preferences().cuisineStyle === option.value"
@@ -120,7 +120,7 @@
           <img src="assets/img/Preferences-Page/fork_spoon.svg" alt="" class="h-6 w-6" />
           Diet preferences
         </h2>
-        <div class="flex flex-wrap gap-2.5">
+        <div class="flex flex-wrap gap-x-2.5 gap-y-4">
           @for (option of dietOptions; track option.value) {
             <app-choice-chip
               [selected]="preferences().diet === option.value"
