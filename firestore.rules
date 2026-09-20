@@ -16,24 +16,76 @@ service cloud.firestore {
 
     // Public recipe library (User Story 12): every generated recipe is
     // written directly from the browser, by anyone, no account required.
-    // Entries are append-only - once published a recipe can't be edited or
-    // deleted from the client, only created.
+    // That is deliberate - but it means these rules are the only thing
+    // standing between the collection and an arbitrary writer, so they spell
+    // out the exact document LibraryService.addGenerated() produces:
+    // an exhaustive field list, a type per field, and a size cap per field.
+    // Anything else is rejected. Entries stay append-only.
+    //
+    // Not checkable here: rules cannot iterate an array, so the shape of the
+    // individual `steps`/`ingredients` entries is unverified - only how many
+    // there may be. The caps below keep a document well under 100 KB.
     match /library_recipes/{recipeId} {
       allow read: if true;
-      allow create: if request.resource.data.title is string
-        && request.resource.data.cookingTimeMinutes is number
-        && request.resource.data.cuisineStyle is string
-        && request.resource.data.id is number
+
+      allow create: if isWellFormedRecipe(request.resource.data)
         && recipeId == string(request.resource.data.id);
+
       allow update, delete: if false;
     }
 
     // Sequential id counter backing the library above, advanced inside the
-    // same transaction that creates the recipe docs.
+    // same transaction that creates the recipe docs. It may only ever move
+    // forward, and only by as many recipes as one generation can produce:
+    // resetting it would make the next transaction reuse existing ids, and
+    // since recipes are append-only that write would fail from then on.
     match /library_meta/counter {
       allow read: if true;
-      allow create, update: if request.resource.data.value is int;
+
+      allow create: if request.resource.data.keys().hasOnly(['value'])
+        && request.resource.data.value is int
+        && request.resource.data.value > 0
+        && request.resource.data.value <= 10;
+
+      allow update: if request.resource.data.keys().hasOnly(['value'])
+        && request.resource.data.value is int
+        && request.resource.data.value > resource.data.value
+        && request.resource.data.value <= resource.data.value + 10;
+
       allow delete: if false;
+    }
+
+    /// Full shape check for a library recipe, mirroring StoredRecipe in
+    /// src/app/core/models/recipe.models.ts.
+    function isWellFormedRecipe(data) {
+      return data.keys().hasOnly([
+          'id', 'title', 'description', 'ingredients', 'missingIngredients',
+          'steps', 'difficulty', 'cookingTimeMinutes', 'servings',
+          'cuisineStyle', 'nutrition', 'helpers', 'createdAt'
+        ])
+        && data.keys().hasAll([
+          'id', 'title', 'ingredients', 'missingIngredients', 'steps',
+          'difficulty', 'cookingTimeMinutes', 'servings', 'cuisineStyle',
+          'helpers', 'createdAt'
+        ])
+        && data.id is int && data.id > 0
+        && data.title is string && data.title.size() > 0 && data.title.size() <= 200
+        && (!('description' in data.keys()) || data.description == null
+            || (data.description is string && data.description.size() <= 1000))
+        && data.ingredients is list && data.ingredients.size() <= 50
+        && data.missingIngredients is list && data.missingIngredients.size() <= 20
+        && data.steps is list && data.steps.size() <= 30
+        && data.difficulty in ['easy', 'medium', 'hard']
+        && data.cookingTimeMinutes is number
+        && data.cookingTimeMinutes > 0 && data.cookingTimeMinutes <= 600
+        && data.servings is int && data.servings >= 1 && data.servings <= 12
+        && data.cuisineStyle in ['german', 'italian', 'japanese', 'indian', 'gourmet', 'fusion']
+        && (!('nutrition' in data.keys()) || data.nutrition == null
+            || (data.nutrition is map && data.nutrition.keys().hasOnly([
+                 'caloriesPerServing', 'proteinGrams', 'carbsGrams', 'fatGrams'
+               ])))
+        && data.helpers is int && data.helpers >= 1 && data.helpers <= 3
+        && data.createdAt is string && data.createdAt.size() <= 40;
     }
   }
 }

@@ -104,11 +104,6 @@ below — add nodes by name from n8n's node panel, then paste the exact
 parameter values/code shown (all of it is also inline in the JSON files, so
 you can copy from there instead of retyping).
 
-Every node also carries its own description inside the workflow (n8n: select
-the node → **Settings → Notes**). The tables below are the overview; the
-notes explain each node where you are actually looking at it. They travel
-with the exported JSON, so an import brings them along.
-
 ### `generate-recipe` — node chain
 
 | # | Node | Type | Notes |
@@ -203,15 +198,25 @@ throws if the salt is missing or shorter than 16 characters.
 
 **Execution data is not retained either.** n8n would otherwise store the
 full run of every request, including the original webhook headers with the
-raw `x-forwarded-for`. All workflows therefore ship with retention switched
-off in **Settings → …**, which the exported JSON carries as:
+raw `x-forwarded-for`. Both webhook workflows therefore have retention
+switched off, which the exported JSON carries in its `settings` block as:
 
 ```json
 "saveDataSuccessExecution": "none",
-"saveDataErrorExecution": "none",
-"saveManualExecutions": false,
-"saveExecutionProgress": false
+"saveDataErrorExecution": "none"
 ```
+
+**Set this in n8n, not by importing a file.** "Import from File" does not
+apply the `settings` block — the values land in the JSON but never in the
+running workflow. Open the workflow, **"…" → Settings**, set *Save
+successful production executions* and *Save failed production executions*
+to **Do not save**, switch off *Save manual executions* and *Save execution
+progress*, confirm the dialog, then save the workflow itself. The same menu
+holds **Error Workflow**, which must point at `Error Notifications`; it is
+exported as `errorWorkflow` and shares the same import caveat. n8n only
+writes settings into the export that differ from the instance default, so a
+field missing from the JSON is not proof that it is switched on — read it in
+the UI.
 
 The raw IP is thus gone end-to-end: it exists only in memory for the few
 nodes between the webhook and `Compute Quota Keys`. Error notifications are
