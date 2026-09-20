@@ -4,6 +4,7 @@ import {
   HostListener,
   Input,
   OnChanges,
+  OnDestroy,
   Output,
   SimpleChanges,
 } from "@angular/core";
@@ -21,7 +22,7 @@ import { IconComponent } from "../icon/icon.component";
   imports: [RouterLink, IconComponent],
   templateUrl: "./impressum-modal.component.html",
 })
-export class ImpressumModalComponent implements OnChanges {
+export class ImpressumModalComponent implements OnChanges, OnDestroy {
   @Input() open = false;
   @Output() closed = new EventEmitter<void>();
 
@@ -29,6 +30,12 @@ export class ImpressumModalComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (!changes["open"]) return;
     document.body.style.overflow = this.open ? "hidden" : "";
+  }
+
+  /** Releases the scroll lock even when the modal is torn down while open,
+   * e.g. because the browser's Back button left the page. */
+  ngOnDestroy(): void {
+    document.body.style.overflow = "";
   }
 
   /** Closes the modal when Escape is pressed while it is open. */

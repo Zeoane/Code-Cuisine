@@ -50,6 +50,10 @@ export class LoadingComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
 
   private timer: ReturnType<typeof setTimeout> | null = null;
+  /** Settles the minimum-runtime promise when the view goes away early. */
+  private releaseDelay: (() => void) | null = null;
+  /** True once the view is gone, so a late response changes nothing. */
+  private abandoned = false;
 
   /** Shows the notice popup (not-enough-ingredients or a generation failure). */
   protected readonly notice = signal(false);
@@ -79,9 +83,17 @@ export class LoadingComponent implements OnInit, OnDestroy {
     void this.runGeneration();
   }
 
-  /** Drops the minimum-runtime timer so it can't fire after the view is gone. */
+  /**
+   * Marks the run as abandoned and settles the minimum-runtime promise.
+   * Without the release, `await minDelay` would never resolve after the timer
+   * is cleared and the whole generation would stay suspended for the lifetime
+   * of the tab; without the flag, a response arriving after the user left
+   * would still overwrite the results of whatever run is current by then.
+   */
   ngOnDestroy(): void {
+    this.abandoned = true;
     if (this.timer) clearTimeout(this.timer);
+    this.releaseDelay?.();
   }
 
   /** Dismissing the popup returns to the ingredient step. */
@@ -97,6 +109,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
    */
   private async runGeneration(): Promise<void> {
     const minDelay = new Promise<void>(resolve => {
+      this.releaseDelay = resolve;
       this.timer = setTimeout(resolve, LOADER_DURATION_MS);
     });
 
@@ -113,6 +126,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
     let error: unknown = null;
     try {
       const recipes = await this.generator.generate(options);
+      if (this.abandoned) return;
       this.wizard.results.set(recipes);
       // Fire-and-forget: the library is a nice-to-have, so a Firestore hiccup
       // here must never block the user from seeing their own results.
@@ -121,6 +135,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
       error = e;
     }
     await minDelay;
+    if (this.abandoned) return;
 
     if (error) {
       this.showGenerationError(error);

@@ -4,6 +4,7 @@ import {
   HostListener,
   Input,
   OnChanges,
+  OnDestroy,
   Output,
   SimpleChanges,
 } from "@angular/core";
@@ -24,7 +25,7 @@ import { IconComponent } from "../icon/icon.component";
   templateUrl: "./not-enough-modal.component.html",
   styleUrl: "./not-enough-modal.component.css",
 })
-export class NotEnoughModalComponent implements OnChanges {
+export class NotEnoughModalComponent implements OnChanges, OnDestroy {
   @Input() open = false;
   @Input() title = "Ups! Not quite enough...";
   @Input() message =
@@ -36,6 +37,12 @@ export class NotEnoughModalComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (!changes["open"]) return;
     document.body.style.overflow = this.open ? "hidden" : "";
+  }
+
+  /** Releases the scroll lock even when the popup is torn down while open,
+   * e.g. because the browser's Back button left the page. */
+  ngOnDestroy(): void {
+    document.body.style.overflow = "";
   }
 
   /** Closes the popup when Escape is pressed while it is open. */

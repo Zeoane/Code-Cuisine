@@ -37,6 +37,13 @@ export class IngredientQuantityFormComponent {
 
   protected readonly suggestions = signal<string[]>([]);
   protected readonly showSuggestions = signal(false);
+  /** Index of the suggestion the arrow keys currently sit on, -1 for none. */
+  protected readonly activeIndex = signal(-1);
+
+  /** DOM id of a suggestion, needed for aria-activedescendant. */
+  protected optionId(index: number): string {
+    return `ingredient-suggestion-${index}`;
+  }
 
   /** Emits the current form values as a new ingredient and clears the name. */
   submit(): void {
@@ -44,14 +51,65 @@ export class IngredientQuantityFormComponent {
     if (!trimmed || this.quantity <= 0) return;
     this.add.emit({ name: trimmed, quantity: this.quantity, unit: this.unit });
     this.name = "";
-    this.showSuggestions.set(false);
+    this.closeSuggestions();
   }
 
-  /** Submits the form when Enter is pressed inside the name field. */
+  /**
+   * Keyboard handling for the name field, which acts as a combobox: the
+   * arrow keys walk the suggestion list, Enter takes the highlighted entry
+   * (or submits when none is highlighted) and Escape closes the list. The
+   * suggestions themselves are not focusable - that is what makes them
+   * reachable by keyboard at all, since focus never leaves the input.
+   */
   handleKeydown(event: KeyboardEvent): void {
+    const open = this.showSuggestions();
+    const items = this.suggestions();
+
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      if (!open || !items.length) return;
+      event.preventDefault();
+      const step = event.key === "ArrowDown" ? 1 : -1;
+      const next = (this.activeIndex() + step + items.length + 1) % (items.length + 1);
+      this.activeIndex.set(next === items.length ? -1 : next);
+      this.scrollActiveIntoView();
+      return;
+    }
+
+    if (event.key === "Escape") {
+      if (!open) return;
+      event.preventDefault();
+      this.closeSuggestions();
+      return;
+    }
+
+    if (event.key === "Tab") {
+      this.closeSuggestions();
+      return;
+    }
+
     if (event.key !== "Enter") return;
     event.preventDefault();
+    const active = items[this.activeIndex()];
+    if (open && active !== undefined) {
+      this.pickSuggestion(active);
+      return;
+    }
     this.submit();
+  }
+
+  /** Keeps the highlighted suggestion visible inside the scrolling list. */
+  private scrollActiveIntoView(): void {
+    const index = this.activeIndex();
+    if (index < 0) return;
+    queueMicrotask(() => {
+      document.getElementById(this.optionId(index))?.scrollIntoView({ block: "nearest" });
+    });
+  }
+
+  /** Hides the suggestion list and clears the arrow-key highlight. */
+  private closeSuggestions(): void {
+    this.showSuggestions.set(false);
+    this.activeIndex.set(-1);
   }
 
   /** Updates the name and recomputes matching autocomplete suggestions. */
@@ -61,12 +119,13 @@ export class IngredientQuantityFormComponent {
     const matches = query ? matchSuggestions(query) : [];
     this.suggestions.set(matches);
     this.showSuggestions.set(matches.length > 0);
+    this.activeIndex.set(-1);
   }
 
   /** Fills the name field with a picked suggestion and closes the list. */
   pickSuggestion(value: string): void {
     this.name = value;
-    this.showSuggestions.set(false);
+    this.closeSuggestions();
   }
 
   /** Prevents the input from losing focus before a suggestion click lands. */
@@ -83,7 +142,7 @@ export class IngredientQuantityFormComponent {
 
   /** Hides suggestions shortly after the field loses focus. */
   handleBlur(): void {
-    setTimeout(() => this.showSuggestions.set(false), BLUR_HIDE_DELAY_MS);
+    setTimeout(() => this.closeSuggestions(), BLUR_HIDE_DELAY_MS);
   }
 }
 

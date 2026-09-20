@@ -72,39 +72,50 @@
             </p>
 
             @if (recipe.nutrition; as nutrition) {
-              <dl class="grid grid-cols-[82px_77px_38px_62px] gap-x-6 gap-y-2 text-center">
-                <dt
-                  class="font-quicksand flex h-7 items-center justify-center text-[22px] leading-none font-bold text-deep-green"
-                >
-                  Energy
-                </dt>
-                <dt
-                  class="font-quicksand flex h-7 items-center justify-center text-[22px] leading-none font-bold text-deep-green"
-                >
-                  Protein
-                </dt>
-                <dt
-                  class="font-quicksand flex h-7 items-center justify-center text-[22px] leading-none font-bold text-deep-green"
-                >
-                  Fat
-                </dt>
-                <dt
-                  class="font-quicksand flex h-7 items-center justify-center text-[22px] leading-none font-bold text-deep-green"
-                >
-                  Carbs
-                </dt>
-                <dd class="font-quicksand text-xl leading-7 font-medium text-deep-green">
-                  {{ nutrition.caloriesPerServing }} kcal
-                </dd>
-                <dd class="font-quicksand text-xl leading-7 font-medium text-deep-green">
-                  {{ nutrition.proteinGrams }}g
-                </dd>
-                <dd class="font-quicksand text-xl leading-7 font-medium text-deep-green">
-                  {{ nutrition.fatGrams }}g
-                </dd>
-                <dd class="font-quicksand text-xl leading-7 font-medium text-deep-green">
-                  {{ nutrition.carbsGrams }}g
-                </dd>
+              <!-- One div per term/value pair: four consecutive dt would
+                   otherwise apply to all four dd, and a screen reader could
+                   not tell which number belongs to which nutrient. -->
+              <dl class="grid grid-cols-[82px_77px_38px_62px] gap-x-6 text-center">
+                <div>
+                  <dt
+                    class="font-quicksand flex h-7 items-center justify-center text-[22px] leading-none font-bold text-deep-green"
+                  >
+                    Energy
+                  </dt>
+                  <dd class="font-quicksand text-xl leading-7 font-medium text-deep-green">
+                    {{ nutrition.caloriesPerServing }} kcal
+                  </dd>
+                </div>
+                <div>
+                  <dt
+                    class="font-quicksand flex h-7 items-center justify-center text-[22px] leading-none font-bold text-deep-green"
+                  >
+                    Protein
+                  </dt>
+                  <dd class="font-quicksand text-xl leading-7 font-medium text-deep-green">
+                    {{ nutrition.proteinGrams }}g
+                  </dd>
+                </div>
+                <div>
+                  <dt
+                    class="font-quicksand flex h-7 items-center justify-center text-[22px] leading-none font-bold text-deep-green"
+                  >
+                    Fat
+                  </dt>
+                  <dd class="font-quicksand text-xl leading-7 font-medium text-deep-green">
+                    {{ nutrition.fatGrams }}g
+                  </dd>
+                </div>
+                <div>
+                  <dt
+                    class="font-quicksand flex h-7 items-center justify-center text-[22px] leading-none font-bold text-deep-green"
+                  >
+                    Carbs
+                  </dt>
+                  <dd class="font-quicksand text-xl leading-7 font-medium text-deep-green">
+                    {{ nutrition.carbsGrams }}g
+                  </dd>
+                </div>
               </dl>
 
               @if (wholeRecipe(); as whole) {
