@@ -1,4 +1,7 @@
-<div class="flex flex-1 flex-col gap-6 sm:flex-row sm:items-start sm:gap-8">
+<!-- Name and amount side by side only from lg (1024px): the panel shares
+     the row with the ingredient list from md on, and at 768px a side-by-side
+     form left the name field under 100px wide. -->
+<div class="flex flex-1 flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
   <div class="relative flex flex-1 flex-col gap-2">
     <label for="ingredient-name" class="font-quicksand text-xl font-medium text-deep-green"> Ingredient </label>
     <input

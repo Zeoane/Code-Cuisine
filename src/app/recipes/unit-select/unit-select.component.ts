@@ -42,7 +42,7 @@ export class UnitSelectComponent {
 
   /** Trigger button classes for the current size. */
   triggerClass(): string {
-    const base = "flex items-center gap-1.5 rounded-full bg-creme font-quicksand text-forest-dark focus-visible:outline-none";
+    const base = "tap-target flex items-center gap-1.5 rounded-full bg-creme font-quicksand text-forest-dark focus-visible:outline-none";
     return `${base} ${TRIGGER_SIZE_CLASSES[this.size]}`;
   }
 

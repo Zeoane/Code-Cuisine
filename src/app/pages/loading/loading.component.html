@@ -53,12 +53,14 @@
       </div>
     </div>
 
-    <p class="font-quicksand text-[32px] leading-none font-bold text-creme">
+    <!-- The page's only heading: without it the loading view had no h1 at
+         all. Tailwind's base reset keeps it looking exactly like before. -->
+    <h1 class="font-quicksand text-[32px] leading-none font-bold text-creme">
       Generating
       <span aria-hidden="true">
         <span class="loader-dot">.</span><span class="loader-dot">.</span><span class="loader-dot">.</span>
       </span>
-    </p>
+    </h1>
   </main>
 
   <app-not-enough-modal

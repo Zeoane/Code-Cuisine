@@ -1,6 +1,6 @@
 <div class="flex min-h-screen flex-col items-center gap-16 bg-white pb-16">
   <header class="flex w-full items-center justify-between px-4 pt-6 sm:px-[68px] sm:pt-10">
-    <a routerLink="/" aria-label="Code à Cuisine – Home">
+    <a routerLink="/" aria-label="Code à Cuisine – Home" class="tap-target">
       <app-logo variant="color" klass="h-10 w-auto sm:h-12" />
     </a>
     <app-logout-button klass="flex h-11 w-11 shrink-0 items-center justify-center text-forest transition-colors hover:text-deep-green" />
@@ -15,8 +15,11 @@
       Got random stuff in your kitchen? Pop it in—we've got the perfect recipe waiting.
     </p>
 
-    <div class="flex w-full flex-col gap-8 sm:flex-row sm:items-start">
-      <div class="flex flex-col gap-8 rounded-[20px] bg-forest/30 px-6 py-6 sm:max-w-[577px] sm:flex-1 sm:py-[25px]">
+    <!-- Side by side from md (768px) on, not sm: between 640 and ~680px the
+         form row alone is wider than its half, which pushed the ingredient
+         list - including its remove buttons - past the right screen edge. -->
+    <div class="flex w-full flex-col gap-8 md:flex-row md:items-start">
+      <div class="flex flex-col gap-8 rounded-[20px] bg-forest/30 px-6 py-6 sm:py-[25px] md:max-w-[577px] md:flex-1">
         <app-ingredient-quantity-form (add)="addIngredient($event)" />
       </div>
       <div class="flex-1 rounded-[20px] bg-forest/30 p-6">
