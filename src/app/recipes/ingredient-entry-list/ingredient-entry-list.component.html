@@ -4,53 +4,66 @@
   <ul class="flex flex-col gap-4">
     @for (entry of entries; track entry.id) {
       <li
-        class="font-quicksand flex items-center gap-2 rounded-[10px] px-2 py-1 text-base text-deep-green transition-colors"
+        class="font-quicksand rounded-[10px] px-2 py-1 text-base text-deep-green transition-colors"
         [ngClass]="{ 'hover:bg-creme': editingId() !== entry.id }">
-        <span aria-hidden="true">•</span>
-
         @if (editingId() === entry.id) {
-          <input
-            type="number"
-            min="1"
-            [(ngModel)]="editQuantity"
-            aria-label="Edit quantity"
-            [attr.aria-invalid]="isEditQuantityValid() ? null : 'true'"
-            class="h-7 w-14 rounded-full bg-creme px-1 text-center text-base text-forest-dark focus-visible:outline-none" />
-          <app-unit-select [value]="editUnit" (valueChange)="editUnit = $event" size="sm" />
+          <!-- Edit state as in Figma: the name moves up next to the actions,
+               amount and unit get a line of their own. On one line the two
+               fields pushed the delete button past the panel's edge on
+               phones. -->
+          <div class="-ml-2 flex items-center gap-2">
+            <span class="min-w-0 flex-1 break-words">{{ entry.name }}</span>
+            <span class="flex shrink-0 items-center gap-5">
+              <button
+                type="button"
+                (click)="confirmEdit(entry)"
+                [disabled]="!isEditQuantityValid()"
+                aria-label="Confirm change"
+                class="tap-target flex h-6 w-6 items-center justify-center rounded-[6px] text-deep-green transition-colors hover:bg-creme disabled:opacity-40 disabled:hover:bg-transparent">
+                <app-icon name="check" klass="h-4 w-4" />
+              </button>
+              <ng-container *ngTemplateOutlet="removeButton; context: { $implicit: entry }" />
+            </span>
+          </div>
+          <div class="mt-2 flex items-center gap-2.5">
+            <span aria-hidden="true">•</span>
+            <input
+              type="number"
+              min="1"
+              [(ngModel)]="editQuantity"
+              aria-label="Edit quantity"
+              [attr.aria-invalid]="isEditQuantityValid() ? null : 'true'"
+              class="h-9 w-[61px] rounded-full bg-creme px-2 text-center text-base text-forest-dark focus-visible:outline-none" />
+            <app-unit-select [value]="editUnit" (valueChange)="editUnit = $event" size="md" />
+          </div>
         } @else {
-          <span class="font-medium">{{ entry.quantity }}{{ unitSuffix(entry.unit) }}</span>
+          <div class="flex items-center gap-2">
+            <span aria-hidden="true">•</span>
+            <span class="font-medium">{{ entry.quantity }}{{ unitSuffix(entry.unit) }}</span>
+            <span class="min-w-0 flex-1 break-words">{{ entry.name }}</span>
+            <span class="flex shrink-0 items-center gap-5">
+              <button
+                type="button"
+                (click)="startEdit(entry)"
+                aria-label="Edit ingredient"
+                class="tap-target flex h-6 w-6 items-center justify-center rounded-[6px] transition-colors hover:bg-forest/30">
+                <img src="assets/img/Generate-Page/edit.svg" alt="" class="h-[14px] w-[13px]" />
+              </button>
+              <ng-container *ngTemplateOutlet="removeButton; context: { $implicit: entry }" />
+            </span>
+          </div>
         }
-
-        <span class="flex-1">{{ entry.name }}</span>
-
-        <span class="flex items-center gap-5">
-          @if (editingId() === entry.id) {
-            <button
-              type="button"
-              (click)="confirmEdit(entry)"
-              [disabled]="!isEditQuantityValid()"
-              aria-label="Confirm change"
-              class="tap-target flex h-6 w-6 items-center justify-center rounded-[6px] text-deep-green transition-colors hover:bg-creme disabled:opacity-40 disabled:hover:bg-transparent">
-              <app-icon name="check" klass="h-4 w-4" />
-            </button>
-          } @else {
-            <button
-              type="button"
-              (click)="startEdit(entry)"
-              aria-label="Edit ingredient"
-              class="tap-target flex h-6 w-6 items-center justify-center rounded-[6px] transition-colors hover:bg-forest/30">
-              <img src="assets/img/Generate-Page/edit.svg" alt="" class="h-[14px] w-[13px]" />
-            </button>
-          }
-          <button
-            type="button"
-            (click)="remove.emit(entry.id)"
-            aria-label="Remove ingredient"
-            class="tap-target flex h-6 w-6 items-center justify-center rounded-[6px] transition-colors hover:bg-forest/30">
-            <img src="assets/img/Generate-Page/delete.svg" alt="" class="h-[15px] w-[13px]" />
-          </button>
-        </span>
       </li>
     }
   </ul>
 }
+
+<ng-template #removeButton let-entry>
+  <button
+    type="button"
+    (click)="remove.emit(entry.id)"
+    aria-label="Remove ingredient"
+    class="tap-target flex h-6 w-6 items-center justify-center rounded-[6px] transition-colors hover:bg-forest/30">
+    <img src="assets/img/Generate-Page/delete.svg" alt="" class="h-[15px] w-[13px]" />
+  </button>
+</ng-template>

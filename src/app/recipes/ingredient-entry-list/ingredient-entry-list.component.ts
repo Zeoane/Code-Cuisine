@@ -1,4 +1,4 @@
-import { NgClass } from "@angular/common";
+import { NgClass, NgTemplateOutlet } from "@angular/common";
 import { Component, EventEmitter, Input, Output, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { IngredientEntry, IngredientUnit } from "../../core/models/recipe.models";
@@ -20,7 +20,7 @@ const UNIT_SUFFIX: Record<IngredientUnit, string> = {
 @Component({
   selector: "app-ingredient-entry-list",
   standalone: true,
-  imports: [NgClass, FormsModule, IconComponent, UnitSelectComponent],
+  imports: [NgClass, NgTemplateOutlet, FormsModule, IconComponent, UnitSelectComponent],
   templateUrl: "./ingredient-entry-list.component.html",
 })
 export class IngredientEntryListComponent {

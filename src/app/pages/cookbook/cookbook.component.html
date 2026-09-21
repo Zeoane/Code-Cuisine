@@ -38,9 +38,13 @@
           <app-heart-icon klass="h-[26px] w-[29px]" />
         </h2>
 
+        <!-- relative: the cards' sr-only labels are absolutely positioned.
+             Without a positioned ancestor inside the scroller they escaped its
+             clipping and stretched the whole page to ~1400px (Chromium and
+             WebKit both reported it; the page itself only hid it). -->
         <ul
           appDragScroll
-          class="scrollbar-none flex gap-3 overflow-x-auto overscroll-x-contain pr-5"
+          class="scrollbar-none relative flex gap-3 overflow-x-auto overscroll-x-contain pr-5"
           tabindex="0"
           aria-label="Most liked recipes, horizontal scrollbar"
         >

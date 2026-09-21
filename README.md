@@ -58,7 +58,7 @@ und speichert Favoriten in einem persönlichen Kochbuch.
 | Tageslimit         | 3 Generierungen je IP-Adresse und Tag, 12 systemweit; der verbleibende Stand steht im Schritt „Preferences“                                                                   |
 | Login              | Registrierung und Anmeldung per E-Mail/Passwort sowie Google-Login (Firebase Auth), schützt die Kochbuch-Route                                                             |
 | Impressum          | Impressum gemäß § 5 DDG (`/impressum`)                                                                                                                                    |
-| Responsiv          | Mobile-first bis 320 px Breite, Mindestschriftgröße 16 px auf Mobilgeräten, keine sichtbaren Scrollbalken, Swipe-Interaktionen, Touch-Ziele ≥ 44 px                        |
+| Responsiv          | Mobile-first bis 320 px Breite, Schrift mind. 16 px, keine sichtbaren Scrollbalken, Swipe-Interaktionen, Buttons/Links ≥ 44 px Trefferfläche, Eingabefelder in Figma-Höhe  |
 
 <a id="de-aktueller-stand"></a>
 
@@ -235,7 +235,7 @@ you save favorites to a personal cookbook.
 | Daily limit       | 3 generations per IP address per day, 12 system-wide; the remaining count sits on the "Preferences" step                                                                      |
 | Login             | Email/password registration and sign-in plus Google sign-in (Firebase Auth), gating the cookbook route                                                                    |
 | Imprint           | Legal notice per § 5 DDG (German Digital Services Act) (`/impressum`)                                                                                                    |
-| Responsive        | Mobile-first down to 320 px width, minimum 16 px font size on mobile, no visible scrollbars, swipe interactions, touch targets ≥ 44 px                                    |
+| Responsive        | Mobile-first down to 320 px width, minimum 16 px font size, no visible scrollbars, swipe interactions, button and link hit areas ≥ 44 px, input fields at Figma height    |
 
 <a id="en-current-status"></a>
 

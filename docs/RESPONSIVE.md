@@ -4,7 +4,7 @@ Stand: 21.09.2026 · geprüft auf 10 Breiten von 320 px bis 2560 px, 134 Kombina
 
 ## Anforderungen
 
-Aus der Projekt-Checkliste (siehe auch README → Features → „Responsiv"):
+Laut README (Features → „Responsiv"). Verbindlich sind die Projekt-Checkliste und das Figma-Design. Wo das README davon abweicht, gilt Figma:
 
 - **Mobile-first bis 320 px Breite** – nichts ragt über den Bildschirmrand, nichts wird abgeschnitten
 - **Mindestschriftgröße 16 px** auf jeder Breite
@@ -30,7 +30,7 @@ Auf großen Monitoren bleibt der Inhalt auf eine Maximalbreite begrenzt (z. B. 1
 
 ## Ergebnis
 
-✓ = alle Prüfungen bestanden · ✓¹ = bestanden bis auf die zwei Eingabefelder (siehe „Bekannte Ausnahmen") · – = Ansicht existiert auf dieser Breite nicht
+✓ = alle Prüfungen bestanden · ✓¹ = bestanden, die zwei Eingabefelder haben die Figma-Höhe von 36 px (siehe „Anmerkungen") · – = Ansicht existiert auf dieser Breite nicht
 
 | Ansicht | Route | 320 | 375 | 414 | 640 | 768 | 1024 | 1280 | 1440 | 1920 | 2560 |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -56,25 +56,25 @@ Geprüft wurde pro Ansicht und Breite:
 | Horizontaler Überlauf | Kein sichtbares Element ragt über den Bildschirmrand hinaus (ausgenommen Inhalte in absichtlich horizontal scrollenden Reihen und dekorative Grafiken) | 0 Treffer in 134 Kombinationen |
 | Schriftgröße | Kleinste gerenderte Schriftgröße sichtbaren Texts | 16 px überall |
 | Scrollbalken | Breite des sichtbaren Seiten-Scrollbalkens | 0 px überall |
-| Touch-Ziele | Trefferfläche jedes Links, Buttons und Eingabefelds, inkl. der unsichtbaren `.tap-target`-Fläche | ≥ 44 × 44 px, bis auf zwei Eingabefelder |
+| Touch-Ziele | Trefferfläche jedes Links, Buttons und Eingabefelds, inkl. der unsichtbaren `.tap-target`-Fläche | ≥ 44 × 44 px, außer zwei Eingabefeldern in Figma-Höhe (36 px) |
 | Überschriften | Genau ein `h1` pro Ansicht | überall erfüllt |
 
 ## Behobene Probleme
 
-Die Messung hat vier echte Layoutfehler gefunden, die inzwischen behoben sind:
+Die Messung hat fünf echte Layoutfehler gefunden, die inzwischen behoben sind:
 
 1. **Rezeptansicht, schmale Smartphones: „Carbs" war unsichtbar.** Die vier festen Nährwert-Spalten aus Figma brauchen 331 px. Bis 398 px lag die Spalte „Carbs" ganz oder teilweise außerhalb des Bildschirms, bis 466 px ragte die Reihe über die Karte hinaus. → Unter `sm` (640 px) jetzt ein 2 × 2-Raster, darüber wie im Design.
 2. **Generator, 640 bis etwa 680 px: Löschen-Buttons außerhalb des Bildschirms.** Eingabe und Zutatenliste standen schon ab `sm` nebeneinander. Das Formular war aber breiter als seine Hälfte und schob die Liste über den rechten Rand. → Nebeneinander erst ab `md`.
 3. **Generator, ab 768 px: Namensfeld nur 95 px breit.** → Name und Menge stehen jetzt erst ab `lg` nebeneinander. Das Feld ist auf jeder Breite mindestens 185 px breit.
 4. **Ladeansicht ohne Überschrift.** „Generating" ist jetzt das `h1` der Seite, optisch unverändert.
+5. **Kochbuch: Seite intern rund 1400 px breit.** Die Screenreader-Labels (`sr-only`) in den „Most liked"-Karten sind absolut positioniert und hatten innerhalb der scrollbaren Reihe keinen positionierten Vorfahren. Dadurch entkamen sie dem Clipping der Reihe und dehnten das Dokument auf jeder Breite auf etwa 1400 px. Sichtbar wurde das nur nicht, weil `html` und `body` `overflow-x: hidden` haben. Chromium und WebKit melden es beide, auf iOS hätte man die Seite womöglich seitlich wischen können. → Die Reihe hat jetzt `relative`, die Seite ist überall genau so breit wie der Bildschirm.
 
 Zusätzlich haben weitere Bedienelemente eine 44 px große Trefferfläche bekommen, ohne dass sich ihre Optik ändert (`.tap-target` in `styles.css`): die Logo-Links in den Seitenköpfen, die Zurück-Links, „Generate new recipe", „Back to home", die Seitennavigation der Küchen-Liste und der Einheiten-Umschalter.
 
-## Bekannte Ausnahmen
+## Anmerkungen
 
-- **Zwei Eingabefelder sind 36 px hoch** (Zutatenname, Menge im Generator). Das ist die Figma-Höhe `h-9`. Eingabefelder können kein Pseudo-Element tragen, deshalb geht das nur über eine sichtbar größere Höhe (44 px), also eine Designänderung. Die WCAG-Mindestgröße für AA (24 px, Kriterium 2.5.8) ist erfüllt.
+- **Zwei Eingabefelder sind 36 px hoch** (Zutatenname, Menge im Generator), genau wie im Figma-Design (`h-9`). Checkliste und Figma sind die Vorgabe. Die 44-px-Angabe stammt aus dem README und wird hier bewusst nicht umgesetzt. Die WCAG-Mindestgröße für AA (24 px, Kriterium 2.5.8) ist erfüllt.
 - **Einträge im Einheiten-Dropdown sind 32 px hoch** (laut Code: `py-1` + 24 px Zeilenhöhe). Die Einträge stehen ohne Abstand untereinander, eine unsichtbare Vergrößerung würde sie überlappen lassen. Diese Liste war während der automatischen Messung geschlossen und ist deshalb nicht in der Tabelle oben enthalten.
-- **Kochbuch, nur Chromium:** Die horizontal scrollbaren Reihen („Most liked recipes") vergrößern die gemeldete Dokumentbreite. Seitlich verschieben lässt sich die Seite trotzdem nicht: geprüft per Touch-Wisch, Mausrad und Tab-Taste auf 320 px. In Safari wird das bei der Cross-Browser-Prüfung (Checkliste Punkt 8) noch einmal kontrolliert.
 
 ## Testaufbau
 
@@ -86,6 +86,8 @@ Die Screenshots und Messungen stammen aus einem automatisierten Durchlauf mit Pl
 - **Schriften kommen lokal** (Quicksand und Ubuntu aus `@fontsource`) statt von Google Fonts. Die Testumgebung erreicht Google nicht.
 
 Pro Breite wird der echte Nutzerweg durchlaufen: fünf Zutaten eingeben → Präferenzen wählen → generieren → Ergebnisse → Rezept → Bibliothek → Detail → Kochbuch → Küchen-Liste. Dazu kommen Startseite, Login, Impressum, 404 und unter 768 px das geöffnete Mobilmenü. Die Ladeansicht ist 2,5 s nach dem Start aufgenommen, mitten in der Animation.
+
+Manuell gegengeprüft auf iPhone SE und iPhone 16 Pro Max (alle Ansichten bis 768 px): ohne Befund.
 
 Geprüfte Breiten: 320 (kleinstes Ziel), 375 (iPhone), 414 (große Smartphones), 640 (`sm`), 768 (`md`, Tablet hochkant), 1024 (`lg`, Tablet quer), 1280 (`xl`), 1440 (Figma-Desktop), 1920 (Full HD), 2560 (WQHD).
 

@@ -14,7 +14,7 @@
  *    case at the bottom can simply switch every animation off and still show a
  *    complete, correct salad.
  * 3. Everything that belongs in the bowl lives in .scene__fill, which is clipped
- *    along the bowl's rim (see #loader-bowl-rim in loading.component.html). That
+ *    along the bowl's rim (see the clip-path on .scene__fill below). That
  *    single clip is what makes the ingredients sit inside the bowl instead of
  *    behind it, and it is why no part needs its own masking.
  *
@@ -51,21 +51,24 @@
   animation-name: bowl-in;
 }
 
-/* The clip path lives in an inline <svg> in the template; it must not take up
-   any space of its own. */
-.scene-defs {
-  position: absolute;
-  height: 0;
-  width: 0;
-}
-
-/* Clipped along the bowl's rim: nothing inside it is ever drawn over the bowl
-   body, so ingredients that hang below the rim simply disappear into the bowl. */
+/*
+ * Clipped along the bowl's rim: nothing inside it is ever drawn over the bowl
+ * body, so ingredients that hang below the rim simply disappear into the bowl.
+ *
+ * The rim is a CSS path() in the card's pixel coordinates (253x309), not a
+ * reference to an SVG <clipPath>. Firefox did not repaint a url(#...) clip
+ * while the parts inside it moved: the finished salad only appeared once the
+ * spoon came in, and a white strip was left behind when it lifted out again.
+ * A basic-shape clip is handled by the compositor in every engine. Recalculate
+ * this path if the bowl's size or position changes.
+ */
 .scene__fill {
   position: absolute;
   inset: 0;
   z-index: 1;
-  clip-path: url(#loader-bowl-rim);
+  clip-path: path(
+    "M0,0 L253,0 L253,309 L202,309 L202,178.45 C184.21,190.53 158.58,194.45 127.01,194.45 C95.43,194.45 70.41,190.22 52.02,178.45 L52.02,309 L0,309 Z"
+  );
 }
 
 /* --- the finished bowl, back to front ------------------------------------ */
