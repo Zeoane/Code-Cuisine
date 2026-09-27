@@ -3,7 +3,7 @@ import { CuisineStyle, DietPreference, TimeCategory } from "../models/recipe.mod
 /** Cooking time options with their English label and duration hint. */
 export const TIME_OPTIONS: { value: TimeCategory; label: string; hint: string }[] = [
   { value: "quick", label: "Quick", hint: "up to 20min" },
-  { value: "medium", label: "Medium", hint: "25-40min" },
+  { value: "medium", label: "Medium", hint: "20-45min" },
   { value: "elaborate", label: "Complex", hint: "over 45min" },
 ];
 

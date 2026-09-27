@@ -13,8 +13,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -2320,
-        192
+        0,
+        0
       ],
       "webhookId": "generate-recipe",
       "retryOnFail": true,
@@ -29,8 +29,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2080,
-        192
+        260,
+        0
       ],
       "notes": "Reads the caller's IP from $json.ip, falling back to the x-forwarded-for, x-real-ip and cf-connecting-ip headers, and checks its shape. Deletes the raw headers from the item right away so the address travels no further through the run than it has to."
     },
@@ -63,8 +63,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        -1872,
-        192
+        520,
+        0
       ],
       "notes": "Without a usable IP the quota cannot be keyed, so the request is turned away rather than let through unmetered."
     },
@@ -79,8 +79,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
       "position": [
-        -1680,
-        320
+        780,
+        -85
       ],
       "notes": "400 with { error: 'invalid_request' }, the error shape recipe-generator.service.ts expects."
     },
@@ -93,8 +93,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1648,
-        144
+        780,
+        85
       ],
       "notes": "Re-checks ingredients, servings, helpers and the enum fields against the same ranges the Angular form enforces. Defence in depth: the webhook is public and anyone can post to it."
     },
@@ -127,8 +127,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        -1440,
-        144
+        1040,
+        0
       ],
       "notes": "Splits into the 400 branch or into the Firestore chain."
     },
@@ -143,8 +143,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
       "position": [
-        -1104,
-        336
+        1300,
+        -85
       ],
       "notes": "400 listing the collected payloadErrors, so the client can say what was wrong instead of showing a generic failure."
     },
@@ -157,8 +157,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1056,
-        -64
+        1560,
+        0
       ],
       "notes": "Signs an RS256 service-account assertion for the datastore scope. Hand-written because n8n has no Google service-account credential for the Firestore REST API. normalizePemKey repairs the line breaks that get lost when the private key is pasted into the Set node."
     },
@@ -187,8 +187,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -848,
-        -64
+        1820,
+        0
       ],
       "notes": "Trades the signed assertion at oauth2.googleapis.com for an access token valid for one hour. Needs no n8n credential - the assertion is the proof of identity."
     },
@@ -201,8 +201,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -656,
-        -64
+        2080,
+        0
       ],
       "notes": "Carries access_token on as accessToken, together with the fields from the JWT step, so every later Firestore call can read it by node name."
     },
@@ -215,8 +215,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -448,
-        -64
+        2340,
+        0
       ],
       "notes": "Builds the daily document ids: quota_ip/<date>_<salted SHA-256 of the IP> and quota_total/<date>, then drops clientIp. No raw address is ever written to Firestore. The date is UTC, so the limit resets at midnight UTC, not local midnight."
     },
@@ -260,8 +260,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        352,
-        -64
+        3120,
+        0
       ],
       "notes": "ipCount > 3 or totalCount > 12. The counts already include this request, so the limit trips one step later than it would with a read-first gate."
     },
@@ -274,8 +274,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        240,
-        112
+        3640,
+        -85
       ],
       "notes": "Picks the message by which limit tripped - the caller's own three or the twelve shared across all users - and reports the counts as they stand after the release."
     },
@@ -290,8 +290,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
       "position": [
-        464,
-        112
+        3900,
+        -85
       ],
       "notes": "429 with error 'quota_exceeded'. The Angular loading view turns this into the 'Daily limit reached' notice instead of a generic error."
     },
@@ -300,14 +300,14 @@
         "jsCode": "const CUISINE_PRESETS = {\n  german: { nameTemplates: [\"%s Pan, Home-Style\", \"Hearty %s Stew\", \"%s Bake\"], spices: [\"Marjoram\", \"Caraway\", \"Mustard\", \"Parsley\"], staples: [\"Butter\", \"Flour\", \"Cream\", \"Bacon\"] },\n  italian: { nameTemplates: [\"Pasta al %s\", \"%s Risotto\", \"Oven-Baked %s alla Italiana\"], spices: [\"Basil\", \"Oregano\", \"Garlic\", \"Chili flakes\"], staples: [\"Olive oil\", \"Parmesan\", \"Pasta\", \"Tomato passata\"] },\n  japanese: { nameTemplates: [\"%s Teriyaki Pan\", \"%s Donburi\", \"Miso Soup with %s\"], spices: [\"Soy sauce\", \"Ginger\", \"Sesame\", \"Mirin\"], staples: [\"Rice\", \"Soy sauce\", \"Sesame oil\", \"Nori\"] },\n  indian: { nameTemplates: [\"%s Curry\", \"%s Masala Pan\", \"Spicy %s Dal\"], spices: [\"Turmeric\", \"Garam masala\", \"Cumin\", \"Coriander\"], staples: [\"Basmati rice\", \"Coconut milk\", \"Lentils\", \"Ghee\"] },\n  gourmet: { nameTemplates: [\"%s Finely Poached with Beurre Blanc\", \"Confit %s Composition\", \"%s Fine-Dining Plate\"], spices: [\"Thyme\", \"Sea salt\", \"Butter\", \"White wine\"], staples: [\"Butter\", \"Cream\", \"White wine\", \"Shallots\"] },\n  fusion: { nameTemplates: [\"%s Fusion Bowl\", \"Street Food Wrap with %s\", \"Pan-Seared %s Fusion-Style\"], spices: [\"Soy sauce\", \"Lime\", \"Chili\", \"Coriander\"], staples: [\"Soy sauce\", \"Lime\", \"Sesame oil\", \"Spring onions\"] }\n};\nconst DIET_EXCLUDED_STAPLES = {\n  vegan: [\"Butter\", \"Cream\", \"Bacon\", \"Parmesan\", \"Ghee\"],\n  vegetarian: [\"Bacon\"],\n  keto: [\"Rice\", \"Basmati rice\", \"Pasta\", \"Flour\"],\n  none: []\n};\nconst TIME_RANGES = { quick: [15, 20], medium: [25, 45], elaborate: [50, 75] };\nconst DIFFICULTY_SEQUENCE = {\n  quick: [\"easy\", \"easy\", \"medium\"],\n  medium: [\"easy\", \"medium\", \"medium\"],\n  elaborate: [\"medium\", \"hard\", \"hard\"]\n};\n\nfunction capitalize(word) { return word.charAt(0).toUpperCase() + word.slice(1); }\nfunction pickRandom(items) { return items[Math.floor(Math.random() * items.length)]; }\nfunction gramsFor(servings) { return 80 + servings * 40; }\nfunction dietSafeStaples(cuisine, diet) {\n  const excluded = DIET_EXCLUDED_STAPLES[diet] || [];\n  return CUISINE_PRESETS[cuisine].staples.filter(function (s) { return excluded.indexOf(s) === -1; });\n}\n\nconst options = $node[\"Validate Request Payload\"].json.body;\n\nfunction buildTitle(index) {\n  const templates = CUISINE_PRESETS[options.cuisineStyle].nameTemplates;\n  const template = templates[index % templates.length];\n  const lead = capitalize(options.ingredients[0] || \"Vegetables\");\n  return template.replace(\"%s\", lead);\n}\nfunction buildDescription(title) {\n  const spice = pickRandom(CUISINE_PRESETS[options.cuisineStyle].spices);\n  return title + \", finished with \" + spice + \" \\u2013 quickly prepared from your ingredients.\";\n}\nfunction scaleIngredients() {\n  const grams = gramsFor(options.servings);\n  return options.ingredients.map(function (item) { return grams + \" g \" + item; });\n}\nfunction buildMissingIngredients() {\n  const have = options.ingredients.map(function (i) { return i.toLowerCase(); });\n  const candidates = dietSafeStaples(options.cuisineStyle, options.diet);\n  return candidates.filter(function (s) { return have.indexOf(s.toLowerCase()) === -1; }).slice(0, 3);\n}\nfunction stepTexts(missing) {\n  const spice = pickRandom(CUISINE_PRESETS[options.cuisineStyle].spices);\n  const main = options.ingredients.slice(0, 3).join(\", \") || \"the ingredients\";\n  return [\n    \"Wash and prepare \" + main + \".\",\n    missing.length ? (\"Get \" + missing.join(\", \") + \" ready.\") : \"Weigh out all ingredients.\",\n    \"Heat a pan or pot and season with \" + spice + \".\",\n    \"Add the ingredients one by one and cook while stirring.\",\n    \"Season to taste and plate for \" + options.servings + \" servings.\"\n  ];\n}\nfunction buildSteps(missing) {\n  const texts = stepTexts(missing);\n  return texts.map(function (instruction, i) {\n    return { instruction: instruction, assignedTo: (i % options.helpers) + 1, isParallel: options.helpers > 1 && i > 0 && i % 2 === 1 };\n  });\n}\nfunction pickCookingTime(index) {\n  const range = TIME_RANGES[options.timeCategory];\n  const step = Math.round(((range[1] - range[0]) / 2) * index);\n  return range[0] + step;\n}\nfunction buildNutrition() {\n  const base = { caloriesPerServing: 520, proteinGrams: 28, carbsGrams: 55, fatGrams: 18 };\n  if (options.diet === \"keto\") return Object.assign({}, base, { carbsGrams: 12, fatGrams: 38 });\n  if (options.diet === \"vegan\") return Object.assign({}, base, { proteinGrams: 18, fatGrams: 14 });\n  return base;\n}\nfunction buildRecipe(index) {\n  const title = buildTitle(index);\n  const missingIngredients = buildMissingIngredients();\n  return {\n    title: title,\n    description: buildDescription(title),\n    ingredients: scaleIngredients(),\n    missingIngredients: missingIngredients,\n    steps: buildSteps(missingIngredients),\n    difficulty: DIFFICULTY_SEQUENCE[options.timeCategory][index],\n    cookingTimeMinutes: pickCookingTime(index),\n    servings: options.servings,\n    cuisineStyle: options.cuisineStyle,\n    nutrition: buildNutrition()\n  };\n}\n\nconst recipes = [0, 1, 2].map(buildRecipe);\nconst counts = $node[\"Parse Quota Reservation\"].json;\n\nreturn [{\n  json: {\n    recipes: recipes,\n    quota: {\n      ipRemaining: Math.max(0, 3 - counts.ipCount),\n      totalRemaining: Math.max(0, 12 - counts.totalCount)\n    }\n  }\n}];"
       },
       "id": "6fb4d714-1d24-4cf8-8605-f7ca1ef89c88",
-      "name": "Generate Mock Recipes",
+      "name": "Generate Fallback Recipes",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        16,
-        560
+        4160,
+        0
       ],
-      "notes": "Port of recipe-generator.service.ts plus cuisine-presets.ts: same algorithm, same output shape. Placeholder until the real LLM call takes its place - everything around it stays as it is."
+      "notes": "The former mock generator, now the safety net: it runs when the OpenAI call fails or its answer cannot be validated, so the app always gets three recipes. Same output shape as the real path."
     },
     {
       "parameters": {
@@ -320,8 +320,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
       "position": [
-        240,
-        560
+        4420,
+        0
       ],
       "notes": "200 with { recipes, quota: { ipRemaining, totalRemaining } }, exactly the GenerateResponse shape the Angular service reads."
     },
@@ -355,8 +355,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.5,
       "position": [
-        -1232,
-        80
+        1300,
+        85
       ],
       "id": "3b5294b1-db29-4e42-8bfb-6ddddff2b8ec",
       "name": "Set Service Account  Credentials",
@@ -385,8 +385,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -784,
-        304
+        2600,
+        0
       ],
       "notes": "One atomic Firestore :commit that raises both counters by 1 with an increment transform. Reading a count and writing count+1 would lose an update whenever two requests overlap. updateMask ['date'] leaves count alone, which lets the same call create the document on the first request of the day."
     },
@@ -399,8 +399,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -528,
-        304
+        2860,
+        0
       ],
       "notes": "Reads the post-increment counts out of writeResults[].transformResults. These values are authoritative: overlapping requests get 3 and 4 instead of both getting 3."
     },
@@ -427,10 +427,67 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        16,
-        112
+        3380,
+        -85
       ],
       "notes": "The same commit with increment -1. The slot was taken before the limit was known, so a rejected request hands it back before the 429 goes out."
+    },
+    {
+      "parameters": {
+        "jsCode": "/*\n * Builds the request for the OpenAI Chat Completions API.\n *\n * The response shape is pinned with a JSON schema (structured outputs), so the\n * model cannot answer with prose or a differently named field. Everything the\n * app and the Firestore rules require is in the schema; the limits themselves\n * are enforced again in \"Validate & Normalise Recipes\", because a schema can\n * describe types but not our length caps.\n */\nconst options = $node[\"Validate Request Payload\"].json.body;\n\n/* The only place the model is named. Swap it here if the account has no\n   access to this one (e.g. an older gpt-4o-mini). */\nconst MODEL = \"gpt-6-luna\";\n\nconst TIME_HINTS = {\n  quick: \"15 to 20 minutes\",\n  medium: \"25 to 45 minutes\",\n  elaborate: \"50 to 75 minutes\"\n};\n\nconst DIET_HINTS = {\n  none: \"no dietary restriction\",\n  vegetarian: \"strictly vegetarian: no meat, no fish, no gelatine\",\n  vegan: \"strictly vegan: no meat, fish, dairy, egg, honey or gelatine\",\n  keto: \"ketogenic: very low carbohydrate, no pasta, rice, potatoes, bread or sugar\"\n};\n\nconst recipeProperties = {\n  title: { type: \"string\", description: \"Dish name, at most 80 characters, no quotes\" },\n  description: { type: \"string\", description: \"One sentence about the dish, at most 200 characters\" },\n  ingredients: {\n    type: \"array\",\n    description: \"Every ingredient with an amount, e.g. '200 g pasta'. Uses the user's ingredients.\",\n    items: { type: \"string\" }\n  },\n  missingIngredients: {\n    type: \"array\",\n    description: \"At most 3 common staples the user still has to buy, name only, no amounts\",\n    items: { type: \"string\" }\n  },\n  steps: {\n    type: \"array\",\n    description: \"4 to 8 cooking steps in order\",\n    items: {\n      type: \"object\",\n      additionalProperties: false,\n      required: [\"instruction\", \"assignedTo\", \"isParallel\"],\n      properties: {\n        instruction: { type: \"string\", description: \"One step, at most 300 characters\" },\n        assignedTo: { type: \"integer\", description: \"Which cook does this step, from 1 to the number of cooks\" },\n        isParallel: { type: \"boolean\", description: \"True when this step runs at the same time as the previous one\" }\n      }\n    }\n  },\n  difficulty: { type: \"string\", enum: [\"easy\", \"medium\", \"hard\"] },\n  cookingTimeMinutes: { type: \"integer\" },\n  servings: { type: \"integer\" },\n  cuisineStyle: { type: \"string\", enum: [\"german\", \"italian\", \"japanese\", \"indian\", \"gourmet\", \"fusion\"] },\n  nutrition: {\n    type: \"object\",\n    description: \"Per serving, realistic for the ingredients and amounts\",\n    additionalProperties: false,\n    required: [\"caloriesPerServing\", \"proteinGrams\", \"fatGrams\", \"carbsGrams\"],\n    properties: {\n      caloriesPerServing: { type: \"integer\" },\n      proteinGrams: { type: \"integer\" },\n      fatGrams: { type: \"integer\" },\n      carbsGrams: { type: \"integer\" }\n    }\n  }\n};\n\nconst schema = {\n  type: \"object\",\n  additionalProperties: false,\n  required: [\"recipes\"],\n  properties: {\n    recipes: {\n      type: \"array\",\n      description: \"Exactly three different recipes\",\n      items: {\n        type: \"object\",\n        additionalProperties: false,\n        required: Object.keys(recipeProperties),\n        properties: recipeProperties\n      }\n    }\n  }\n};\n\nconst system = [\n  \"You are the recipe generator of the app Code a Cuisine.\",\n  \"You write practical home-cooking recipes in English.\",\n  \"Rules:\",\n  \"- Return exactly three recipes that clearly differ in preparation or flavour direction.\",\n  \"- Every recipe has to use at least 70 percent of the ingredients the user already has, listed with amounts.\",\n  \"- Anything else the dish needs goes into missingIngredients: never more than three common basic staples.\",\n  \"- Keep to the requested cuisine, diet, servings and cooking time.\",\n  \"- Spread the steps over the given number of cooks; with a single cook every step is assignedTo 1 and isParallel is false.\",\n  \"- Steps are chronological and easy enough for a beginner: say what to do, with which ingredient, and how to tell it is done.\",\n  \"- Use waiting times (oven, simmering, resting) for the next preparation instead of standing around.\",\n  \"- Nutrition is per serving and has to fit the ingredients: calories must roughly match protein times 4 plus carbs times 4 plus fat times 9.\",\n  \"- Plain text only, no markdown, no emoji.\"\n].join(\"\\n\");\n\nconst request = {\n  servings: options.servings,\n  cooks: options.helpers,\n  cuisineStyle: options.cuisineStyle,\n  diet: options.diet,\n  dietRule: DIET_HINTS[options.diet] || DIET_HINTS.none,\n  cookingTime: TIME_HINTS[options.timeCategory] || TIME_HINTS.medium,\n  ingredientsAtHome: options.ingredients\n};\n\nreturn [{\n  json: {\n    payload: {\n      model: MODEL,\n      messages: [\n        { role: \"system\", content: system },\n        { role: \"user\", content: JSON.stringify(request) }\n      ],\n      response_format: {\n        type: \"json_schema\",\n        json_schema: { name: \"recipe_suggestions\", strict: true, schema: schema }\n      }\n    }\n  }\n}];\n"
+      },
+      "id": "b1f0a9c2-0d51-4c2a-9a77-3c5d8e1f0a11",
+      "name": "Build LLM Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3380,
+        85
+      ],
+      "notes": "Prompt and JSON schema for the OpenAI call. The model id is the constant MODEL at the top - the only place it is named."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.payload) }}",
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "id": "b1f0a9c2-0d51-4c2a-9a77-3c5d8e1f0a12",
+      "name": "OpenAI: Generate Recipes",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3640,
+        85
+      ],
+      "notes": "The real recipe generation (checklist item 1). Uses the OpenAI credential stored in n8n; the key is never in this file. On an error (timeout, rate limit, outage) the run leaves through the second output and the fallback node answers instead.",
+      "onError": "continueErrorOutput",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "jsCode": "/*\n * Turns the model's answer into exactly the shape the app and the Firestore\n * rules expect. The JSON schema in the request already fixes the field names\n * and types; what is left to do here is\n *   - repair what a model may still get wrong (too many steps, a cook number\n *     that does not exist, a diet slip in an ingredient line),\n *   - enforce the caps from firestore.rules, so a generated recipe can never\n *     be rejected when the app saves it to the library,\n *   - throw when the answer is unusable, which sends the run down the error\n *     output into \"Generate Fallback Recipes\".\n */\nconst options = $node[\"Validate Request Payload\"].json.body;\nconst counts = $node[\"Parse Quota Reservation\"].json;\n\nconst DIFFICULTIES = [\"easy\", \"medium\", \"hard\"];\nconst CUISINES = [\"german\", \"italian\", \"japanese\", \"indian\", \"gourmet\", \"fusion\"];\n\nfunction text(value, max) {\n  const cleaned = String(value == null ? \"\" : value).replace(/\\s+/g, \" \").trim();\n  return cleaned.length > max ? cleaned.slice(0, max - 1).trim() + \"…\" : cleaned;\n}\n\nfunction whole(value, min, max, fallback) {\n  const number = Math.round(Number(value));\n  if (!Number.isFinite(number)) return fallback;\n  return Math.min(max, Math.max(min, number));\n}\n\nfunction cook(value, position) {\n  const number = Math.round(Number(value));\n  const valid = Number.isFinite(number) && number >= 1 && number <= options.helpers;\n  return valid ? number : (position % options.helpers) + 1;\n}\n\nfunction list(value, max, maxLength) {\n  if (!Array.isArray(value)) return [];\n  const items = [];\n  for (const entry of value) {\n    const line = text(entry, maxLength);\n    if (line) items.push(line);\n    if (items.length >= max) break;\n  }\n  return items;\n}\n\nconst raw = $json.choices && $json.choices[0] && $json.choices[0].message\n  ? $json.choices[0].message.content\n  : null;\nif (!raw) throw new Error(\"OpenAI returned no message content\");\n\nlet parsed;\ntry {\n  parsed = JSON.parse(raw);\n} catch (error) {\n  throw new Error(\"OpenAI did not return valid JSON: \" + error.message);\n}\n\nconst candidates = Array.isArray(parsed.recipes) ? parsed.recipes : [];\nif (candidates.length < 3) throw new Error(\"OpenAI returned \" + candidates.length + \" recipes instead of 3\");\n\nconst recipes = candidates.slice(0, 3).map(function (recipe, index) {\n  const steps = (Array.isArray(recipe.steps) ? recipe.steps : []).slice(0, 30).map(function (step, position) {\n    return {\n      instruction: text(step && step.instruction, 300),\n      /* A cook number the user does not have is not clamped but replaced by\n         the next cook in turn - clamping would push every stray step onto the\n         last cook and leave the first one with nothing to do. */\n      assignedTo: cook(step && step.assignedTo, position),\n      isParallel: options.helpers > 1 && Boolean(step && step.isParallel)\n    };\n  }).filter(function (step) { return step.instruction.length > 0; });\n\n  if (!steps.length) throw new Error(\"Recipe \" + (index + 1) + \" has no usable steps\");\n\n  const nutrition = recipe.nutrition || {};\n  return {\n    title: text(recipe.title, 200) || \"Recipe \" + (index + 1),\n    description: text(recipe.description, 1000) || null,\n    ingredients: list(recipe.ingredients, 50, 200),\n    /* The checklist caps the extras at three basic staples; the model is told\n       the same, this is the hard stop. */\n    missingIngredients: list(recipe.missingIngredients, 3, 200),\n    steps: steps,\n    difficulty: DIFFICULTIES.indexOf(recipe.difficulty) === -1 ? \"medium\" : recipe.difficulty,\n    cookingTimeMinutes: whole(recipe.cookingTimeMinutes, 1, 600, 30),\n    /* Servings and cuisine are the user's choice, not the model's. */\n    servings: options.servings,\n    cuisineStyle: CUISINES.indexOf(options.cuisineStyle) === -1 ? \"german\" : options.cuisineStyle,\n    nutrition: {\n      caloriesPerServing: whole(nutrition.caloriesPerServing, 0, 5000, 0),\n      proteinGrams: whole(nutrition.proteinGrams, 0, 500, 0),\n      fatGrams: whole(nutrition.fatGrams, 0, 500, 0),\n      carbsGrams: whole(nutrition.carbsGrams, 0, 500, 0)\n    }\n  };\n});\n\nfor (const recipe of recipes) {\n  if (!recipe.ingredients.length) throw new Error(\"A recipe came back without ingredients\");\n}\n\nreturn [{\n  json: {\n    recipes: recipes,\n    quota: {\n      ipRemaining: Math.max(0, 3 - counts.ipCount),\n      totalRemaining: Math.max(0, 12 - counts.totalCount)\n    }\n  }\n}];\n"
+      },
+      "id": "b1f0a9c2-0d51-4c2a-9a77-3c5d8e1f0a13",
+      "name": "Validate & Normalise Recipes",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3900,
+        85
+      ],
+      "notes": "Parses the model's JSON, repairs what it may get wrong and enforces the caps from firestore.rules. Throws when the answer is unusable, which routes the run to the fallback node.",
+      "onError": "continueErrorOutput"
     }
   ],
   "pinData": {},
@@ -559,7 +616,7 @@
         ],
         [
           {
-            "node": "Generate Mock Recipes",
+            "node": "Build LLM Request",
             "type": "main",
             "index": 0
           }
@@ -571,17 +628,6 @@
         [
           {
             "node": "Respond: 429 Quota Exceeded",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Generate Mock Recipes": {
-      "main": [
-        [
-          {
-            "node": "Respond: 200 Success",
             "type": "main",
             "index": 0
           }
@@ -626,6 +672,64 @@
         [
           {
             "node": "Build Quota Exceeded Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build LLM Request": {
+      "main": [
+        [
+          {
+            "node": "OpenAI: Generate Recipes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI: Generate Recipes": {
+      "main": [
+        [
+          {
+            "node": "Validate & Normalise Recipes",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate Fallback Recipes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate & Normalise Recipes": {
+      "main": [
+        [
+          {
+            "node": "Respond: 200 Success",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate Fallback Recipes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Fallback Recipes": {
+      "main": [
+        [
+          {
+            "node": "Respond: 200 Success",
             "type": "main",
             "index": 0
           }

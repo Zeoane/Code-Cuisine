@@ -29,12 +29,20 @@ export class QuotaService {
   /** Recipes left today system-wide, or null while unknown. */
   readonly totalRemaining = signal<number | null>(null);
 
-  /** Fetches the current quota status from n8n; silently no-ops on failure. */
+  /**
+   * Fetches the current quota status from n8n; silently no-ops on failure.
+   *
+   * The URL carries a timestamp because the n8n webhook answers without any
+   * cache headers: Firefox then served its stored copy and showed yesterday's
+   * count on the first visit, while the same page was right in Chrome and
+   * Edge. A changing URL can never be answered from the cache.
+   */
   async refresh(): Promise<void> {
     if (!isQuotaStatusConfigured()) return;
     try {
+      const url = environment.n8n.quotaStatusUrl;
       const status = await firstValueFrom(
-        this.http.get<QuotaStatus>(environment.n8n.quotaStatusUrl),
+        this.http.get<QuotaStatus>(`${url}${url.includes("?") ? "&" : "?"}t=${Date.now()}`),
       );
       this.applyFromResponse(status);
     } catch {

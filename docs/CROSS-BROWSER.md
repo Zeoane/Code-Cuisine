@@ -1,13 +1,13 @@
 # Cross-Browser-Test – Code à Cuisine
 
-Stand: 21.09.2026 · Checkliste Punkt 8
+Stand: 27.09.2026 · Checkliste Punkt 8
 
 | Browser | Engine | Wie getestet | Ergebnis |
 |---|---|---|---|
 | Chrome | Blink | automatisch, 10 Breiten × 14 Ansichten (siehe [RESPONSIVE.md](RESPONSIVE.md)) | ✓ |
 | Safari | WebKit | automatisch mit WebKitGTK 2.52, 10 Breiten × 14 Ansichten | ✓ |
-| Firefox | Gecko | manuell, siehe Checkliste unten | _offen_ |
-| Edge | Blink | manuell, siehe Checkliste unten | _offen_ |
+| Firefox | Gecko | manuell durchgeklickt, 27.09.2026 | ✓ (zwei Funde, beide behoben) |
+| Edge | Blink | manuell durchgeklickt, 27.09.2026 | ✓ |
 
 ## Safari (WebKit)
 
@@ -126,17 +126,24 @@ Firefox nutzt mit Gecko eine eigene, dritte Engine. Edge baut auf Chromium auf u
 
 | # | Was prüfen | Firefox | Edge |
 |---|---|---|---|
-| 1 | Startseite: Teller-Collage, Schriften (Quicksand/Ubuntu), „Get started" | | |
-| 2 | Generator: Autovervollständigung mit Maus **und** Pfeiltasten/Enter/Escape | | |
-| 3 | Generator: Mengenfeld ohne Pfeil-Spinner, Einheiten-Dropdown öffnet und schließt | | |
-| 4 | Zutat bearbeiten: leeres Feld → Häkchen ausgegraut | | |
-| 5 | Präferenzen: Chips, Stepper, Diät-Hinweis bei Konflikt | | |
-| 6 | Ladeanimation läuft einmal durch, danach Ergebnisse | | |
-| 7 | Rezeptansicht: Nährwerte, Makro-Balken, Herz anklicken | | |
-| 8 | Kochbuch: „Most liked"-Reihe mit Maus ziehen und mit dem Mausrad scrollen | | |
-| 9 | Bibliothek: Filter, Seitenwechsel, Detailseite mit „Directions" auf/zu | | |
-| 10 | Impressum öffnen, **per Browser-Zurück** verlassen: Seite scrollt danach noch | | |
-| 11 | DevTools → Responsive-Modus auf 320 px: nichts ragt über den Rand | | |
-| 12 | Konsole (F12) während des ganzen Durchlaufs ohne rote Fehler | | |
+| 1 | Startseite: Teller-Collage, Schriften (Quicksand/Ubuntu), „Get started" | ✓ | ✓ |
+| 2 | Generator: Autovervollständigung mit Maus **und** Pfeiltasten/Enter/Escape | ✓ | ✓ |
+| 3 | Generator: Mengenfeld ohne Pfeil-Spinner, Einheiten-Dropdown öffnet und schließt | ✓ | ✓ |
+| 4 | Zutat bearbeiten: leeres Feld → Häkchen ausgegraut | ✓ | ✓ |
+| 5 | Präferenzen: Chips, Stepper, Diät-Hinweis bei Konflikt | ✓ | ✓ |
+| 6 | Ladeanimation läuft einmal durch, danach Ergebnisse | ✓ | ✓ |
+| 7 | Rezeptansicht: Nährwerte, Makro-Balken, Herz anklicken | ✓ | ✓ |
+| 8 | Kochbuch: „Most liked"-Reihe mit Maus ziehen und mit dem Mausrad scrollen | ✓ | ✓ |
+| 9 | Bibliothek: Filter, Seitenwechsel, Detailseite mit „Directions" auf/zu | ✓ | ✓ |
+| 10 | Impressum öffnen, **per Browser-Zurück** verlassen: Seite scrollt danach noch | ✓ | ✓ |
+| 11 | DevTools → Responsive-Modus auf 320 px: nichts ragt über den Rand | ✓ | ✓ |
+| 12 | Konsole (F12) während des ganzen Durchlaufs ohne rote Fehler | ✓ | ✓ |
+
+Alle zwölf Punkte sind in beiden Browsern in Ordnung, die Konsole blieb in beiden Durchläufen ohne Fehlermeldung.
 
 Bekannt und harmlos: Firefox meldet im Dev-Server eine Sicherheitswarnung zu `file:///`-Links aus Vite. Das betrifft nur `ng serve` und nicht den Produktions-Build.
+
+### Zwei Funde in Firefox, beide behoben
+
+1. **Ladeanimation zeichnete sich nicht neu.** Die Zutaten in der Schüssel werden an der Schüsselkante beschnitten. Dafür stand ein Verweis auf eine SVG-Form in der CSS (`clip-path: url(#loader-bowl-rim)`). Firefox zeichnete den beschnittenen Bereich nicht bei jedem Bild neu: Die fertige Schüssel erschien erst, als der Löffel hereinkam, und beim Herausfahren blieb ein weißer Streifen stehen. Chrome und WebKit waren unauffällig. → Die Kante ist jetzt direkt als CSS-Form `path(...)` hinterlegt, ohne Umweg über ein SVG-Element (`loading.component.css`).
+2. **Veralteter Zähler für das Tageslimit.** Der n8n-Endpunkt `quota-status` antwortet ohne Cache-Header. Firefox bediente die erste Abfrage aus seinem Cache und zeigte einen alten Stand; erst die Antwort auf die Generierung selbst brachte den echten Wert. Edge und Chrome holten die Daten neu. Der Zähler in Firestore war immer korrekt, nur die Anzeige nicht. → Die Abfrage trägt jetzt einen Zeitstempel in der URL, damit kein Browser sie aus dem Cache beantworten kann (`quota.service.ts`).

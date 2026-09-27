@@ -41,6 +41,11 @@ copy-pasteable regardless of import success.
 2. **An email-sending credential** for `error-notifications` (SMTP, Gmail,
    or whatever n8n's Email node supports in your instance) — self-notifying
    to `codeacuisine@gmail.com` is the simplest setup.
+3. **An OpenAI credential** for the recipe generation itself: n8n → Credentials
+   → New → *OpenAI*, paste the API key from
+   <https://platform.openai.com/api-keys>. The key lives only in n8n; it is
+   never part of the exported workflow JSON, which stores just the credential's
+   name and id.
 
 **No Google/Firestore n8n credential needed.** n8n Cloud workspaces don't
 consistently expose a usable Firestore/service-account credential type (ours
@@ -124,8 +129,31 @@ you can copy from there instead of retyping).
 | 12 | Check Quota Limits | IF | `{{ $json.ipCount > 3 \|\| $json.totalCount > 12 }}` — the counts already include this request, so the limit trips one step later than with a read-first gate |
 | 12a | Release Quota Slot | HTTP Request | same commit with `increment: -1`, handing the slot back before the 429 is sent |
 | 12b | Build Quota Exceeded Response → Respond: 429 | Code → Respond to Webhook | message differs depending on which limit tripped |
-| 13 | Generate Mock Recipes | Code | ported from `recipe-generator.service.ts` + `cuisine-presets.ts` — same algorithm, same output shape |
-| 14 | Respond: 200 Success | Respond to Webhook | 200, `{ recipes, quota: { ipRemaining, totalRemaining } }` |
+| 13 | Build LLM Request | Code | prompt plus the JSON schema for the answer; the model id is the constant `MODEL` at the top of the node |
+| 14 | OpenAI: Generate Recipes | HTTP Request | POST `api.openai.com/v1/chat/completions` with the *OpenAI* credential; 60 s timeout, one retry; errors leave through the second output |
+| 15 | Validate & Normalise Recipes | Code | parses the answer, repairs what the model may get wrong and enforces the caps from `firestore.rules`; throws (→ second output) when the answer is unusable |
+| 15a | Generate Fallback Recipes | Code | the former mock generator, now the safety net for both error outputs — ported from `recipe-generator.service.ts` + `cuisine-presets.ts`, same output shape |
+| 16 | Respond: 200 Success | Respond to Webhook | 200, `{ recipes, quota: { ipRemaining, totalRemaining } }` |
+
+**Recipe generation: the model, the schema and the safety net.** The request
+pins the answer with a JSON schema (OpenAI structured outputs, `strict: true`),
+so the model cannot reply with prose or rename a field. The schema covers the
+shape; the length limits live in *Validate & Normalise Recipes*, which cuts
+titles to 200 and descriptions to 1000 characters, caps ingredients at 50,
+extras at 20 and steps at 30, keeps `servings` and `cuisineStyle` at what the
+user actually chose, and replaces a cook number that does not exist with the
+next cook in turn. Those are exactly the limits `firestore.rules` enforces, so
+a generated recipe can never be rejected when the app saves it to the library.
+
+If the call fails — timeout, rate limit, outage — or the answer cannot be
+validated, the run leaves through the node's second output and *Generate
+Fallback Recipes* answers instead. The user always gets three recipes, and the
+quota block stays correct either way. To see the fallback on purpose, disable
+the OpenAI credential for a moment and generate once.
+
+Cost: one generation is roughly 1.5k tokens in and 2k out. With the model set
+in the node that is well under a cent per generation, and the daily limit of
+12 generations caps it in any case.
 
 Firestore REST base URL used throughout:
 `https://firestore.googleapis.com/v1/projects/code-a-cuisine-3d1e0/databases/(default)/documents/...`
