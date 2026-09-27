@@ -2,6 +2,8 @@
 
 **AI-Powered recipe generator**
 
+Repository: <https://github.com/Zeoane/Code-Cuisine>
+
 ## Inhaltsverzeichnis / Table of Contents
 
 **Deutsch**
@@ -58,7 +60,7 @@ und speichert Favoriten in einem persönlichen Kochbuch.
 | Tageslimit         | 3 Generierungen je IP-Adresse und Tag, 12 systemweit; der verbleibende Stand steht im Schritt „Preferences“                                                                   |
 | Login              | Registrierung und Anmeldung per E-Mail/Passwort sowie Google-Login (Firebase Auth), schützt die Kochbuch-Route                                                             |
 | Impressum          | Impressum gemäß § 5 DDG (`/impressum`)                                                                                                                                    |
-| Responsiv          | Mobile-first bis 320 px Breite, Schrift mind. 16 px, keine sichtbaren Scrollbalken, Swipe-Interaktionen, Buttons/Links ≥ 44 px Trefferfläche, Eingabefelder in Figma-Höhe  |
+| Responsiv          | Mobile-first bis 320 px Breite, Mindestschriftgröße 16 px auf Mobilgeräten, keine sichtbaren Scrollbalken, Swipe-Interaktionen, Touch-Ziele ≥ 44 px                        |
 
 <a id="de-aktueller-stand"></a>
 
@@ -80,28 +82,32 @@ lokale Ersatzlösungen zurück, statt zu scheitern.
 **n8n** läuft mit drei Workflows (Details in [`n8n/README.md`](n8n/README.md)):
 
 - `Recipe Generation` – validiert die Eingaben aus Angular erneut, prüft und
-  erhöht das IP-Quota und liefert die drei Rezepte zurück.
+  erhöht das IP-Quota, lässt die drei Rezepte von OpenAI erzeugen und gibt sie
+  zurück.
 - `Recipe Quota Status` – meldet dem Frontend den verbleibenden Tagesstand.
 - `Error Notifications` – Error-Trigger, der bei jedem Fehlschlag eine E-Mail
   verschickt.
 
-**Was noch offen ist:** die eigentliche KI. Der Node `Generate Mock Recipes`
-erzeugt die Rezepte bislang regelbasiert aus Kochstil-Vorlagen, es findet kein
-LLM-Aufruf statt. Der `RecipeGeneratorService` ruft n8n an, sobald
-`environment.n8n.generateUrl` gesetzt ist, und nutzt sonst denselben Mock im
-Browser – die Umstellung auf ein echtes Modell betrifft deshalb nur den einen
-n8n-Node, nicht das Frontend.
+**Die Rezepte kommen von einem echten Modell.** Der Knoten
+`OpenAI: Generate Recipes` ruft die Chat-Completions-API auf. Die Antwort ist
+per JSON-Schema festgelegt (Structured Outputs), ein nachgelagerter Knoten prüft
+sie gegen dieselben Grenzen, die `firestore.rules` erzwingt, und repariert
+Kleinigkeiten. Schlägt der Aufruf fehl oder ist die Antwort unbrauchbar,
+springt der frühere regelbasierte Generator als Fallback ein – der Nutzer
+bekommt immer drei Rezepte.
 
-Weitere geplante Schritte:
+**Qualitätssicherung** ist dokumentiert und abgeschlossen:
 
-- **Nährwerte vervollständigen**: Makronährstoffe zusätzlich in Prozent sowie
-  Werte für das Gesamtrezept, nicht nur pro Portion.
-- **Nährwert-Diagramm**, das auch auf kleinen Bildschirmen lesbar bleibt.
-- **Kochbuch auf Firestore** umstellen, damit es pro Konto synchronisiert statt
-  nur im jeweiligen Browser zu liegen.
-- **Beschreibungstexte an den n8n-Nodes** ergänzen; die Namen sind gesetzt, die
-  Notizfelder noch leer.
-- **Cross-Browser-Test und Code-Review** als Abschluss.
+- [`docs/RESPONSIVE.md`](docs/RESPONSIVE.md) – 14 Ansichten auf 10 Breiten von
+  320 bis 2560 px, mit Screenshots und Messwerten.
+- [`docs/CROSS-BROWSER.md`](docs/CROSS-BROWSER.md) – Chrome, Safari (WebKit),
+  Firefox und Edge.
+- [`CODE-REVIEW.md`](CODE-REVIEW.md) – Review über Sicherheit, Zugänglichkeit
+  und Wartbarkeit; alle Befunde sind abgearbeitet.
+
+**Ausblick, nicht Teil der Abgabe:** Das Kochbuch liegt weiterhin im
+`localStorage` des jeweiligen Browsers. Eine Umstellung auf Firestore würde es
+pro Konto synchronisieren.
 
 <a id="de-einrichtung"></a>
 
@@ -235,7 +241,7 @@ you save favorites to a personal cookbook.
 | Daily limit       | 3 generations per IP address per day, 12 system-wide; the remaining count sits on the "Preferences" step                                                                      |
 | Login             | Email/password registration and sign-in plus Google sign-in (Firebase Auth), gating the cookbook route                                                                    |
 | Imprint           | Legal notice per § 5 DDG (German Digital Services Act) (`/impressum`)                                                                                                    |
-| Responsive        | Mobile-first down to 320 px width, minimum 16 px font size, no visible scrollbars, swipe interactions, button and link hit areas ≥ 44 px, input fields at Figma height    |
+| Responsive        | Mobile-first down to 320 px width, minimum 16 px font size on mobile, no visible scrollbars, swipe interactions, touch targets ≥ 44 px                                    |
 
 <a id="en-current-status"></a>
 
@@ -257,26 +263,28 @@ missing, the app falls back to a local substitute instead of failing.
 **n8n** runs three workflows (details in [`n8n/README.md`](n8n/README.md)):
 
 - `Recipe Generation` – re-validates the payload coming from Angular, checks and
-  raises the IP quota, and returns the three recipes.
+  raises the IP quota, has OpenAI write the three recipes and returns them.
 - `Recipe Quota Status` – reports the remaining daily allowance to the frontend.
 - `Error Notifications` – an error trigger that sends an email on every failure.
 
-**What is still open:** the actual AI. The `Generate Mock Recipes` node builds
-the recipes from cuisine templates by rule; no LLM is called. `RecipeGeneratorService`
-calls n8n as soon as `environment.n8n.generateUrl` is set and otherwise runs the
-same mock in the browser – swapping in a real model therefore touches that single
-n8n node, not the frontend.
+**The recipes come from a real model.** The `OpenAI: Generate Recipes` node
+calls the Chat Completions API. The answer is pinned with a JSON schema
+(structured outputs); the node after it checks the result against the very
+limits `firestore.rules` enforces and repairs small slips. If the call fails or
+the answer cannot be used, the earlier rule-based generator steps in as a
+fallback – the user always gets three recipes.
 
-Further planned steps:
+**Quality assurance** is documented and finished:
 
-- **Complete the nutrition facts**: macronutrients as percentages as well, plus
-  values for the whole recipe instead of per serving only.
-- **A nutrition chart** that stays readable on small screens.
-- **Move the cookbook to Firestore** so it syncs per account instead of living in
-  one browser.
-- **Add description texts to the n8n nodes**; the names are in place, the notes
-  fields are still empty.
-- **Cross-browser testing and a code review** to close things out.
+- [`docs/RESPONSIVE.md`](docs/RESPONSIVE.md) – 14 views across 10 widths from
+  320 to 2560 px, with screenshots and measurements.
+- [`docs/CROSS-BROWSER.md`](docs/CROSS-BROWSER.md) – Chrome, Safari (WebKit),
+  Firefox and Edge.
+- [`CODE-REVIEW.md`](CODE-REVIEW.md) – a review covering security,
+  accessibility and maintainability; every finding has been addressed.
+
+**Beyond this submission:** the cookbook still lives in each browser's
+`localStorage`. Moving it to Firestore would sync it per account.
 
 <a id="en-setup"></a>
 
