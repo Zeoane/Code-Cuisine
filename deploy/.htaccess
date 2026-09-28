@@ -1,0 +1,71 @@
+# Code à Cuisine - Apache-Konfiguration für den Produktions-Build.
+#
+# Diese Datei gehört neben die index.html auf den Webserver. Der Build erzeugt
+# sie nicht selbst, "npm run build:upload" legt sie mit ins Upload-Paket.
+#
+# Die App liegt auf dem Server nicht auf der Domain selbst, sondern im
+# Unterordner /angular-projects/code-a-cuisine/. Dieser Pfad steht an drei
+# Stellen und muss überall gleich sein, sonst lädt die Seite ihre Dateien nicht:
+#   1. RewriteBase hier unten
+#   2. --base-href in "build:upload" (package.json)
+#   3. ErrorDocument am Ende dieser Datei
+# Zieht die App später in einen anderen Ordner, sind das die drei Stellen.
+
+# --- Routing ----------------------------------------------------------------
+# Die App ist eine Single-Page-Application: Angular baut jede Route im Browser
+# auf, der Server liefert immer nur die index.html aus. Ohne die Umleitung
+# antwortet ein Reload auf /library oder /recipe/42 mit 404, weil der Server
+# dort einen echten Ordner sucht.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /angular-projects/code-a-cuisine/
+
+  # Vorhandene Dateien und Ordner (JS, CSS, Bilder) werden direkt ausgeliefert.
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Alles andere ist eine Angular-Route und geht an die index.html.
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+# --- Caching ----------------------------------------------------------------
+# Die Build-Dateien tragen einen Hash im Namen (main-JE6MPW4Y.js) und dürfen
+# deshalb lange im Cache bleiben: ein neuer Build heißt anders. Die index.html
+# darf nie gecacht werden, sonst lädt der Browser weiter die alten Dateinamen.
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault                      "access plus 1 month"
+  ExpiresByType text/html             "access plus 0 seconds"
+  ExpiresByType text/css              "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType image/webp            "access plus 1 year"
+  ExpiresByType image/svg+xml         "access plus 1 year"
+</IfModule>
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+</IfModule>
+
+# --- Komprimierung ----------------------------------------------------------
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml
+  AddOutputFilterByType DEFLATE application/javascript application/json
+  AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+# --- MIME-Typen -------------------------------------------------------------
+# Ältere Apache-Installationen kennen .webp nicht und liefern es als
+# application/octet-stream aus, dann zeigt der Browser kein Bild.
+<IfModule mod_mime.c>
+  AddType image/webp .webp
+  AddType application/javascript .js
+  AddType text/css .css
+</IfModule>
+
+# --- Fehlerseiten -----------------------------------------------------------
+# Greift nur, wenn mod_rewrite auf dem Server fehlt: dann übernimmt die App
+# selbst und zeigt ihre eigene 404-Seite.
+ErrorDocument 404 /angular-projects/code-a-cuisine/index.html

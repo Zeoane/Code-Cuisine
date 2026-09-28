@@ -6,6 +6,8 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:upload": "ng build --configuration production --base-href /angular-projects/code-a-cuisine/ && node scripts/make-upload.mjs",
+    "pack:upload": "node scripts/make-upload.mjs",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "format": "prettier --write \"src/**/*.{ts,html,css}\""

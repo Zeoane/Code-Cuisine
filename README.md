@@ -16,6 +16,7 @@ Repository: <https://github.com/Zeoane/Code-Cuisine>
 - [Tech-Stack](#de-tech-stack)
 - [Projektstruktur](#de-projektstruktur)
 - [Lokal entwickeln (VS Code)](#de-lokal-entwickeln)
+- [Deployment: Upload auf den Webserver](#de-deployment)
 - [Git & GitHub](#de-git-github)
 
 **English**
@@ -28,6 +29,7 @@ Repository: <https://github.com/Zeoane/Code-Cuisine>
 - [Tech Stack](#en-tech-stack)
 - [Project Structure](#en-project-structure)
 - [Local Development (VS Code)](#en-local-development)
+- [Deployment: Upload to the Web Server](#en-deployment)
 - [Git & GitHub](#en-git-github)
 
 ---
@@ -197,6 +199,50 @@ Eine `.env`-Datei wird nicht benötigt; die Konfiguration steht in
 `src/environments/environment.ts` (siehe [Einrichtung](#de-einrichtung)). Ohne
 Firebase und n8n läuft die App vollständig im Browser, dann ohne Bibliothek,
 Login und Tageslimit.
+
+<a id="de-deployment"></a>
+
+### Deployment: Upload auf den Webserver
+
+Die App ist nach dem Build reines HTML, CSS und JavaScript. Sie braucht keinen
+Node-Server: Firestore, Auth und die n8n-Webhooks werden direkt aus dem Browser
+angesprochen. Ein klassischer Webspace mit FTP-Zugang genügt.
+
+Projekt-URL:
+<https://gabriele-lerch.developerakademie.net/angular-projects/code-a-cuisine/>
+
+Der Upload ist zwei Handgriffe:
+
+```bash
+npm run build:upload
+```
+
+Das erzeugt den Ordner **`upload/code-a-cuisine`** - Produktions-Build plus
+[`deploy/.htaccess`](deploy/.htaccess), fertig benannt. Anschließend meldet der
+Befehl Dateizahl und Gesamtgröße und nennt einzelne Dateien über 1 MB, damit
+kein ungenutztes Asset unbemerkt mitgeht.
+
+Dann in FileZilla den Ordner `code-a-cuisine` als Ganzes nach
+`/angular-projects/` ziehen. Fertig. Danach prüfen: Startseite, eine Unterseite
+direkt aufrufen und neu laden, ein Rezept generieren, einmal einloggen.
+
+Zwei Dinge, die den Upload sonst kosten:
+
+- **Der Pfad steht an drei Stellen** und muss überall gleich sein:
+  `--base-href /angular-projects/code-a-cuisine/` im Skript `build:upload`
+  (`package.json`), `RewriteBase` und `ErrorDocument` in
+  [`deploy/.htaccess`](deploy/.htaccess). Passt er nicht, sucht die Seite ihre
+  Dateien unter `/assets/…` und bleibt weiß. Ändert sich der Serverordner, sind
+  das die drei Stellen.
+- **Der Google-Login braucht einen Eintrag bei Firebase**, weil Firebase nur
+  Domains erlaubt, die dort hinterlegt sind: Firebase-Konsole → Authentication →
+  Settings → *Authorized domains* → `gabriele-lerch.developerakademie.net`.
+  Einmalig. Ohne den Eintrag läuft alles außer dem Google-Button; Registrierung
+  und Login per E-Mail und Passwort funktionieren auch ohne. Die Seite außerdem
+  über `https` aufrufen, der Google-Login verlangt eine sichere Verbindung.
+
+Firestore-Regeln liegen weiterhin bei Firebase und werden getrennt vom Upload
+veröffentlicht: `npx firebase deploy --only firestore:rules`.
 
 <a id="de-git-github"></a>
 
@@ -375,6 +421,50 @@ No `.env` file is needed; the configuration lives in
 `src/environments/environment.ts` (see [Setup](#en-setup)). Without Firebase and
 n8n the app runs entirely in the browser, then without the library, login and
 daily limit.
+
+<a id="en-deployment"></a>
+
+### Deployment: Upload to the Web Server
+
+Once built, the app is plain HTML, CSS and JavaScript. It needs no Node server:
+Firestore, Auth and the n8n webhooks are called straight from the browser. A
+classic web space with FTP access is enough.
+
+Project URL:
+<https://gabriele-lerch.developerakademie.net/angular-projects/code-a-cuisine/>
+
+Uploading takes two moves:
+
+```bash
+npm run build:upload
+```
+
+This produces the folder **`upload/code-a-cuisine`** - the production build plus
+[`deploy/.htaccess`](deploy/.htaccess), already named the way the server needs
+it. The command then reports the file count and total size and lists any single
+file above 1 MB, so no unused asset travels along unnoticed.
+
+Then drag the folder `code-a-cuisine` as a whole into `/angular-projects/` in
+FileZilla. Done. Afterwards check: start page, open a sub page directly and
+reload it, generate a recipe, sign in once.
+
+Two things that otherwise cost an upload:
+
+- **The path appears in three places** and has to match everywhere:
+  `--base-href /angular-projects/code-a-cuisine/` in the `build:upload` script
+  (`package.json`), `RewriteBase` and `ErrorDocument` in
+  [`deploy/.htaccess`](deploy/.htaccess). A mismatch makes the page look for its
+  files under `/assets/…` and stay blank. If the server folder changes, those are
+  the three places.
+- **Google sign-in needs one entry in Firebase**, because Firebase only accepts
+  domains listed there: Firebase console → Authentication → Settings →
+  *Authorized domains* → `gabriele-lerch.developerakademie.net`. One time only.
+  Without it everything works except the Google button; email/password
+  registration and sign-in work regardless. Also open the site over `https`,
+  Google sign-in requires a secure connection.
+
+The Firestore rules stay with Firebase and are published separately from the
+upload: `npx firebase deploy --only firestore:rules`.
 
 <a id="en-git-github"></a>
 

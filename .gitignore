@@ -4,6 +4,10 @@
 # Angular build output
 /dist
 /out-tsc
+
+# Fertig gepacktes Upload-Paket (npm run build:upload) - entsteht aus /dist
+# und deploy/.htaccess, gehoert deshalb nicht ins Repo.
+/upload
 /.angular
 *.tsbuildinfo
 
