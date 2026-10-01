@@ -1,56 +1,21 @@
-@if (variant === "desktop") {
-  <div
-    class="pointer-events-none absolute top-[-42px] z-10 hidden h-[1145px] w-[480px] overflow-hidden lg:block min-[1440px]:h-[1413px]"
-    style="right: max(calc((100vw - 1440px) / 2 + 49px), 49px)"
-    aria-hidden="true">
-    <img
-      src="assets/img/hero/plate-top.webp"
-      alt=""
-      class="absolute top-0 left-[5px] h-[470px] w-[470px] rounded-full min-[1440px]:hidden" />
-    <img
-      src="assets/img/hero/plate-middle.webp"
-      alt=""
-      class="absolute top-[315px] left-[-8px] h-[484px] w-[484px] rounded-full min-[1440px]:hidden" />
-    <img
-      src="assets/img/hero/plate-bottom.webp"
-      alt=""
-      class="absolute top-[603.86px] h-[505px] w-[480px] rotate-[0.09deg] rounded-full min-[1440px]:hidden" />
-    <img
-      src="assets/img/hero/widescreen/Gemüse-Teller.webp"
-      alt=""
-      class="absolute top-0 left-[5px] hidden h-[484px] w-[484px] rounded-full min-[1440px]:block" />
-    <img
-      src="assets/img/hero/widescreen/Lachs-Teller.webp"
-      alt=""
-      class="absolute top-[315px] left-[-8px] hidden h-[484px] w-[484px] rounded-full min-[1440px]:block" />
-    <img
-      src="assets/img/hero/widescreen/Stake-Teller.webp"
-      alt=""
-      class="absolute top-[603.86px] left-0 hidden h-[484px] w-[484px] rotate-[0.09deg] rounded-full min-[1440px]:block" />
-    <img
-      src="assets/img/hero/widescreen/Hähnchen-Teller.webp"
-      alt=""
-      class="absolute top-[903.86px] left-[-8px] hidden h-[484px] w-[484px] rounded-full min-[1440px]:block" />
-    <img
-      src="assets/img/hero/widescreen/Baguette-Teller.webp"
-      alt=""
-      class="absolute top-[1177.6px] left-[5px] hidden h-[484px] w-[484px] rounded-full min-[1440px]:block" />
+<div class="plates z-0" aria-hidden="true">
+  <!-- Two stacks rather than one with toggled items: the overlap is applied to
+       every plate but the first, and a hidden element would still count as a
+       sibling and leave a gap where it sits. -->
+  <div class="plates__stack flex flex-col min-[1440px]:hidden">
+    <img src="assets/img/hero/plate-top.webp" alt="" class="plates__item" />
+    <img src="assets/img/hero/plate-middle.webp" alt="" class="plates__item" />
+    <img src="assets/img/hero/plate-bottom.webp" alt="" class="plates__item" />
   </div>
-} @else {
-  <div
-    class="pointer-events-none absolute top-[23px] right-[-234px] z-10 h-[810px] w-[371px] lg:hidden"
-    aria-hidden="true">
-    <img
-      src="assets/img/hero/plate-top.webp"
-      alt=""
-      class="absolute top-0 left-0 h-[352px] w-[352px] rounded-full" />
-    <img
-      src="assets/img/hero/plate-middle.webp"
-      alt=""
-      class="absolute top-[229px] left-0 h-[352px] w-[352px] rounded-full" />
-    <img
-      src="assets/img/hero/plate-bottom.webp"
-      alt=""
-      class="absolute top-[458px] left-0 h-[352px] w-[352px] rounded-full" />
+
+  <!-- The widescreen plates only from 1440px, as the design file notes next to
+       the widescreen frame ("Verwende die Teller ab 1440px"). Below that the
+       desktop layout keeps the same three plates as the phone, only larger. -->
+  <div class="plates__stack hidden flex-col min-[1440px]:flex">
+    <img src="assets/img/hero/widescreen/Gemüse-Teller.webp" alt="" class="plates__item" />
+    <img src="assets/img/hero/widescreen/Lachs-Teller.webp" alt="" class="plates__item" />
+    <img src="assets/img/hero/widescreen/Stake-Teller.webp" alt="" class="plates__item" />
+    <img src="assets/img/hero/widescreen/Hähnchen-Teller.webp" alt="" class="plates__item" />
+    <img src="assets/img/hero/widescreen/Baguette-Teller.webp" alt="" class="plates__item" />
   </div>
-}
+</div>

@@ -1,26 +1,36 @@
-<div class="relative flex min-h-screen flex-col overflow-x-hidden bg-forest">
-  <header
-    class="relative z-20 flex items-center justify-between pt-3 pr-4 pb-2 pl-4 sm:pt-10 sm:pb-0 sm:pr-10 sm:pl-[68px]">
-    <a routerLink="/" aria-label="Code à Cuisine – Home" class="tap-target">
-      <app-logo klass="h-10 w-auto sm:h-12" />
-    </a>
-    <app-logout-button klass="flex h-11 w-11 shrink-0 items-center justify-center text-creme/70 transition-colors hover:text-creme" />
-  </header>
+<div class="relative flex min-h-screen flex-col overflow-hidden bg-forest">
+  <app-hero-plates />
 
-  <app-hero-plates variant="desktop" />
-  <app-hero-plates variant="mobile" />
+  <!-- Header, hero and footer line share one container, so the logo starts
+       exactly where the headline starts - on a 1920px screen the header used to
+       keep its 68px to the window edge while the content was centred, which put
+       the logo 172px to the left of everything below it. -->
+  <div class="relative z-20 mx-auto flex w-full max-w-[1440px] flex-1 flex-col px-4 pb-8 sm:px-[65px] sm:pb-12">
+    <header class="flex items-center justify-between pt-3 sm:pt-10">
+      <a routerLink="/" aria-label="Code à Cuisine – Home" class="tap-target">
+        <app-logo klass="h-10 w-auto sm:h-12" />
+      </a>
+      <app-logout-button
+        klass="flex h-11 w-11 shrink-0 items-center justify-center text-creme/70 transition-colors hover:text-creme" />
+    </header>
 
-  <main class="relative z-10 mx-auto w-full max-w-[1440px] flex-1">
-    <div class="flex flex-col items-start gap-10 px-4 pt-16 sm:gap-16 sm:px-[65px] lg:pt-[152px]">
-      <div class="flex w-full max-w-[240px] flex-col items-start sm:max-w-[755px]">
+    <!-- The hero takes the space between header and footer line and centres
+         itself in it, instead of being pushed down by a fixed padding and then
+         leaving a gap at the bottom of a tall screen. -->
+    <main class="flex flex-1 flex-col items-start justify-center gap-8 py-10 sm:gap-12">
+      <!-- The width is capped against the plate column: the headline used to
+           run 72px into the plates on an iPad and 239px at 1024px. -->
+      <div
+        class="flex w-full flex-col items-start max-w-[calc(100%-var(--plate)*0.42-16px)] lg:max-w-[calc(100%-var(--plate)-70px)] min-[1440px]:max-w-[755px]">
         <!-- A subtitle, not a section heading: as an h2 it came before the
              h1 in the document, so a screen reader opened the page one level
              down and then jumped back up. -->
-        <p class="font-quicksand text-2xl font-semibold text-beige min-[400px]:text-[28px] sm:text-5xl">
+        <p
+          class="font-quicksand text-2xl font-semibold text-beige min-[400px]:text-[28px] sm:text-[32px] lg:text-[40px] xl:text-5xl">
           AI-Powered recipe generator
         </p>
         <h1
-          class="font-ubuntu text-[44px] leading-[1.15] font-bold text-creme min-[400px]:text-[52px] sm:text-[104px]">
+          class="font-ubuntu text-[44px] leading-[1.15] font-bold text-creme min-[400px]:text-[52px] sm:text-[64px] lg:text-[80px] xl:text-[104px]">
           Code à Cuisine
         </h1>
       </div>
@@ -30,10 +40,12 @@
         class="font-quicksand flex h-[60px] items-center justify-center bg-creme px-[26px] py-4 text-2xl font-semibold text-leaf transition-transform duration-150 ease-out hover:brightness-105 active:scale-[0.97]">
         Get started
       </a>
-    </div>
+    </main>
 
-    <div
-      class="absolute top-[597px] left-4 -translate-y-1/2 flex flex-col items-start gap-2 sm:top-[569px] sm:left-[65px] lg:top-[726.36px] min-[1440px]:top-[1120px]">
+    <!-- In the normal flow now. As an absolutely positioned block with four
+         hardcoded top values it sat wherever those pixels pointed, which is
+         what left the large empty area underneath on tablets. -->
+    <div class="flex max-w-[calc(100%-var(--plate)*0.42-16px)] flex-col items-start gap-2 lg:max-w-none">
       <div class="flex flex-col items-start gap-4 sm:flex-row sm:flex-wrap sm:items-center">
         <p class="font-ubuntu text-2xl font-medium text-creme sm:text-[32px]">Hungry for inspiration?</p>
         <a
@@ -52,7 +64,7 @@
         Imprint
       </button>
     </div>
-  </main>
+  </div>
 
   <app-impressum-modal [open]="impressumOpen()" (closed)="impressumOpen.set(false)" />
 </div>

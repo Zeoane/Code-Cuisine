@@ -1,5 +1,8 @@
-<div class="flex min-h-screen flex-col items-center gap-16 bg-white pb-16">
-  <header class="flex w-full items-center justify-between px-4 pt-6 sm:px-[68px] sm:pt-10">
+<div class="flex min-h-screen flex-col items-center gap-8 sm:gap-16 bg-white pb-16">
+  <!-- Bounded by the same container as the page content: left to itself the
+       header keeps its 68px to the window edge, so on a wide screen the logo
+       drifts away from the centred content instead of starting with it. -->
+  <header class="mx-auto flex w-full max-w-[1466px] items-center justify-between px-4 pt-6 sm:px-[68px] sm:pt-10">
     <a routerLink="/" aria-label="Code à Cuisine – Home" class="tap-target">
       <app-logo variant="color" klass="h-10 w-auto sm:h-12" />
     </a>

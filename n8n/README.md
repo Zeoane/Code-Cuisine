@@ -5,8 +5,8 @@ day, 12 per day system-wide**, enforced server-side as a cost airbag (not
 just in the Angular frontend).
 
 - [`workflows/Recipe Generation.example.json`](workflows/Recipe%20Generation.example.json) —
-  the main webhook: validates the request, checks/increments quota, returns
-  (currently mock) recipes.
+  the main webhook: validates the request, checks/increments quota, has the
+  model write three recipes and returns them.
 - [`workflows/Recipe Quota Status.example.json`](workflows/Recipe%20Quota%20Status.example.json) —
   read-only webhook so the Angular app can show "X of 3 left today" before
   the user even tries to generate.
@@ -14,17 +14,20 @@ just in the Angular frontend).
   Error Trigger + email, referenced as the other two workflows' Error
   Workflow.
 
-**Why `.example.json`:** this project signs the Firestore JWT inline in a
-Code node rather than using an n8n credential object (see below), so a raw
-"Download" from n8n includes whatever real client_email/private_key you've
-pasted in. `.gitignore` excludes every other `.json` file under
-`n8n/workflows/` — **download from n8n into this folder as often as you
-like**, using n8n's own filenames; it's ignored automatically. Only these
-three sanitized `*.example.json` files (placeholders instead of real
-credentials) are meant to be committed. If you change the workflow logic and
-want to update the committed template, copy your real export over the
-`.example.json` file and manually put the two placeholder lines back in
-"Build & Sign Firestore JWT" before saving.
+**Why `.example.json`:** no secret is part of any of these files any more —
+the service account lives in an n8n credential (see below) and the quota salt
+is typed into a Set node after importing. What a raw "Download" from n8n
+still carries is instance-specific: the credential **ids** of this n8n
+workspace, the `errorWorkflow` id and the workflow ids. `.gitignore`
+therefore excludes every other `.json` file under `n8n/workflows/` —
+**download from n8n into this folder as often as you like**, using n8n's own
+filenames; it's ignored automatically. Only these three sanitized
+`*.example.json` files are meant to be committed; in them every credential
+`id` and `name` is an empty string and the `errorWorkflow` id is dropped. If
+you change the workflow logic and want to update the committed template, copy
+your real export over the `.example.json` file and empty those fields again
+before saving — the credential names are also written in each node's note, so
+nothing is lost.
 
 **Import caveat:** these JSON files were written by hand (no live n8n
 instance was available to build/test against), following n8n's documented
@@ -37,7 +40,8 @@ copy-pasteable regardless of import success.
 
 1. **Firebase Console → Project Settings → Service Accounts → Generate new
    private key.** Download the JSON. Never commit it — already covered by
-   `.gitignore`'s `*firebase-adminsdk*.json` rule.
+   `.gitignore`'s `*firebase-adminsdk*.json` rule. Its `client_email` and
+   `private_key` go into the n8n credential in step 4, nowhere else.
 2. **An email-sending credential** for `error-notifications` (SMTP, Gmail,
    or whatever n8n's Email node supports in your instance) — self-notifying
    to `codeacuisine@gmail.com` is the simplest setup.
@@ -46,62 +50,75 @@ copy-pasteable regardless of import success.
    <https://platform.openai.com/api-keys>. The key lives only in n8n; it is
    never part of the exported workflow JSON, which stores just the credential's
    name and id.
+4. **A Firestore credential, created before you import anything:** n8n →
+   **Credentials → Create credential → "Google Service Account API"**:
 
-**No Google/Firestore n8n credential needed.** n8n Cloud workspaces don't
-consistently expose a usable Firestore/service-account credential type (ours
-didn't — only OAuth2-only, wrong-product options like "Google Cloud Natural
-Language" showed up, which don't work for a service account and aren't even
-the right API). Both webhooks instead mint their own Firestore access token
-at the start of each run:
+   | Field | Value |
+   |-------|-------|
+   | Name (top of the dialog) | `Firestore Service Account` — exactly this, the workflows reference it by name |
+   | Region | leave at `global` (only used by the Vertex nodes) |
+   | Service Account Email | the `client_email` from the service-account JSON of step 1 |
+   | Private Key | the `private_key` from that JSON, without the surrounding quotes |
+   | Impersonate a User | off |
+   | **Set up for use in HTTP Request node** | **on — mandatory** |
+   | Scope(s) | `https://www.googleapis.com/auth/datastore` |
 
-**Build & Sign Firestore JWT** (Code node) → signs a JWT assertion with the
-service account's private key (`crypto.createSign('RSA-SHA256')`, a Node
-built-in n8n's Code node allows by default) → **Exchange JWT for Access
-Token** (HTTP Request, POST to `https://oauth2.googleapis.com/token`, no
-credential needed — it's a public token endpoint) → **Store Access Token**
-(Code) carries the resulting `access_token` forward. Every later Firestore
-`HTTP Request` node sends it as `Authorization: Bearer <token>` via a plain
-header parameter — no n8n credential object at all, so this works on any
-n8n instance/plan.
+   That last toggle is not cosmetic: with it off n8n's credential returns the
+   request unsigned, and every Firestore call comes back 401.
 
-**After importing (or building) `generate-recipe` and `quota-status`**, fill
-in the credentials via a **Set node's form fields**, not by editing code —
-pasting a multi-line secret into a JS code editor kept breaking on stray
+**How Firestore is authenticated.** The four Firestore `HTTP Request` nodes
+use the credential from step 4 — `Authentication: Predefined Credential Type`,
+`Credential Type: Google Service Account API` — and n8n does the whole OAuth
+dance itself: it signs the RS256 JWT assertion with the private key, POSTs it
+to `https://oauth2.googleapis.com/token` and sets the resulting
+`Authorization: Bearer <token>` header. Nothing in the workflows builds or
+carries a token any more, and the private key never leaves the credential.
+
+**After importing `generate-recipe` and `quota-status`**, one value still has
+to be filled in by hand, via a **Set node's form field** rather than in code —
+pasting a secret into a JS code editor kept breaking on stray
 quotes/commas/escaping picked up along the way; a plain n8n text field takes
 any paste as-is, no escaping rules to get wrong:
 
-1. Both workflows have a **"Set Service Account Credentials"** node (an
-   "Edit Fields (Set)" node) right before **"Build & Sign Firestore JWT"**.
-   Open it and fill in its two fields directly from the downloaded service
-   account JSON — paste each value as-is, with or without the surrounding
-   quotes, it doesn't matter:
-   - `serviceAccountEmail` ← the JSON's `client_email` field (not secret).
-   - `serviceAccountPrivateKey` ← the JSON's `private_key` field, pasted in
-     any form (one line, multi-line, literal `\n` text or real line breaks).
-   - `quotaIpSalt` ← a random string of at least 16 characters, e.g. from
-     `node -e "console.log(require('crypto').randomBytes(24).toString('hex'))"`.
-     **Both workflows must use the exact same value**, otherwise
-     `quota-status` reads a different document than `generate-recipe` writes
-     and the badge always shows 3 of 3. Treat it as a secret: whoever knows
-     it can re-derive which IP a counter belongs to.
-2. **"Build & Sign Firestore JWT"** reads both fields from `$json` and
-   normalizes the key itself: it locates the `BEGIN`/`END PRIVATE KEY`
-   markers and keeps only the Base64 characters between them, rebuilding a
-   clean PEM — so however the key was pasted, only the meaningful payload
-   is used.
+Both workflows have a **"Set Quota IP Salt"** node (an "Edit Fields (Set)"
+node) right before **"Compute Quota Keys"**. Open it and fill in its single
+field:
+
+- `quotaIpSalt` ← a random string of at least 16 characters, e.g. from
+  `node -e "console.log(require('crypto').randomBytes(24).toString('hex'))"`.
+  **Both workflows must use the exact same value**, otherwise
+  `quota-status` reads a different document than `generate-recipe` writes
+  and the badge always shows 3 of 3. Treat it as a secret: whoever knows
+  it can re-derive which IP a counter belongs to.
 
 **Do this only inside n8n, never in the committed JSON files** — the Set
-node's fields in `workflows/*.example.json` must stay empty; only the copy
-living in your n8n workspace should hold the real values.
+node's field in `workflows/*.example.json` must stay empty; only the copy
+living in your n8n workspace should hold the real value.
+
+**If a salt is already live, copy it out before you import.** Importing
+replaces the Set node, and a different salt afterwards means today's counters
+live under different document ids and the badge jumps back to "3 of 3".
 
 ## 2. Import (or build manually)
 
-For each JSON file: n8n → Workflows → **+ Add workflow** → "..." menu →
-**Import from File**. After import:
+With the `Firestore Service Account` credential in place, import each JSON
+file: n8n → Workflows → **+ Add workflow** → "..." menu → **Import from
+File**. Importing over an existing workflow keeps its id and therefore its
+production webhook URL, so nothing in `environment.ts` changes. After import,
+in this order:
 
-- Fill in the two placeholders in **"Build & Sign Firestore JWT"** as
-  described above (both `generate-recipe` and `quota-status` have their own
-  copy of this node — fill in both).
+- **Pick the credential in the four Firestore nodes.** The exported files
+  carry the credential's name but an empty id, and n8n is not documented to
+  re-link a credential by name — so open each of `generate-recipe` →
+  **"Reserve Quota Slot"**, **"Release Quota Slot"** and `quota-status` →
+  **"Read IP Quota Counter"**, **"Read Global Quota Counter"** and select
+  `Firestore Service Account` in *Credential for Google Service Account API*.
+  Also check that **"OpenAI Chat Model"** shows your OpenAI credential.
+- **Paste the quota salt** into the **"Set Quota IP Salt"** node of both
+  workflows, as described above — the same value in both.
+- **Re-set the workflow settings** the import ignores (Error Workflow and
+  execution-data retention) — see *Set this in n8n, not by importing a file*
+  below.
 - The `Send Error Email` node needs the email credential from step 1.
 
 **If import fails**, build each workflow from scratch using the node list
@@ -120,24 +137,28 @@ you can copy from there instead of retyping).
 | 4 | Validate Request Payload | Code | re-checks `ingredients`/`servings`/`helpers`/enum fields against the same ranges Angular enforces (defense in depth) |
 | 5 | Payload Valid? | IF | `{{ $json.payloadValid }}` |
 | 5a | Respond: 400 Invalid Request | Respond to Webhook | 400, joined `payloadErrors` |
-| 6 | Build & Sign Firestore JWT | Code | signs a JWT assertion with the service account key (see setup above) |
-| 7 | Exchange JWT for Access Token | HTTP Request | POST `oauth2.googleapis.com/token`, no credential needed |
-| 8 | Store Access Token | Code | carries `access_token` forward as `accessToken` |
-| 9 | Compute Quota Keys | Code | UTC `date`, `ipDocId = date_sha256(salt\|ip)`, `totalDocId = date`; drops `clientIp` from the item |
-| 10 | Reserve Quota Slot | HTTP Request | POST `documents:commit` — one atomic commit that raises `quota_ip/{ipDocId}` and `quota_total/{totalDocId}` by 1 via an `increment` transform and upserts `date`, same Bearer header |
-| 11 | Parse Quota Reservation | Code | reads the post-increment counts from `writeResults[].transformResults[0].integerValue` |
-| 12 | Check Quota Limits | IF | `{{ $json.ipCount > 3 \|\| $json.totalCount > 12 }}` — the counts already include this request, so the limit trips one step later than with a read-first gate |
-| 12a | Release Quota Slot | HTTP Request | same commit with `increment: -1`, handing the slot back before the 429 is sent |
-| 12b | Build Quota Exceeded Response → Respond: 429 | Code → Respond to Webhook | message differs depending on which limit tripped |
-| 13 | Build LLM Request | Code | prompt plus the JSON schema for the answer; the model id is the constant `MODEL` at the top of the node |
-| 14 | OpenAI: Generate Recipes | HTTP Request | POST `api.openai.com/v1/chat/completions` with the *OpenAI* credential; 60 s timeout, one retry; errors leave through the second output |
-| 15 | Validate & Normalise Recipes | Code | parses the answer, repairs what the model may get wrong and enforces the caps from `firestore.rules`; throws (→ second output) when the answer is unusable |
-| 15a | Generate Fallback Recipes | Code | the former mock generator, now the safety net for both error outputs — ported from `recipe-generator.service.ts` + `cuisine-presets.ts`, same output shape |
-| 16 | Respond: 200 Success | Respond to Webhook | 200, `{ recipes, quota: { ipRemaining, totalRemaining } }` |
+| 6 | Set Quota IP Salt | Edit Fields (Set) | holds `quotaIpSalt`, the only secret left in the workflow; "Include Other Fields" is on so the value travels with the item |
+| 7 | Compute Quota Keys | Code | UTC `date`, `ipDocId = date_sha256(salt\|ip)`, `totalDocId = date`; drops `clientIp` from the item |
+| 8 | Reserve Quota Slot | HTTP Request | POST `documents:commit` — one atomic commit that raises `quota_ip/{ipDocId}` and `quota_total/{totalDocId}` by 1 via an `increment` transform and upserts `date`; authenticated with the `Firestore Service Account` credential |
+| 9 | Parse Quota Reservation | Code | reads the post-increment counts from `writeResults[].transformResults[0].integerValue` |
+| 10 | Check Quota Limits | IF | `{{ $json.ipCount > 3 \|\| $json.totalCount > 12 }}` — the counts already include this request, so the limit trips one step later than with a read-first gate |
+| 10a | Release Quota Slot | HTTP Request | same commit with `increment: -1`, handing the slot back before the 429 is sent |
+| 10b | Build Quota Exceeded Response → Respond: 429 | Code → Respond to Webhook | message differs depending on which limit tripped |
+| 11 | Build LLM Request | Code | turns the validated options into `promptRequest`, the compact JSON the prompt works from (servings, cooks, cuisine, diet rule, time hint, ingredients at home) |
+| 12 | OpenAI: Generate Recipes | Basic LLM Chain | the generation rules as its System message, `{{ $json.promptRequest }}` as the user message (*Prompt: Define below*), *Require Specific Output Format* on; errors leave through the second output |
+| 12a | OpenAI Chat Model | OpenAI Chat Model | sub-node on 12's *Chat Model* connector: the model id (change it here), 60 s timeout, two retries, with the *OpenAI* credential |
+| 12b | Recipe Output Parser | Structured Output Parser | sub-node on 12's *Output Parser* connector: *Schema Type: Manual*, the JSON schema of the answer in *Input Schema* |
+| 13 | Validate & Normalise Recipes | Code | unwraps the parser's `{ output: { recipes: [...] } }`, repairs what the model may get wrong and enforces the caps from `firestore.rules`; throws (→ second output) when the answer is unusable |
+| 13a | Generate Fallback Recipes | Code | the former mock generator, now the safety net for both error outputs — ported from `recipe-generator.service.ts` + `cuisine-presets.ts`, same output shape |
+| 14 | Respond: 200 Success | Respond to Webhook | 200, `{ recipes, quota: { ipRemaining, totalRemaining } }` |
 
-**Recipe generation: the model, the schema and the safety net.** The request
-pins the answer with a JSON schema (OpenAI structured outputs, `strict: true`),
-so the model cannot reply with prose or rename a field. The schema covers the
+**Recipe generation: the model, the schema and the safety net.** The chain
+pins the answer with a JSON schema held by the *Recipe Output Parser*
+sub-node, so the model cannot reply with prose or rename a field: the parser
+validates the answer against the schema and hands it on as data (under an
+`output` key), or fails the node. It is the same schema the earlier HTTP
+request passed as `response_format.json_schema`, so the contract with the
+Angular app is unchanged. The schema covers the
 shape; the length limits live in *Validate & Normalise Recipes*, which cuts
 titles to 200 and descriptions to 1000 characters, caps ingredients at 50,
 extras at 20 and steps at 30, keeps `servings` and `cuisineStyle` at what the
@@ -146,14 +167,15 @@ next cook in turn. Those are exactly the limits `firestore.rules` enforces, so
 a generated recipe can never be rejected when the app saves it to the library.
 
 If the call fails — timeout, rate limit, outage — or the answer cannot be
-validated, the run leaves through the node's second output and *Generate
+parsed or validated, the run leaves through the second output of *OpenAI:
+Generate Recipes* or of *Validate & Normalise Recipes*, and *Generate
 Fallback Recipes* answers instead. The user always gets three recipes, and the
 quota block stays correct either way. To see the fallback on purpose, disable
 the OpenAI credential for a moment and generate once.
 
 Cost: one generation is roughly 1.5k tokens in and 2k out. With the model set
-in the node that is well under a cent per generation, and the daily limit of
-12 generations caps it in any case.
+in *OpenAI Chat Model* that is well under a cent per generation, and the daily
+limit of 12 generations caps it in any case.
 
 Firestore REST base URL used throughout:
 `https://firestore.googleapis.com/v1/projects/code-a-cuisine-3d1e0/databases/(default)/documents/...`
@@ -164,19 +186,21 @@ whenever two requests overlap: both read 2, both write 3, and one generation
 is never billed. Firestore's `increment` transform does the addition inside
 the database, so overlapping requests get 3 and 4 and never collide. The
 price is that the check has to happen afterwards — a request over the limit
-has already taken its slot, so node 12a gives it back before answering 429.
+has already taken its slot, so node 10a gives it back before answering 429.
 `update` + `updateMask: ["date"]` leaves `count` alone, which lets the same
 call create the document on the day's first request (a missing field
 increments from 0).
 
 ### `quota-status` — node chain
 
-Same as steps 1–3 and 6–9 above (IP extract → validate → sign JWT → get
-access token → quota keys), no payload validation. Then two read-only GETs
-on `quota_ip/{ipDocId}` and `quota_total/{totalDocId}` (**Never Error** on,
-a missing document counts as 0) → **Parse Quota Counts** (Code) → **Build
-Status Response** (Code, `{ ipRemaining, totalRemaining }`) → **Respond: 200
-Success**. This workflow never writes, so it needs no commit.
+Same as steps 1–3 and 6–7 above (IP extract → validate → salt → quota keys),
+no payload validation. Then two read-only GETs on `quota_ip/{ipDocId}` and
+`quota_total/{totalDocId}` — **Read IP Quota Counter** and **Read Global
+Quota Counter**, the same `Firestore Service Account` credential as in
+`generate-recipe`, **Never Error** on so a missing document counts as 0 →
+**Build Status Response** (Code, reads both counts and returns
+`{ ipRemaining, totalRemaining }`) → **Respond: 200 Success**. This workflow
+never writes, so it needs no commit.
 
 ### `error-notifications`
 

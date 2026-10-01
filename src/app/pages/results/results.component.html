@@ -1,5 +1,7 @@
-<div class="flex min-h-screen flex-col gap-16 bg-forest pb-16">
-  <header class="flex items-center justify-between px-4 pt-6 sm:px-8 sm:pt-10 xl:px-20">
+<div class="flex min-h-screen flex-col gap-8 sm:gap-16 bg-forest pb-16">
+  <!-- Same box as <main> below (1281px, no padding from xl on), so the logo
+       sits exactly above the content's left edge on every screen. -->
+  <header class="mx-auto flex w-full max-w-[1281px] items-center justify-between px-4 pt-6 sm:px-8 sm:pt-10 xl:px-0">
     <app-logo klass="h-10 w-auto sm:h-12" />
     <app-logout-button klass="flex h-11 w-11 shrink-0 items-center justify-center text-creme/70 transition-colors hover:text-creme" />
   </header>
@@ -36,9 +38,16 @@
         class="w-full max-w-[574px] rounded-[20px] object-cover" />
     </section>
 
-    <ul class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+    <!--
+      One column until the three cards fit side by side, then all three at once.
+      Two columns in between left the third recipe alone in its own row next to
+      an empty slot, and made every title wrap. The fixed minimum height goes
+      with it: on one column it only opened a hole between the cooking time and
+      the button, while from three columns the grid keeps the row even anyway.
+    -->
+    <ul class="grid gap-6 lg:grid-cols-3">
       @for (recipe of recipes(); track $index; let i = $index) {
-        <li class="flex min-h-[338px] flex-col justify-between rounded-[20px] bg-mist px-6 py-8">
+        <li class="flex flex-col justify-between gap-6 rounded-[20px] bg-mist px-6 py-8 lg:min-h-[338px]">
           <div class="flex flex-col gap-3">
             <div class="flex items-center gap-2.5">
               <img

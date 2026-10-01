@@ -34,9 +34,13 @@ export class GeneratorComponent {
 
   protected readonly ingredients = this.wizard.ingredients;
 
-  /** Adds a new ingredient to the top of the list (most recent first). */
+  /**
+   * Appends a new ingredient. The mockup lists them in the order they were
+   * typed in, which is also the order the user remembers putting them in;
+   * newest-first made the list reshuffle under the cursor after every add.
+   */
   addIngredient(entry: Omit<IngredientEntry, "id">): void {
-    this.ingredients.update(list => [{ ...entry, id: nextId++ }, ...list]);
+    this.ingredients.update(list => [...list, { ...entry, id: nextId++ }]);
   }
 
   /** Applies an inline edit (quantity/unit) to an existing ingredient. */

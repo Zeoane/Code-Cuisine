@@ -4,9 +4,6 @@
 # Angular build output
 /dist
 /out-tsc
-
-# Fertig gepacktes Upload-Paket (npm run build:upload) - entsteht aus /dist
-# und deploy/.htaccess, gehoert deshalb nicht ins Repo.
 /upload
 /.angular
 *.tsbuildinfo
@@ -33,8 +30,7 @@ yarn-error.log*
 # Testing
 /coverage
 
-# Papierkorb für Dateien, die per Claude-Bridge nicht direkt gelöscht werden
-# können – Inhalt manuell entfernen, nichts davon gehört ins Repo.
+# Scratch folder for files waiting to be deleted locally - never part of the repo
 _to_delete/
 
 # ---------------------------------------------------------------------------

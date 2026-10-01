@@ -1,7 +1,7 @@
-import { Component, signal } from "@angular/core";
+import { Component, OnInit, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
-import { AuthService } from "../../core/services/auth.service";
+import { AuthCancelledError, AuthService } from "../../core/services/auth.service";
 import { PASSWORD_REQUIREMENTS_HINT, isStrongPassword } from "../../core/services/password-policy";
 import { SiteHeaderComponent } from "../../layout/site-header/site-header.component";
 
@@ -9,8 +9,8 @@ import { SiteHeaderComponent } from "../../layout/site-header/site-header.compon
 type Mode = "login" | "register";
 
 /**
- * Login/registration page gating the personal cookbook: email/password
- * (sign in or create an account) plus a Google sign-in button.
+ * Login/registration page: email/password (sign in or create an account)
+ * plus a Google sign-in button.
  */
 @Component({
   selector: "app-login",
@@ -38,7 +38,7 @@ type Mode = "login" | "register";
     `,
   ],
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   protected readonly mode = signal<Mode>("login");
   protected readonly loading = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
@@ -54,17 +54,42 @@ export class LoginComponent {
     private readonly route: ActivatedRoute,
   ) {}
 
+  /**
+   * Forwards a user who is already signed in. This is also the landing point
+   * after a Google sign-in that had to fall back to a full-page redirect:
+   * the session is restored while this page loads, and without this the user
+   * would stare at a login form they no longer need.
+   */
+  async ngOnInit(): Promise<void> {
+    await this.auth.ready();
+    if (!this.auth.isLoggedIn()) return;
+    this.router.navigateByUrl(this.route.snapshot.queryParamMap.get("returnUrl") ?? "/cookbook");
+  }
+
   /** Switches between the login and register forms, clearing any error. */
   setMode(mode: Mode): void {
     this.mode.set(mode);
     this.errorMessage.set(null);
   }
 
-  /** Submits the email/password form for the current mode. */
+  /**
+   * Submits the email/password form for the current mode.
+   *
+   * Angular turns off the browser's own form validation, so an empty field
+   * used to leave the button looking broken: the click did nothing and said
+   * nothing. Missing fields are therefore reported here.
+   */
   async submit(): Promise<void> {
     const email = this.email.trim();
     const password = this.password;
-    if (!email || !password) return;
+    if (!email) {
+      this.errorMessage.set("Please enter your email address.");
+      return;
+    }
+    if (!password) {
+      this.errorMessage.set("Please enter your password.");
+      return;
+    }
 
     if (this.mode() === "register" && !isStrongPassword(password)) {
       this.errorMessage.set(this.passwordHint);
@@ -83,7 +108,11 @@ export class LoginComponent {
     await this.run(() => this.auth.loginWithGoogle());
   }
 
-  /** Runs an auth action, tracking loading state and surfacing errors. */
+  /**
+   * Runs an auth action, tracking loading state and surfacing errors. A
+   * sign-in the user cancelled themselves leaves the page as it was: closing
+   * a Google popup on purpose is not a failure worth a red message.
+   */
   private async run(action: () => Promise<void>): Promise<void> {
     this.loading.set(true);
     this.errorMessage.set(null);
@@ -92,7 +121,7 @@ export class LoginComponent {
       const returnUrl = this.route.snapshot.queryParamMap.get("returnUrl") ?? "/cookbook";
       this.router.navigateByUrl(returnUrl);
     } catch (error) {
-      this.errorMessage.set((error as Error).message);
+      if (!(error instanceof AuthCancelledError)) this.errorMessage.set((error as Error).message);
     } finally {
       this.loading.set(false);
     }

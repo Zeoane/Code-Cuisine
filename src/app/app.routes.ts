@@ -1,11 +1,11 @@
 import { Routes } from "@angular/router";
-import { authGuard } from "./core/guards/auth.guard";
 import { ingredientsGuard } from "./core/guards/ingredients.guard";
 
 /**
- * Application route table. Most pages are publicly reachable; the wizard
- * steps after the ingredient input additionally require at least one
- * ingredient, and the cookbook requires a signed-in user.
+ * Application route table. Every page is publicly reachable; only the wizard
+ * steps after the ingredient input require at least one ingredient. The
+ * cookbook lives in the browser's localStorage, so it is readable without an
+ * account - signing in syncs nothing today and must not block the page.
  */
 export const routes: Routes = [
   {
@@ -58,7 +58,6 @@ export const routes: Routes = [
   },
   {
     path: "cookbook",
-    canActivate: [authGuard],
     loadComponent: () =>
       import("./pages/cookbook/cookbook.component").then(m => m.CookbookComponent),
   },

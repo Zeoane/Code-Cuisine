@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Output, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { INGREDIENT_SUGGESTIONS } from "../../core/data/ingredient-suggestions";
+import { MAX_QUANTITY, clampQuantity, isQuantityValid, quantityHint } from "../../core/data/quantity-limits";
 import { IngredientEntry, IngredientUnit } from "../../core/models/recipe.models";
 import { UnitSelectComponent } from "../unit-select/unit-select.component";
 
@@ -32,7 +33,7 @@ export class IngredientQuantityFormComponent {
   @Output() add = new EventEmitter<Omit<IngredientEntry, "id">>();
 
   protected name = "";
-  protected quantity = 100;
+  protected quantity: number | null = 100;
   protected unit: IngredientUnit = "gram";
 
   protected readonly suggestions = signal<string[]>([]);
@@ -48,10 +49,42 @@ export class IngredientQuantityFormComponent {
   /** Emits the current form values as a new ingredient and clears the name. */
   submit(): void {
     const trimmed = this.name.trim();
-    if (!trimmed || this.quantity <= 0) return;
-    this.add.emit({ name: trimmed, quantity: this.quantity, unit: this.unit });
+    if (!this.canSubmit()) return;
+    this.add.emit({ name: trimmed, quantity: Number(this.quantity), unit: this.unit });
     this.name = "";
     this.closeSuggestions();
+  }
+
+  /** True while name and quantity together make a valid ingredient. */
+  protected canSubmit(): boolean {
+    return this.name.trim().length > 0 && isQuantityValid(this.quantity, this.unit);
+  }
+
+  /**
+   * True once something is typed that the unit cannot accept. A still empty
+   * field is not an error yet, it is simply unfinished.
+   */
+  protected hasQuantityError(): boolean {
+    return this.quantity !== null && !isQuantityValid(this.quantity, this.unit);
+  }
+
+  /** Largest value the current unit accepts, also used as the input's max. */
+  protected maxQuantity(): number {
+    return MAX_QUANTITY[this.unit];
+  }
+
+  /** Range hint for the current unit, e.g. "1-2000 g". */
+  protected hint(): string {
+    return quantityHint(this.unit);
+  }
+
+  /**
+   * Switches the unit and pulls the quantity into the new range. Going from
+   * 500 gram to pieces would otherwise leave an amount the unit never allows.
+   */
+  protected changeUnit(unit: IngredientUnit): void {
+    this.unit = unit;
+    if (this.quantity !== null) this.quantity = clampQuantity(this.quantity, unit);
   }
 
   /**
@@ -134,10 +167,14 @@ export class IngredientQuantityFormComponent {
     this.pickSuggestion(value);
   }
 
-  /** Reads the numeric quantity typed into the serving-size field. */
+  /**
+   * Reads the serving-size field. An empty or half-typed field becomes null
+   * rather than 0, so the hint reads as "not filled in yet" instead of as a
+   * rejected value.
+   */
   handleQuantityInput(event: Event): void {
     const raw = (event.target as HTMLInputElement).valueAsNumber;
-    this.quantity = Number.isFinite(raw) ? raw : 0;
+    this.quantity = Number.isFinite(raw) ? raw : null;
   }
 
   /** Hides suggestions shortly after the field loses focus. */

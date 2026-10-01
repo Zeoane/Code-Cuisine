@@ -1,0 +1,66 @@
+/*
+ * The plate column on the landing page.
+ *
+ * It used to be two absolutely positioned blocks with pixel offsets taken from
+ * one Figma frame (top: 603.86px and the like). Those numbers only ever matched
+ * one window size: on a tablet the stack ended 67px above the bottom edge and
+ * left a strip of empty green, and from 1024px up the last plate was cut off
+ * below the fold instead of closing the page off.
+ *
+ * Now a single size drives everything: --plate, the diameter of one plate,
+ * defined in styles.css because the headline's width is derived from it too.
+ * The column is exactly that wide, each plate overlaps the one above it by a
+ * quarter of its own size, and the column is centred over the full page height.
+ * Three plates come to 2.5x the diameter, so the stack is always taller than
+ * the window and bleeds off the top and the bottom edge - the plates close the
+ * page off, instead of floating in it.
+ */
+
+.plates {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: var(--plate);
+  /* Mostly off the right edge on phones and tablets, as in the design. */
+  right: calc(var(--plate) * -0.58);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* From the desktop breakpoint the column moves inside the content box and the
+   plates grow; five of them keep the stack taller than any screen. */
+@media (min-width: 1024px) {
+  .plates {
+    right: 49px;
+  }
+}
+
+/* Beyond the 1440px content width the column follows the centred content
+   instead of the window edge. */
+@media (min-width: 1440px) {
+  .plates {
+    right: max(calc((100vw - 1440px) / 2 + 49px), 49px);
+  }
+}
+
+/*
+ * No `display` here on purpose. A component style and Tailwind's `.hidden`
+ * carry the same specificity, and the component's stylesheet is injected last,
+ * so a `display: flex` in here would quietly beat `lg:hidden` and leave both
+ * stacks on screen at once. Layout classes stay in the template, this file
+ * only adds what Tailwind cannot express.
+ */
+.plates__stack > * + * {
+  margin-top: calc(var(--plate) * -0.25);
+}
+
+.plates__item {
+  width: var(--plate);
+  height: var(--plate);
+  flex-shrink: 0;
+  border-radius: 9999px;
+  object-fit: cover;
+}

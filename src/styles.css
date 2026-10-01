@@ -9,6 +9,35 @@ body {
   font-family: "Quicksand", ui-sans-serif, system-ui, sans-serif;
 }
 
+/*
+ * Diameter of one plate in the landing page's hero. It lives here rather than
+ * inside the plates component because two places have to agree on it: the
+ * plate column itself, and the headline next to it, whose width is derived
+ * from what the plates leave over. When they disagree the headline runs into
+ * the plates, which is exactly what happened on tablets.
+ *
+ * Tied to the window height, because that is what makes the column close the
+ * page off: three plates overlapping by a quarter come to 2.5 diameters, so at
+ * 46vh the stack is 115% of the window however tall it is, and always runs off
+ * both edges. A small fixed maximum would break exactly that on a tall tablet,
+ * which is where the strip of empty green under the plates came from.
+ */
+:root {
+  --plate: clamp(200px, 46vh, 520px);
+}
+
+/*
+ * From the desktop layout the plates grow. 47vh lands on 481px in the 1440x1024
+ * frame the design was drawn in, which is the 480px the file specifies, and
+ * being a ratio rather than a fixed number it keeps covering the page on a
+ * taller window: three plates still come to 117% of the window height.
+ */
+@media (min-width: 1024px) {
+  :root {
+    --plate: clamp(400px, 47vh, 560px);
+  }
+}
+
 button:not(:disabled),
 [role="button"]:not([aria-disabled="true"]),
 a[href],

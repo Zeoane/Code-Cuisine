@@ -30,16 +30,25 @@
             <input
               type="number"
               min="1"
+              [max]="maxQuantity()"
               [(ngModel)]="editQuantity"
               aria-label="Edit quantity"
               [attr.aria-invalid]="isEditQuantityValid() ? null : 'true'"
+              [attr.aria-describedby]="isEditQuantityValid() ? null : 'edit-quantity-range'"
               class="h-9 w-[61px] rounded-full bg-creme px-2 text-center text-base text-forest-dark focus-visible:outline-none" />
-            <app-unit-select [value]="editUnit" (valueChange)="editUnit = $event" size="md" />
+            <app-unit-select [value]="editUnit" (valueChange)="changeEditUnit($event)" size="md" />
           </div>
+          @if (editQuantity !== null && !isEditQuantityValid()) {
+            <p id="edit-quantity-range" role="alert" class="mt-1 text-base text-deep-green">Please enter {{ hint() }}.</p>
+          }
         } @else {
+          <!-- The amount sits in a column of its own, as in the mockup: every
+               ingredient name starts at the same x, whether the amount reads
+               "150g" or just "1". min-width rather than width, so an amount at
+               the upper limit still fits instead of being squashed. -->
           <div class="flex items-center gap-2">
             <span aria-hidden="true">•</span>
-            <span class="font-medium">{{ entry.quantity }}{{ unitSuffix(entry.unit) }}</span>
+            <span class="min-w-[50px] shrink-0 font-medium">{{ entry.quantity }}{{ unitSuffix(entry.unit) }}</span>
             <span class="min-w-0 flex-1 break-words">{{ entry.name }}</span>
             <span class="flex shrink-0 items-center gap-5">
               <button

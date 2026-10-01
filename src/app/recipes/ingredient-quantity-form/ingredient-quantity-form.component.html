@@ -51,22 +51,31 @@
   <div class="flex flex-col gap-2">
     <span class="font-quicksand text-xl font-medium text-deep-green">Serving size</span>
     <div class="flex items-start gap-2.5">
+      <!-- The range is enforced here, in the row editor and once more in the
+           n8n workflow: a type like "10000 potatoes" would otherwise end up in
+           the prompt and come back as a nonsense recipe. -->
       <input
         type="number"
-        min="0"
+        min="1"
+        [max]="maxQuantity()"
         [value]="quantity"
         (input)="handleQuantityInput($event)"
         aria-label="Quantity"
+        [attr.aria-invalid]="hasQuantityError() ? 'true' : null"
+        [attr.aria-describedby]="hasQuantityError() ? 'quantity-range' : null"
         class="h-9 w-[61px] rounded-full bg-creme px-2 text-center font-quicksand text-base text-forest-dark focus-visible:outline-none" />
-      <app-unit-select [value]="unit" (valueChange)="unit = $event" size="md" />
+      <app-unit-select [value]="unit" (valueChange)="changeUnit($event)" size="md" />
       <button
         type="button"
         (click)="submit()"
-        [disabled]="!name.trim() || quantity <= 0"
+        [disabled]="!canSubmit()"
         aria-label="Add ingredient"
         class="tap-target flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] transition-colors hover:bg-creme disabled:opacity-40 disabled:hover:bg-transparent">
         <img src="assets/img/Generate-Page/add_2.svg" alt="" class="h-6 w-6" />
       </button>
     </div>
+    @if (hasQuantityError()) {
+      <p id="quantity-range" role="alert" class="font-quicksand text-base text-deep-green">Please enter {{ hint() }}.</p>
+    }
   </div>
 </div>
