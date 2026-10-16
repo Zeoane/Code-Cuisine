@@ -1,18 +1,14 @@
-<div class="flex min-h-screen flex-col gap-8 sm:gap-16 bg-white pb-16">
-  <!-- Same container as <main> below, so the logo starts where the content
-       starts instead of hugging the window edge on a wide screen. -->
+<div class="flex min-h-screen flex-col gap-10 sm:gap-16 bg-white pb-16">
   <header class="mx-auto flex w-full max-w-[1466px] flex-col gap-9 px-4 pt-6 sm:px-[68px] sm:pt-10">
     <div class="flex w-full items-center justify-between">
       <a routerLink="/" aria-label="Code à Cuisine – Home" class="tap-target w-fit">
         <app-logo variant="color" klass="h-10 w-auto sm:h-12" />
       </a>
-      <app-logout-button klass="flex h-11 w-11 shrink-0 items-center justify-center text-forest transition-colors hover:text-deep-green" />
+      <app-logout-button
+        klass="flex h-11 w-11 shrink-0 items-center justify-center text-forest transition-colors hover:text-deep-green" />
     </div>
-    <button
-      type="button"
-      (click)="goBack()"
-      class="tap-target font-quicksand flex w-fit items-center gap-2.5 text-base font-medium text-forest transition-colors hover:text-deep-green"
-    >
+    <button type="button" (click)="goBack()"
+      class="tap-target font-quicksand flex w-fit items-center gap-2.5 text-base font-medium text-forest transition-colors hover:text-deep-green">
       <img src="assets/img/arrow-back.svg" alt="" class="h-[14px] w-5" />
       Back
     </button>
@@ -21,9 +17,7 @@
   <main class="mx-auto flex w-full max-w-[1466px] flex-col gap-10 px-4 sm:px-[68px]">
     <section class="flex flex-col gap-8 rounded-[20px] bg-mist/40 p-6 sm:p-8 xl:flex-row xl:gap-6">
       <div class="flex flex-col gap-4 xl:w-[454px] xl:shrink-0">
-        <h1
-          class="font-quicksand text-[40px] leading-none font-bold text-mid-green sm:text-[64px] sm:leading-[65px]"
-        >
+        <h1 class="font-quicksand text-[40px] leading-none font-bold text-mid-green sm:text-[64px] sm:leading-[65px]">
           Cookbook
         </h1>
         <p class="font-quicksand text-2xl leading-8 font-medium text-deep-green">
@@ -33,87 +27,56 @@
       </div>
 
       <div class="flex min-w-0 flex-1 flex-col gap-4 xl:pt-[35px]">
-        <h2
-          class="font-quicksand flex items-center gap-2 text-2xl leading-none font-semibold text-mid-green"
-        >
+        <h2 class="font-quicksand flex items-center gap-2 text-2xl leading-none font-semibold text-mid-green">
           Most liked recipes
           <app-heart-icon klass="h-[26px] w-[29px]" />
         </h2>
 
-        <!-- relative: the cards' sr-only labels are absolutely positioned.
-             Without a positioned ancestor inside the scroller they escaped its
-             clipping and stretched the whole page to ~1400px (Chromium and
-             WebKit both reported it; the page itself only hid it). -->
-        <ul
-          appDragScroll
-          class="scrollbar-none relative flex gap-3 overflow-x-auto overscroll-x-contain pr-5"
-          tabindex="0"
-          aria-label="Most liked recipes, horizontal scrollbar"
-        >
+        <ul appDragScroll class="scrollbar-none relative flex gap-3 overflow-x-auto overscroll-x-contain pr-5"
+          tabindex="0" aria-label="Most liked recipes, horizontal scrollbar">
           @for (recipe of mostLiked(); track $index) {
-            <!-- The card sits at 70% mist and goes to the full colour on hover. -->
-            <li
-              class="flex w-[276px] shrink-0 flex-col justify-between gap-3 rounded-2xl bg-mist/70 p-4 transition-colors hover:bg-mist"
-            >
-              <div class="flex items-start justify-between gap-2">
-                <span
-                  class="font-quicksand flex items-center gap-1.5 text-base leading-5 font-medium text-deep-green"
-                >
-                  <img src="assets/img/OneRecipe-Page/schedule.svg" alt="" class="h-5 w-5" />
-                  Cooking time: {{ recipe.cookingTimeMinutes }}min
-                </span>
-                <span
-                  class="font-quicksand flex h-7 shrink-0 items-center gap-1 rounded-[30px] bg-sage px-2 text-base leading-none font-medium text-deep-green"
-                >
-                  <app-heart-icon klass="h-3.5 w-4" />
-                  <span class="sr-only">Likes:</span>
-                  {{ recipe.likes }}
-                </span>
-              </div>
+          <!-- The card sits at 70% mist and goes to the full colour on hover. -->
+          <li
+            class="flex w-[276px] shrink-0 flex-col justify-between gap-3 rounded-2xl bg-mist/70 p-4 transition-colors hover:bg-mist">
+            <div class="flex items-start justify-between gap-2">
+              <span class="font-quicksand flex items-center gap-1.5 text-base leading-5 font-medium text-deep-green">
+                <img src="assets/img/OneRecipe-Page/schedule.svg" alt="" class="h-5 w-5" />
+                Cooking time: {{ recipe.cookingTimeMinutes }}min
+              </span>
+              <span
+                class="font-quicksand flex h-7 shrink-0 items-center gap-1 rounded-[30px] bg-sage px-2 text-base leading-none font-medium text-deep-green">
+                <app-heart-icon klass="h-3.5 w-4" />
+                <span class="sr-only">Likes:</span>
+                {{ recipe.likes }}
+              </span>
+            </div>
 
-              <p class="font-quicksand text-xl leading-6 font-medium text-mid-green">
-                {{ recipe.title }}
-              </p>
-            </li>
+            <p class="font-quicksand text-xl leading-6 font-medium text-mid-green">
+              {{ recipe.title }}
+            </p>
+          </li>
           }
         </ul>
       </div>
     </section>
 
-    <section
-      class="grid gap-x-[65px] gap-y-[52px] sm:grid-cols-2 xl:grid-cols-3"
-      aria-label="Cuisine categories"
-    >
+    <section class="grid gap-x-[65px] gap-y-[52px] sm:grid-cols-2 xl:grid-cols-3" aria-label="Cuisine categories">
       @for (cuisine of cuisines; track cuisine.value) {
-        <button
-          type="button"
-          (click)="openCuisine(cuisine)"
-          class="group flex w-full flex-col gap-2 text-left"
-        >
-          <h2
-            class="font-quicksand flex items-center gap-2 text-[28px] leading-none font-semibold text-mid-green"
-          >
-            {{ cuisine.label }}
-            <span class="text-[28px] leading-none" aria-hidden="true">{{ cuisine.emoji }}</span>
-          </h2>
-          <div class="relative w-full overflow-hidden bg-mist pt-[100%]">
-            <img
-              [src]="'assets/img/Cookbook/' + cuisine.image"
-              alt=""
-              loading="lazy"
-              decoding="async"
-              class="absolute inset-0 !h-full !w-full !max-w-none object-cover transition-transform duration-300 ease-out group-hover:scale-105"
-            />
-          </div>
-        </button>
+      <button type="button" (click)="openCuisine(cuisine)" class="group flex w-full flex-col gap-2 text-left">
+        <h2 class="font-quicksand flex items-center gap-2 text-[28px] leading-none font-semibold text-mid-green">
+          {{ cuisine.label }}
+          <span class="text-[28px] leading-none" aria-hidden="true">{{ cuisine.emoji }}</span>
+        </h2>
+        <div class="relative w-full overflow-hidden bg-mist pt-[100%]">
+          <img [src]="'assets/img/Cookbook/' + cuisine.image" alt="" loading="lazy" decoding="async"
+            class="absolute inset-0 !h-full !w-full !max-w-none object-cover transition-transform duration-300 ease-out group-hover:scale-105" />
+        </div>
+      </button>
       }
     </section>
 
-    <button
-      type="button"
-      (click)="generateNew()"
-      class="tap-target font-quicksand flex items-center gap-2.5 self-end text-xl leading-5 font-medium text-forest transition-colors"
-    >
+    <button type="button" (click)="generateNew()"
+      class="tap-target font-quicksand flex items-center gap-2.5 self-end text-xl leading-5 font-medium text-forest transition-colors">
       Generate new recipe
       <span aria-hidden="true">&#8594;</span>
     </button>

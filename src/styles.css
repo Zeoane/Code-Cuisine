@@ -27,6 +27,20 @@ body {
 }
 
 /*
+ * On a phone the diameter comes from the window width first. The design puts
+ * the plates about a third into the page (131px of 375); driven by height
+ * alone they grew to half the width on a tall phone and squeezed the headline
+ * into three lines. 81vw reproduces the design's third, and the 36vh floor
+ * keeps three plates taller than the window on a very tall phone, so the
+ * column still closes the page off top and bottom.
+ */
+@media (max-width: 639.98px) {
+  :root {
+    --plate: clamp(210px, max(81vw, 36vh), 380px);
+  }
+}
+
+/*
  * From the desktop layout the plates grow. 47vh lands on 481px in the 1440x1024
  * frame the design was drawn in, which is the 480px the file specifies, and
  * being a ratio rather than a fixed number it keeps covering the page on a

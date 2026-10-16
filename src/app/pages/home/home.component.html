@@ -1,4 +1,4 @@
-<div class="relative flex min-h-screen flex-col overflow-hidden bg-forest">
+<div class="relative flex min-h-[100svh] flex-col overflow-hidden bg-forest">
   <app-hero-plates />
 
   <!-- Header, hero and footer line share one container, so the logo starts
@@ -6,38 +6,41 @@
        keep its 68px to the window edge while the content was centred, which put
        the logo 172px to the left of everything below it. -->
   <div class="relative z-20 mx-auto flex w-full max-w-[1440px] flex-1 flex-col px-4 pb-8 sm:px-[65px] sm:pb-12">
-    <header class="flex items-center justify-between pt-3 sm:pt-10">
+    <!-- 52px tall on a phone, the height of the design's mobile menu bar, so
+         the 44px down to the headline below is measured from the same edge. -->
+    <header class="flex h-[52px] shrink-0 items-center justify-between sm:h-auto sm:pt-10">
       <a routerLink="/" aria-label="Code à Cuisine – Home" class="tap-target">
-        <app-logo klass="h-10 w-auto sm:h-12" />
+        <app-logo klass="h-8 w-auto sm:h-12" />
       </a>
       <app-logout-button
         klass="flex h-11 w-11 shrink-0 items-center justify-center text-creme/70 transition-colors hover:text-creme" />
     </header>
 
-    <!-- The hero takes the space between header and footer line and centres
-         itself in it, instead of being pushed down by a fixed padding and then
-         leaving a gap at the bottom of a tall screen. -->
-    <main class="flex flex-1 flex-col items-start justify-center gap-8 py-10 sm:gap-12">
+    <!-- From sm up the hero centres itself between header and footer line
+         instead of being pushed down by a fixed padding and then leaving a gap
+         at the bottom of a tall screen. On a phone Figma anchors it 44px below
+         the header, where centring put it 127px down. -->
+    <main class="flex flex-1 flex-col items-start justify-start gap-10 pt-11 pb-10 sm:justify-center sm:gap-12 sm:py-10">
       <!-- The width is capped against the plate column: the headline used to
            run 72px into the plates on an iPad and 239px at 1024px. -->
       <div
-        class="flex w-full flex-col items-start max-w-[calc(100%-var(--plate)*0.42-16px)] lg:max-w-[calc(100%-var(--plate)-70px)] min-[1440px]:max-w-[755px]">
+        class="flex w-full flex-col items-start gap-2 max-w-[calc(100%-var(--plate)*0.42+16px)] sm:gap-0 sm:max-w-[calc(100%-var(--plate)*0.42-16px)] lg:max-w-[calc(100%-var(--plate)-70px)] min-[1440px]:max-w-[755px]">
         <!-- A subtitle, not a section heading: as an h2 it came before the
              h1 in the document, so a screen reader opened the page one level
              down and then jumped back up. -->
         <p
-          class="font-quicksand text-2xl font-semibold text-beige min-[400px]:text-[28px] sm:text-[32px] lg:text-[40px] xl:text-5xl">
+          class="font-quicksand max-w-[200px] text-2xl leading-[1.25] font-semibold text-beige sm:max-w-none sm:text-[32px] sm:leading-normal lg:text-[40px] xl:text-5xl">
           AI-Powered recipe generator
         </p>
         <h1
-          class="font-ubuntu text-[44px] leading-[1.15] font-bold text-creme min-[400px]:text-[52px] sm:text-[64px] lg:text-[80px] xl:text-[104px]">
+          class="font-ubuntu text-[clamp(44px,17vw,64px)] leading-[1.125] font-bold text-creme sm:text-[64px] sm:leading-[1.15] lg:text-[80px] xl:text-[104px]">
           Code à Cuisine
         </h1>
       </div>
       <a
         routerLink="/generator"
         (click)="startFresh()"
-        class="font-quicksand flex h-[60px] items-center justify-center bg-creme px-[26px] py-4 text-2xl font-semibold text-leaf transition-transform duration-150 ease-out hover:brightness-105 active:scale-[0.97]">
+        class="font-quicksand flex h-[52px] items-center justify-center bg-creme px-[18px] text-base font-semibold text-leaf transition-transform duration-150 ease-out sm:h-[60px] sm:px-[26px] sm:text-2xl hover:brightness-105 active:scale-[0.97]">
         Get started
       </a>
     </main>
@@ -47,10 +50,12 @@
          what left the large empty area underneath on tablets. -->
     <div class="flex max-w-[calc(100%-var(--plate)*0.42-16px)] flex-col items-start gap-2 lg:max-w-none">
       <div class="flex flex-col items-start gap-4 sm:flex-row sm:flex-wrap sm:items-center">
-        <p class="font-ubuntu text-2xl font-medium text-creme sm:text-[32px]">Hungry for inspiration?</p>
+        <p class="font-ubuntu text-2xl leading-[1.1] font-medium text-creme sm:text-[32px] sm:leading-normal">
+          Hungry for inspiration?
+        </p>
         <a
           routerLink="/cookbook"
-          class="font-quicksand group flex h-[52px] items-center justify-center gap-2.5 rounded-[5px] px-[26px] py-4 text-xl font-medium text-creme transition-colors duration-150 ease-out hover:bg-white/10 active:scale-[0.97]">
+          class="font-quicksand group flex h-[52px] items-center justify-center gap-2.5 rounded-[5px] px-0 py-4 text-xl font-medium text-creme transition-colors duration-150 ease-out sm:px-[26px] hover:bg-white/10 active:scale-[0.97]">
           Go to cookbook
           <app-icon
             name="arrow-right"

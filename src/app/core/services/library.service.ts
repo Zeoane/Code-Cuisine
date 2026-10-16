@@ -86,6 +86,15 @@ export class LibraryService {
     return paginateLibrary(this.recipes(), page, cuisine);
   }
 
+  /**
+   * Every library recipe of one cuisine, newest first. Used by the cuisine
+   * list in the cookbook, which pages the recipes itself and therefore needs
+   * the whole set rather than one of this service's pages.
+   */
+  listByCuisine(cuisine: CuisineStyle): StoredRecipe[] {
+    return this.recipes().filter(recipe => recipe.cuisineStyle === cuisine);
+  }
+
   /** Finds a single library recipe by its id. */
   getById(id: number): StoredRecipe | undefined {
     return this.recipes().find(r => r.id === id);

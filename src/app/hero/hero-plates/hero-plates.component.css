@@ -57,6 +57,24 @@
   margin-top: calc(var(--plate) * -0.25);
 }
 
+/*
+ * On a phone the plates barely overlap, as in the design (a 304px plate every
+ * 275px), and the column hangs from the top instead of being centred: the
+ * design starts the first plate on the logo's centre line, 26px down - half
+ * the 52px menu bar - so its whole top arc is visible instead of being cut off
+ * by the upper window edge. Three plates still reach past the bottom edge.
+ */
+@media (max-width: 639.98px) {
+  .plates {
+    justify-content: flex-start;
+    padding-top: 26px;
+  }
+
+  .plates__stack > * + * {
+    margin-top: calc(var(--plate) * -0.1);
+  }
+}
+
 .plates__item {
   width: var(--plate);
   height: var(--plate);
