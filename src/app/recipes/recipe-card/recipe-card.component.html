@@ -6,8 +6,6 @@
       [cookingTimeMinutes]="recipe.cookingTimeMinutes"
       [servings]="recipe.servings"
       [cuisineStyle]="recipe.cuisineStyle" />
-    <!-- h1: the card is the whole content of /library/:id, its only
-         remaining caller, so the recipe title is that page's heading. -->
     <h1 class="font-ubuntu text-xl text-forest-dark">{{ recipe.title }}</h1>
     @if (recipe.description) {
       <p class="font-quicksand text-base text-forest/80">{{ recipe.description }}</p>
@@ -36,10 +34,6 @@
     }
 
     <section>
-      <!-- Disclosure pattern: the heading carries the level, the button
-           inside it carries the expand/collapse. Without the h2 the
-           directions had no heading at all and the steps below jumped
-           straight to h5. -->
       <h2>
         <button
           type="button"

@@ -1,4 +1,3 @@
-/* Figma interaction: "Move in", direction up, linear, 400ms. */
 .not-enough-card {
   animation: move-in 400ms linear both;
 }

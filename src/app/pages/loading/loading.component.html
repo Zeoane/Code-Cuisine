@@ -1,7 +1,4 @@
 <div class="flex min-h-screen flex-col bg-forest">
-  <!-- Bounded by the same container as the page content: left to itself the
-       header keeps its 68px to the window edge, so on a wide screen the logo
-       drifts away from the centred content instead of starting with it. -->
   <header class="mx-auto flex w-full max-w-[1466px] items-center justify-between px-4 pt-6 sm:px-[68px] sm:pt-10">
     <app-logo klass="h-10 w-auto sm:h-12" />
     <app-logout-button klass="flex h-11 w-11 shrink-0 items-center justify-center text-creme/70 transition-colors hover:text-creme" />
@@ -12,18 +9,6 @@
     role="status"
     aria-live="polite"
     aria-label="Recipes are being generated">
-    <!--
-      The bowl choreography - the ingredients dropping in, the pepper mill and
-      the salt shaker turning in from outside and seasoning, then the spoon
-      stirring - is assembled here from the single SVGs in
-      assets/img/Loading-Page. Every part is a vector, so the scene stays sharp
-      on any display, and its timing lives in loading.component.css
-      (see --loader-cycle there).
-
-      The mill, the shaker and the spoon reach past the card on purpose;
-      `overflow-hidden` clips them, which is what makes them appear from outside
-      the card instead of popping in at its edge.
-    -->
     <div class="relative h-[309px] w-[253px] overflow-hidden rounded-[20px] bg-sage">
       <div class="scene" aria-hidden="true">
         <img class="scene__item scene__bowl" src="assets/img/Loading-Page/bowl.svg" alt="" />
@@ -43,8 +28,6 @@
       </div>
     </div>
 
-    <!-- The page's only heading: without it the loading view had no h1 at
-         all. Tailwind's base reset keeps it looking exactly like before. -->
     <h1 class="font-quicksand text-[32px] leading-none font-bold text-creme">
       Generating
       <span aria-hidden="true">

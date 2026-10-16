@@ -30,12 +30,6 @@
   </header>
 
   <main class="mx-auto flex w-full max-w-[1466px] flex-col gap-10 px-4 sm:px-[68px]">
-    <!--
-      The banner artwork now carries its own creme bar and title text baked
-      in (Figma export), so it's shown directly rather than composited - the
-      h1 stays for a real heading landmark, visually hidden since the image
-      already renders the same text.
-    -->
     <div class="overflow-hidden rounded-[10px]">
       <h1 class="sr-only">{{ category().label }}</h1>
       <img [src]="bannerMobile()" alt="" class="w-full sm:hidden" />
