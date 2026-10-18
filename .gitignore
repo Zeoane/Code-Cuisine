@@ -33,6 +33,11 @@ yarn-error.log*
 # Scratch folder for files waiting to be deleted locally - never part of the repo
 _to_delete/
 
+# Working material from development - stays local, not part of the project
+/Claude outputs/
+/docs/
+/CODE-REVIEW.md
+
 # ---------------------------------------------------------------------------
 # Secrets – nothing below this line belongs on GitHub
 # ---------------------------------------------------------------------------

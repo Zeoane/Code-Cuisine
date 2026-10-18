@@ -55,15 +55,15 @@
             type="button"
             (click)="setPage(page() - 1)"
             [disabled]="page() <= 1"
-            class="font-quicksand flex min-h-11 items-center gap-1 rounded-md px-3 text-base text-creme disabled:pointer-events-none disabled:opacity-50">
+            class="font-quicksand flex min-h-11 items-center gap-1 rounded-md px-1 text-base text-creme sm:px-3 disabled:pointer-events-none disabled:opacity-50">
             <app-icon name="arrow-left" klass="h-4 w-4" /> Back
           </button>
-          <span class="font-quicksand px-3 text-base text-creme">Page {{ page() }} of {{ totalPages() }}</span>
+          <span class="font-quicksand px-1 text-base whitespace-nowrap text-creme sm:px-3">Page {{ page() }} of {{ totalPages() }}</span>
           <button
             type="button"
             (click)="setPage(page() + 1)"
             [disabled]="page() >= totalPages()"
-            class="font-quicksand flex min-h-11 items-center gap-1 rounded-md px-3 text-base text-creme disabled:pointer-events-none disabled:opacity-50">
+            class="font-quicksand flex min-h-11 items-center gap-1 rounded-md px-1 text-base text-creme sm:px-3 disabled:pointer-events-none disabled:opacity-50">
             Next <app-icon name="arrow-right" klass="h-4 w-4" />
           </button>
         </nav>
