@@ -3,8 +3,8 @@ import { Router } from "@angular/router";
 import {
   CuisineStyle,
   DietPreference,
-  GeneratedRecipe,
   IngredientEntry,
+  ResultRecipe,
   TimeCategory,
 } from "../models/recipe.models";
 
@@ -37,7 +37,7 @@ export class WizardStateService {
 
   readonly ingredients = signal<IngredientEntry[]>([]);
   readonly preferences = signal<WizardPreferences>({ ...INITIAL_PREFERENCES });
-  readonly results = signal<GeneratedRecipe[]>([]);
+  readonly results = signal<ResultRecipe[]>([]);
 
   /** Merges a partial preferences update into the current state. */
   patchPreferences(patch: Partial<WizardPreferences>): void {

@@ -14,11 +14,11 @@
       <div
         class="flex w-full flex-col items-start gap-2 max-w-[calc(100%-var(--plate)*0.42)] sm:gap-0 sm:max-w-[calc(100%-var(--plate)*0.42-16px)] lg:max-w-[calc(100%-var(--plate)-70px)] min-[1440px]:max-w-[755px]">
         <p
-          class="font-quicksand max-w-[200px] text-[min(24px,6.6vw)] leading-[1.25] font-semibold text-beige sm:max-w-none sm:text-[32px] sm:leading-normal lg:text-[40px] xl:text-5xl">
+          class="font-quicksand max-w-[203px] text-[min(24px,6.4vw)] leading-[1.25] font-semibold text-beige sm:max-w-none sm:text-[32px] sm:leading-normal lg:text-[40px] xl:text-5xl">
           AI-Powered recipe generator
         </p>
         <h1
-          class="font-ubuntu text-[clamp(38px,15vw,64px)] leading-[1.125] font-bold text-creme sm:text-[64px] sm:leading-[1.15] lg:text-[80px] xl:text-[104px]">
+          class="font-ubuntu text-[clamp(44px,17.1vw,64px)] leading-[1.125] font-bold text-creme sm:text-[64px] sm:leading-[1.15] lg:text-[80px] xl:text-[104px]">
           Code à Cuisine
         </h1>
       </div>
@@ -31,7 +31,7 @@
     </main>
 
     <div
-      class="flex max-w-[calc(100%-var(--plate)*0.42)] flex-col items-start gap-2 mb-[max(0px,calc(100svh-112px-2.3*var(--plate)))] sm:mb-0 sm:max-w-[calc(100%-var(--plate)*0.42-16px)] lg:max-w-none">
+      class="flex max-w-[calc(100%-var(--plate)*0.42)] flex-col items-start gap-2 mb-[max(0px,calc(100svh-112px-2.3*var(--plate)))] sm:mb-0 sm:max-w-[calc(100%-var(--plate)*0.42-16px)] lg:max-w-[calc(100%-var(--plate)-70px)] min-[1440px]:max-w-[755px]">
       <div class="flex flex-col items-start gap-4 sm:flex-row sm:flex-wrap sm:items-center">
         <p class="font-ubuntu text-2xl leading-[1.1] font-medium text-creme sm:text-[32px] sm:leading-normal">
           Hungry for inspiration?
@@ -45,14 +45,11 @@
             klass="w-6 transition-transform duration-150 ease-out group-hover:translate-x-1" />
         </a>
       </div>
-      <button
-        type="button"
-        (click)="impressumOpen.set(true)"
+      <a
+        routerLink="/impressum"
         class="font-quicksand flex min-h-11 items-center text-base text-creme/60 underline-offset-4 transition-colors hover:text-creme hover:underline">
         Imprint
-      </button>
+      </a>
     </div>
   </div>
-
-  <app-impressum-modal [open]="impressumOpen()" (closed)="impressumOpen.set(false)" />
 </div>

@@ -52,12 +52,20 @@ export interface GeneratedRecipe {
   nutrition: NutritionInfo | null;
 }
 
-/** A recipe persisted in the public library or the personal cookbook. */
+/** A recipe saved in the cookbook, shared by everyone. */
 export interface StoredRecipe extends GeneratedRecipe {
   id: number;
   helpers: number;
   createdAt: string;
+  /** Hearts given by visitors; starts at zero and only ever counts real clicks. */
+  likes: number;
 }
+
+/**
+ * A recipe of the run that just finished. It gains its id once the cookbook
+ * write has gone through, which is what lets the results view hand out hearts.
+ */
+export type ResultRecipe = GeneratedRecipe & { id?: number; helpers?: number };
 
 /** Shape needed to render a recipe as a card, generated or stored. */
 export type CardRecipe = GeneratedRecipe & { helpers?: number };

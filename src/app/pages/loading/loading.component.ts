@@ -3,7 +3,7 @@ import { Router } from "@angular/router";
 import { GenerationOptions, IngredientEntry } from "../../core/models/recipe.models";
 import { dietSafeIngredients } from "../../core/services/diet-check";
 import { hasEnoughIngredients } from "../../core/services/ingredient-check";
-import { LibraryService } from "../../core/services/library.service";
+import { RecipeStoreService } from "../../core/services/recipe-store.service";
 import { GenerationError, RecipeGeneratorService } from "../../core/services/recipe-generator.service";
 import { WizardStateService } from "../../core/services/wizard-state.service";
 import { LogoComponent } from "../../hero/logo/logo.component";
@@ -46,7 +46,7 @@ const GENERATION_FAILED_TITLE = "Something went wrong";
 export class LoadingComponent implements OnInit, OnDestroy {
   private readonly wizard = inject(WizardStateService);
   private readonly generator = inject(RecipeGeneratorService);
-  private readonly library = inject(LibraryService);
+  private readonly store = inject(RecipeStoreService);
   private readonly router = inject(Router);
 
   private timer: ReturnType<typeof setTimeout> | null = null;
@@ -128,9 +128,16 @@ export class LoadingComponent implements OnInit, OnDestroy {
       const recipes = await this.generator.generate(options);
       if (this.abandoned) return;
       this.wizard.results.set(recipes);
-      // Fire-and-forget: the library is a nice-to-have, so a Firestore hiccup
+      // Fire-and-forget: the cookbook is a nice-to-have, so a Firestore hiccup
       // here must never block the user from seeing their own results.
-      void this.library.addGenerated(recipes, options.helpers).catch(() => {});
+      // Once the write is through, the results carry their cookbook ids, which
+      // is what the heart on the recipe page needs to count against.
+      void this.store
+        .addGenerated(recipes, options.helpers)
+        .then(stored => {
+          if (!this.abandoned && stored.length === recipes.length) this.wizard.results.set(stored);
+        })
+        .catch(() => {});
     } catch (e) {
       error = e;
     }

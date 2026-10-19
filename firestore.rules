@@ -31,7 +31,18 @@ service cloud.firestore {
       allow create: if isWellFormedRecipe(request.resource.data)
         && recipeId == string(request.resource.data.id);
 
-      allow update, delete: if false;
+      // Hearts are the one thing a visitor may change on an existing recipe,
+      // and only their own single heart at a time: the new count has to be a
+      // whole number, may not go below zero, and may differ from the stored
+      // one by at most one in either direction. Everything else about the
+      // document has to stay exactly as it was.
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes'])
+        && request.resource.data.likes is int
+        && request.resource.data.likes >= 0
+        && request.resource.data.likes >= resource.data.get('likes', 0) - 1
+        && request.resource.data.likes <= resource.data.get('likes', 0) + 1;
+
+      allow delete: if false;
     }
 
     // Sequential id counter backing the library above, advanced inside the
@@ -61,7 +72,7 @@ service cloud.firestore {
       return data.keys().hasOnly([
           'id', 'title', 'description', 'ingredients', 'missingIngredients',
           'steps', 'difficulty', 'cookingTimeMinutes', 'servings',
-          'cuisineStyle', 'nutrition', 'helpers', 'createdAt'
+          'cuisineStyle', 'nutrition', 'helpers', 'createdAt', 'likes'
         ])
         && data.keys().hasAll([
           'id', 'title', 'ingredients', 'missingIngredients', 'steps',
@@ -85,7 +96,8 @@ service cloud.firestore {
                  'caloriesPerServing', 'proteinGrams', 'carbsGrams', 'fatGrams'
                ])))
         && data.helpers is int && data.helpers >= 1 && data.helpers <= 3
-        && data.createdAt is string && data.createdAt.size() <= 40;
+        && data.createdAt is string && data.createdAt.size() <= 40
+        && data.likes is int && data.likes == 0;
     }
   }
 }

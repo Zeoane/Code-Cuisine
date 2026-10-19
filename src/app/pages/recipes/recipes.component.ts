@@ -10,7 +10,7 @@ import {
   recipesFor,
 } from "../../core/data/cuisine-recipes";
 import { CuisineStyle, StoredRecipe } from "../../core/models/recipe.models";
-import { LibraryService } from "../../core/services/library.service";
+import { RecipeStoreService } from "../../core/services/recipe-store.service";
 import { ToastService } from "../../core/services/toast.service";
 import { WizardStateService } from "../../core/services/wizard-state.service";
 import { LogoComponent } from "../../hero/logo/logo.component";
@@ -33,11 +33,11 @@ function toRow(recipe: StoredRecipe): CuisineRecipe {
   if (recipe.cookingTimeMinutes <= 20) tags.push("Quick");
   return {
     id: recipe.id,
-    libraryId: recipe.id,
+    storedId: recipe.id,
     title: recipe.title,
     cookingTimeMinutes: recipe.cookingTimeMinutes,
     tags,
-    likes: 0,
+    likes: recipe.likes,
   };
 }
 
@@ -56,7 +56,7 @@ export class RecipesComponent {
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
   private readonly wizard = inject(WizardStateService);
-  private readonly library = inject(LibraryService);
+  private readonly store = inject(RecipeStoreService);
 
   /** Cuisine addressed by the route, falling back to Italian. */
   protected readonly cuisine = computed<CuisineStyle>(() => {
@@ -83,7 +83,7 @@ export class RecipesComponent {
    * the design does not provide for an endless list.
    */
   private readonly all = computed(() => {
-    const generated = this.library.listByCuisine(this.cuisine()).map(toRow);
+    const generated = this.store.listByCuisine(this.cuisine()).map(toRow);
     return [...generated, ...recipesFor(this.cuisine())].slice(0, MAX_ROWS);
   });
 
@@ -142,15 +142,16 @@ export class RecipesComponent {
   }
 
   /**
-   * Opens a generated recipe in its library detail page. The sample rows have
-   * no stored recipe behind them and say so instead of leading nowhere.
+   * Opens a generated recipe in the same recipe view the results lead to. The
+   * sample rows have no stored recipe behind them and say so instead of
+   * leading nowhere.
    */
   openRecipe(recipe: CuisineRecipe): void {
-    if (recipe.libraryId === undefined) {
+    if (recipe.storedId === undefined) {
       this.toast.info("Sample recipe - generate your own to open the full view.");
       return;
     }
-    this.router.navigate(["/library", recipe.libraryId]);
+    this.router.navigate(["/cookbook/recipe", recipe.storedId]);
   }
 
   /** Back to the cookbook overview. */

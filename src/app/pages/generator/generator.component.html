@@ -35,4 +35,9 @@
       Next step
     </button>
   </main>
+
+  <app-not-enough-modal
+    [open]="notice()"
+    linkLabel="Adjust my ingredients"
+    (closed)="notice.set(false)" />
 </div>

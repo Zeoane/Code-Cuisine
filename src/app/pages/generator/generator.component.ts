@@ -1,11 +1,14 @@
-import { Component, inject } from "@angular/core";
+import { Component, inject, signal } from "@angular/core";
 import { Router, RouterLink } from "@angular/router";
 import { IngredientEntry } from "../../core/models/recipe.models";
+import { dietSafeIngredients } from "../../core/services/diet-check";
+import { hasEnoughIngredients } from "../../core/services/ingredient-check";
 import { WizardStateService } from "../../core/services/wizard-state.service";
 import { LogoComponent } from "../../hero/logo/logo.component";
 import { IngredientEntryListComponent } from "../../recipes/ingredient-entry-list/ingredient-entry-list.component";
 import { IngredientQuantityFormComponent } from "../../recipes/ingredient-quantity-form/ingredient-quantity-form.component";
 import { LogoutButtonComponent } from "../../shared/logout-button/logout-button.component";
+import { NotEnoughModalComponent } from "../../shared/not-enough-modal/not-enough-modal.component";
 
 /** Session-wide counter so freshly added ingredients get a stable, unique id. */
 let nextId = 1;
@@ -25,6 +28,7 @@ let nextId = 1;
     IngredientQuantityFormComponent,
     IngredientEntryListComponent,
     LogoutButtonComponent,
+    NotEnoughModalComponent,
   ],
   templateUrl: "./generator.component.html",
 })
@@ -33,6 +37,9 @@ export class GeneratorComponent {
   private readonly router = inject(Router);
 
   protected readonly ingredients = this.wizard.ingredients;
+
+  /** Shows the "not quite enough" notice over this page. */
+  protected readonly notice = signal(false);
 
   /**
    * Appends a new ingredient. The mockup lists them in the order they were
@@ -53,9 +60,25 @@ export class GeneratorComponent {
     this.ingredients.update(list => list.filter(entry => entry.id !== id));
   }
 
-  /** Proceeds to step 2 of the wizard (Preferences). */
+  /**
+   * Proceeds to step 2 of the wizard (Preferences), but only once the entered
+   * amounts can actually carry the servings. The check used to run on the
+   * loading step, which meant the user watched the whole animation before
+   * being told to go back; it belongs here, where the quantities are.
+   *
+   * The servings can still be raised afterwards on the preferences step, so
+   * the loading step keeps checking as well - this is the first gate, not the
+   * only one.
+   */
   handleNextStep(): void {
-    if (this.ingredients().length === 0) return;
+    const entries = this.ingredients();
+    if (entries.length === 0) return;
+
+    const { diet, servings } = this.wizard.preferences();
+    if (!hasEnoughIngredients(dietSafeIngredients(entries, diet ?? "none"), servings)) {
+      this.notice.set(true);
+      return;
+    }
     this.router.navigate(["/preferences"]);
   }
 }

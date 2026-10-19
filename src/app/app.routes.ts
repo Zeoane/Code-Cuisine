@@ -4,8 +4,8 @@ import { ingredientsGuard } from "./core/guards/ingredients.guard";
 /**
  * Application route table. Every page is publicly reachable; only the wizard
  * steps after the ingredient input require at least one ingredient. The
- * cookbook lives in the browser's localStorage, so it is readable without an
- * account - signing in syncs nothing today and must not block the page.
+ * cookbook holds every generated recipe and is readable without an account -
+ * signing in syncs nothing today and must not block the page.
  */
 export const routes: Routes = [
   {
@@ -48,18 +48,14 @@ export const routes: Routes = [
     loadComponent: () => import("./pages/recipes/recipes.component").then(m => m.RecipesComponent),
   },
   {
-    path: "library",
-    loadComponent: () => import("./pages/library/library.component").then(m => m.LibraryComponent),
-  },
-  {
-    path: "library/:id",
-    loadComponent: () =>
-      import("./pages/recipe-detail/recipe-detail.component").then(m => m.RecipeDetailComponent),
-  },
-  {
     path: "cookbook",
     loadComponent: () =>
       import("./pages/cookbook/cookbook.component").then(m => m.CookbookComponent),
+  },
+  {
+    path: "cookbook/recipe/:id",
+    loadComponent: () =>
+      import("./pages/recipe-view/recipe-view.component").then(m => m.RecipeViewComponent),
   },
   {
     path: "impressum",

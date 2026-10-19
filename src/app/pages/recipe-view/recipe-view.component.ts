@@ -1,9 +1,10 @@
-import { Component, computed, inject, signal } from "@angular/core";
+import { Component, computed, inject } from "@angular/core";
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { dietLabel, timeLabel } from "../../core/data/preference-options";
-import { IngredientEntry, IngredientUnit } from "../../core/models/recipe.models";
+import { IngredientUnit } from "../../core/models/recipe.models";
 import { conflictingIngredients, dietSafeIngredients } from "../../core/services/diet-check";
 import { totalNutrition } from "../../core/services/nutrition-facts";
+import { RecipeStoreService } from "../../core/services/recipe-store.service";
 import { WizardStateService } from "../../core/services/wizard-state.service";
 import { LogoComponent } from "../../hero/logo/logo.component";
 import { NutritionSplitComponent } from "../../recipes/nutrition-split/nutrition-split.component";
@@ -17,13 +18,23 @@ const UNIT_SUFFIX: Record<IngredientUnit, string> = {
   piece: " piece",
 };
 
-/** Starting like count shown next to the heart, as in the Figma design. */
-const BASE_LIKES = 82;
+/** One line of the "Your ingredients" column. */
+interface IngredientLine {
+  key: string;
+  amount: string;
+  name: string;
+}
 
 /**
  * "One recipe view": the full recipe with nutrition facts, the ingredients
  * split into the user's own and the extras, and the directions assigned to
  * the available cooks.
+ *
+ * Serves two routes with the same markup. /recipe/:index shows a recipe of
+ * the run that just finished, together with the quantities the user entered
+ * and the preferences they picked. /cookbook/recipe/:id shows a recipe from
+ * the cookbook, where none of that context exists any more - there the
+ * recipe's own stored ingredient list and difficulty stand in for it.
  */
 @Component({
   selector: "app-recipe-view",
@@ -39,33 +50,66 @@ const BASE_LIKES = 82;
 })
 export class RecipeViewComponent {
   private readonly wizard = inject(WizardStateService);
+  private readonly store = inject(RecipeStoreService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
-  /** True when the user arrived from the cookbook instead of the results. */
-  protected readonly fromCookbook =
-    this.route.snapshot.queryParamMap.get("from") === "cookbook";
+  /** Id of the cookbook recipe to show, or null on the results route. */
+  private readonly storedId = (() => {
+    const raw = Number(this.route.snapshot.paramMap.get("id"));
+    return Number.isFinite(raw) && raw > 0 ? raw : null;
+  })();
 
-  /** The recipe addressed by the :index route parameter. */
+  /** True when this page was opened from the cookbook instead of the results. */
+  protected readonly fromCookbook = this.storedId !== null;
+
+  /** The recipe addressed by the route, from the cookbook or the current run. */
   protected readonly recipe = computed(() => {
+    if (this.storedId !== null) return this.store.getById(this.storedId) ?? null;
     const index = Number(this.route.snapshot.paramMap.get("index"));
     return this.wizard.results()[index] ?? null;
   });
 
   protected readonly preferences = this.wizard.preferences;
 
-  /**
-   * The entered ingredients the recipe was actually built from. Filtered the
-   * same way the generation filters, so a vegan recipe never lists the bacon
-   * that step 2 promised to leave out.
-   */
-  protected readonly ownIngredients = computed(() =>
-    dietSafeIngredients(this.wizard.ingredients(), this.preferences().diet ?? "none"),
+  /** Cooks the recipe was written for: the recipe's own number wins. */
+  protected readonly helpers = computed(
+    () => this.recipe()?.helpers ?? this.preferences().helpers,
   );
+
+  /** Cooks available for this recipe, rendered as Chef 1 / Chef 2 labels. */
+  protected readonly cooks = computed(() =>
+    Array.from({ length: this.helpers() }, (_, index) => index + 1),
+  );
+
+  /**
+   * The ingredient column. A finished run still knows the quantities the user
+   * typed in, so those are shown; a cookbook recipe only carries its own
+   * ingredient list, where the amount is already part of the text.
+   */
+  protected readonly ingredientLines = computed<IngredientLine[]>(() => {
+    const recipe = this.recipe();
+    if (this.storedId !== null) {
+      return (recipe?.ingredients ?? []).map((text, index) => ({
+        key: `${index}-${text}`,
+        amount: "",
+        name: text,
+      }));
+    }
+    return dietSafeIngredients(this.wizard.ingredients(), this.preferences().diet ?? "none").map(
+      entry => ({
+        key: String(entry.id),
+        amount: `${entry.quantity}${UNIT_SUFFIX[entry.unit]}`,
+        name: entry.name,
+      }),
+    );
+  });
 
   /** Entered ingredients the selected diet ruled out, shown as a footnote. */
   protected readonly skippedIngredients = computed(() =>
-    conflictingIngredients(this.wizard.ingredients(), this.preferences().diet ?? "none"),
+    this.storedId !== null
+      ? []
+      : conflictingIngredients(this.wizard.ingredients(), this.preferences().diet ?? "none"),
   );
 
   /** The skipped ingredients as one readable list. */
@@ -80,23 +124,38 @@ export class RecipeViewComponent {
     (dietLabel(this.preferences().diet) ?? "diet").toLowerCase(),
   );
 
-  /** Cooks available for this run, rendered as Chef 1 / Chef 2 labels. */
-  protected readonly cooks = computed(() =>
-    Array.from({ length: this.preferences().helpers }, (_, i) => i + 1),
-  );
-
-  /** Diet and cooking time of this run, shown as tags in the header card. */
+  /**
+   * Tags in the header card. A run shows what the user asked for; a cookbook
+   * recipe shows what it turned out to be, the same pair the cuisine list
+   * puts next to it.
+   */
   protected readonly tags = computed(() => {
+    const recipe = this.recipe();
+    if (this.storedId !== null) {
+      if (!recipe) return [];
+      const difficulty = recipe.difficulty[0].toUpperCase() + recipe.difficulty.slice(1);
+      return recipe.cookingTimeMinutes <= 20 ? [difficulty, "Quick"] : [difficulty];
+    }
     const { diet, timeCategory } = this.preferences();
     return [dietLabel(diet), timeLabel(timeCategory)].filter(
       (label): label is string => label !== null,
     );
   });
 
-  protected readonly liked = signal(false);
+  /** Id this page's heart writes to, or null while the recipe has none yet. */
+  protected readonly likeId = computed(() => this.recipe()?.id ?? null);
 
-  /** Like count shown next to the heart tag. */
-  protected readonly likes = computed(() => BASE_LIKES + (this.liked() ? 1 : 0));
+  /** True when this browser has already given this recipe a heart. */
+  protected readonly liked = computed(() => {
+    const id = this.likeId();
+    return id === null ? false : this.store.hasLiked(id);
+  });
+
+  /** Hearts this recipe has collected. */
+  protected readonly likes = computed(() => {
+    const id = this.likeId();
+    return id === null ? 0 : this.store.likesOf(id);
+  });
 
   /** Rounded whole-recipe nutrition, or null when the recipe is a single portion. */
   protected readonly wholeRecipe = computed(() => {
@@ -111,25 +170,27 @@ export class RecipeViewComponent {
     };
   });
 
-  /** Quantity plus unit as shown in the "Your ingredients" column. */
-  formatAmount(entry: IngredientEntry): string {
-    return `${entry.quantity}${UNIT_SUFFIX[entry.unit]}`;
-  }
-
   /** Asset for the chef label of a given cook number (1-3). */
   cookLabel(cook: number): string {
     const index = Math.min(Math.max(cook, 1), 3);
     return `assets/img/OneRecipe-Page/cook-label-${index}.svg`;
   }
 
-  /** Toggles the "I cooked this" heart. */
+  /** Adds or withdraws this browser's heart. */
   toggleLike(): void {
-    this.liked.update(value => !value);
+    const id = this.likeId();
+    if (id === null) return;
+    void this.store.toggleLike(id);
   }
 
-  /** Back link target: cookbook when opened from there, results otherwise. */
+  /** Back to the cuisine list it came from, or to the results of the run. */
   goBack(): void {
-    this.router.navigate([this.fromCookbook ? "/cookbook" : "/results"]);
+    const cuisine = this.recipe()?.cuisineStyle;
+    if (this.storedId !== null) {
+      this.router.navigate(cuisine ? ["/recipes", cuisine] : ["/cookbook"]);
+      return;
+    }
+    this.router.navigate(["/results"]);
   }
 
   /** Discards the finished run and starts over with empty ingredients. */

@@ -20,7 +20,7 @@ import { Component, Input } from "@angular/core";
       type="button"
       [attr.aria-pressed]="selected"
       class="tap-target font-quicksand flex h-7 items-center rounded-[30px] px-3 text-base leading-none font-medium text-forest transition-colors hover:bg-peach"
-      [ngClass]="selected ? 'bg-forest/30' : 'bg-creme'">
+      [ngClass]="[selected ? 'bg-forest/30' : 'bg-creme', klass]">
       <ng-content />
     </button>
   `,
@@ -28,4 +28,7 @@ import { Component, Input } from "@angular/core";
 export class ChoiceChipComponent {
   /** Renders the selected (filled) variant when true. */
   @Input() selected = false;
+
+  /** Extra classes for the pill, e.g. to stretch it across a grid column. */
+  @Input() klass = "";
 }

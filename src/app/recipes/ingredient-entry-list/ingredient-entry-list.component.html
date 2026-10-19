@@ -7,7 +7,18 @@
         class="font-quicksand rounded-[10px] px-2 py-1 text-base text-deep-green transition-colors"
         [ngClass]="{ 'hover:bg-creme': editingId() !== entry.id }">
         @if (editingId() === entry.id) {
-          <div class="-ml-2 flex items-center gap-2">
+          <div class="flex items-center gap-2">
+            <span aria-hidden="true">•</span>
+            <input
+              type="number"
+              min="1"
+              [max]="maxQuantity()"
+              [(ngModel)]="editQuantity"
+              aria-label="Edit quantity"
+              [attr.aria-invalid]="isEditQuantityValid() ? null : 'true'"
+              [attr.aria-describedby]="isEditQuantityValid() ? null : 'edit-quantity-range'"
+              class="h-9 w-[61px] shrink-0 rounded-full bg-creme px-2 text-center text-base text-forest-dark focus-visible:outline-none" />
+            <app-unit-select [value]="editUnit" (valueChange)="changeEditUnit($event)" size="md" />
             <span class="min-w-0 flex-1 break-words">{{ entry.name }}</span>
             <span class="flex shrink-0 items-center gap-5">
               <button
@@ -20,19 +31,6 @@
               </button>
               <ng-container *ngTemplateOutlet="removeButton; context: { $implicit: entry }" />
             </span>
-          </div>
-          <div class="mt-2 flex items-center gap-2.5">
-            <span aria-hidden="true">•</span>
-            <input
-              type="number"
-              min="1"
-              [max]="maxQuantity()"
-              [(ngModel)]="editQuantity"
-              aria-label="Edit quantity"
-              [attr.aria-invalid]="isEditQuantityValid() ? null : 'true'"
-              [attr.aria-describedby]="isEditQuantityValid() ? null : 'edit-quantity-range'"
-              class="h-9 w-[61px] rounded-full bg-creme px-2 text-center text-base text-forest-dark focus-visible:outline-none" />
-            <app-unit-select [value]="editUnit" (valueChange)="changeEditUnit($event)" size="md" />
           </div>
           @if (editQuantity !== null && !isEditQuantityValid()) {
             <p id="edit-quantity-range" role="alert" class="mt-1 text-base text-deep-green">Please enter {{ hint() }}.</p>

@@ -85,15 +85,21 @@
           <img src="assets/img/Preferences-Page/clock.svg" alt="" class="h-6 w-6" />
           Cooking time:
         </h2>
-        <div class="flex flex-wrap items-start gap-x-2.5 gap-y-4">
+        <div class="flex flex-wrap items-start gap-x-2 gap-y-4">
           @for (option of timeOptions; track option.value) {
-            <div class="flex flex-col items-start gap-1">
+            <div class="flex flex-col items-stretch gap-1">
               <app-choice-chip
+                klass="justify-center max-[374px]:px-2"
                 [selected]="preferences().timeCategory === option.value"
                 (click)="selectTime(option.value)">
                 {{ option.label }}
               </app-choice-chip>
-              <span class="font-quicksand px-1 text-base font-medium text-deep-green/70">{{ option.hint }}</span>
+              <span class="relative block h-4 w-full">
+                <span
+                  class="font-quicksand absolute top-0 left-1/2 -translate-x-1/2 text-xs font-medium whitespace-nowrap text-deep-green/70 max-[374px]:text-[10px]">
+                  {{ option.hint }}
+                </span>
+              </span>
             </div>
           }
         </div>

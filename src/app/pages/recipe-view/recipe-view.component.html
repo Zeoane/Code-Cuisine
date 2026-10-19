@@ -40,7 +40,7 @@
 
             <div class="flex flex-wrap items-center gap-2.5">
               <span class="font-quicksand text-xl leading-5 font-medium text-forest">
-                Cooking person: {{ preferences().helpers }}
+                Cooking person: {{ helpers() }}
               </span>
               @for (cook of cooks(); track cook) {
                 <img [src]="cookLabel(cook)" [alt]="'Chef ' + cook" class="h-[27px] w-[91px]" />
@@ -146,13 +146,15 @@
                 Your ingredients
               </h3>
               <ul class="flex flex-col gap-2">
-                @for (entry of ownIngredients(); track entry.id) {
+                @for (line of ingredientLines(); track line.key) {
                   <li
                     class="font-quicksand flex gap-4 text-xl leading-5 font-medium text-deep-green"
                   >
                     <span aria-hidden="true">&bull;</span>
-                    <span class="w-20">{{ formatAmount(entry) }}</span>
-                    <span>{{ entry.name }}</span>
+                    @if (line.amount) {
+                      <span class="w-20 shrink-0">{{ line.amount }}</span>
+                    }
+                    <span>{{ line.name }}</span>
                   </li>
                 }
               </ul>
@@ -225,9 +227,10 @@
           <button
             type="button"
             (click)="toggleLike()"
+            [disabled]="likeId() === null"
             [attr.aria-pressed]="liked()"
             aria-label="Mark recipe with a heart"
-            class="tap-target flex h-10 w-10 items-center justify-center"
+            class="tap-target flex h-10 w-10 items-center justify-center disabled:opacity-40"
           >
             <app-heart-icon [filled]="liked()" klass="h-9 w-10" />
           </button>
