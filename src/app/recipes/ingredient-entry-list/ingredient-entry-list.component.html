@@ -7,8 +7,22 @@
         class="font-quicksand rounded-[10px] px-2 py-1 text-base text-deep-green transition-colors"
         [ngClass]="{ 'hover:bg-creme': editingId() !== entry.id }">
         @if (editingId() === entry.id) {
-          <div class="flex items-center gap-2">
-            <span aria-hidden="true">•</span>
+          <div class="flex flex-wrap items-start gap-x-2 gap-y-2 sm:flex-nowrap sm:gap-2.5">
+            <span class="order-1 flex w-full items-center gap-2 sm:order-4 sm:h-9 sm:w-auto sm:min-w-0 sm:flex-1">
+              <span class="-ml-2 min-w-0 flex-1 break-words sm:ml-0">{{ entry.name }}</span>
+              <span class="flex shrink-0 items-center gap-4">
+                <button
+                  type="button"
+                  (click)="confirmEdit(entry)"
+                  [disabled]="!isEditQuantityValid()"
+                  aria-label="Confirm change"
+                  class="tap-target flex h-6 w-6 items-center justify-center rounded-[6px] text-deep-green transition-colors hover:bg-creme disabled:opacity-40 disabled:hover:bg-transparent">
+                  <app-icon name="check" klass="h-4 w-4" />
+                </button>
+                <ng-container *ngTemplateOutlet="removeButton; context: { $implicit: entry }" />
+              </span>
+            </span>
+            <span class="order-2 flex h-9 items-center sm:order-1" aria-hidden="true">•</span>
             <input
               type="number"
               min="1"
@@ -17,20 +31,12 @@
               aria-label="Edit quantity"
               [attr.aria-invalid]="isEditQuantityValid() ? null : 'true'"
               [attr.aria-describedby]="isEditQuantityValid() ? null : 'edit-quantity-range'"
-              class="h-9 w-[61px] shrink-0 rounded-full bg-creme px-2 text-center text-base text-forest-dark focus-visible:outline-none" />
-            <app-unit-select [value]="editUnit" (valueChange)="changeEditUnit($event)" size="md" />
-            <span class="min-w-0 flex-1 break-words">{{ entry.name }}</span>
-            <span class="flex shrink-0 items-center gap-5">
-              <button
-                type="button"
-                (click)="confirmEdit(entry)"
-                [disabled]="!isEditQuantityValid()"
-                aria-label="Confirm change"
-                class="tap-target flex h-6 w-6 items-center justify-center rounded-[6px] text-deep-green transition-colors hover:bg-creme disabled:opacity-40 disabled:hover:bg-transparent">
-                <app-icon name="check" klass="h-4 w-4" />
-              </button>
-              <ng-container *ngTemplateOutlet="removeButton; context: { $implicit: entry }" />
-            </span>
+              class="order-3 h-9 w-[61px] shrink-0 rounded-full bg-creme px-2 text-center text-base text-forest-dark focus-visible:outline-none sm:order-2" />
+            <app-unit-select
+              class="order-4 sm:order-3"
+              [value]="editUnit"
+              (valueChange)="changeEditUnit($event)"
+              size="md" />
           </div>
           @if (editQuantity !== null && !isEditQuantityValid()) {
             <p id="edit-quantity-range" role="alert" class="mt-1 text-base text-deep-green">Please enter {{ hint() }}.</p>
@@ -40,7 +46,7 @@
             <span aria-hidden="true">•</span>
             <span class="min-w-[50px] shrink-0 font-medium">{{ entry.quantity }}{{ unitSuffix(entry.unit) }}</span>
             <span class="min-w-0 flex-1 break-words">{{ entry.name }}</span>
-            <span class="flex shrink-0 items-center gap-5">
+            <span class="flex shrink-0 items-center gap-4">
               <button
                 type="button"
                 (click)="startEdit(entry)"
