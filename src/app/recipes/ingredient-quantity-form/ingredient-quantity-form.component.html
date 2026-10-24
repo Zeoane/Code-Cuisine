@@ -16,6 +16,8 @@
       aria-controls="ingredient-suggestions"
       [attr.aria-expanded]="showSuggestions()"
       [attr.aria-activedescendant]="activeIndex() >= 0 ? optionId(activeIndex()) : null"
+      [attr.aria-invalid]="hasUnknownName() ? 'true' : null"
+      [attr.aria-describedby]="hasUnknownName() ? 'ingredient-unknown' : null"
       class="h-9 w-full rounded-[20px] bg-creme/80 px-4 font-quicksand text-base text-forest-dark focus-visible:outline-none" />
 
     @if (showSuggestions()) {
@@ -38,6 +40,13 @@
           </li>
         }
       </ul>
+    } @else if (hasUnknownName()) {
+      <p
+        id="ingredient-unknown"
+        role="status"
+        class="font-quicksand mt-1 px-4 py-1.5 text-base text-deep-green">
+        Please pick an ingredient from the list.
+      </p>
     }
   </div>
 

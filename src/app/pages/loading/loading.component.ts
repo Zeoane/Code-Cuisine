@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, inject, signal } from "@angular/core";
 import { Router } from "@angular/router";
-import { GenerationOptions, IngredientEntry } from "../../core/models/recipe.models";
+import { GenerationOptions, IngredientEntry, ResultRecipe } from "../../core/models/recipe.models";
 import { dietSafeIngredients } from "../../core/services/diet-check";
 import { hasEnoughIngredients } from "../../core/services/ingredient-check";
 import { RecipeStoreService } from "../../core/services/recipe-store.service";
@@ -19,6 +19,15 @@ import { NotEnoughModalComponent } from "../../shared/not-enough-modal/not-enoug
  * sync - a shorter value cuts the stir off, a longer one restarts the loop.
  */
 const LOADER_DURATION_MS = 11200;
+
+/**
+ * Longest the view waits for the cookbook write before it opens the results.
+ * The ids that write hands back are what the heart on the recipe page counts
+ * against, so waiting a moment makes the heart usable the instant the recipe
+ * appears; a slow or unreachable Firestore must not hold the user up longer
+ * than this, and a write that lands later still attaches its ids.
+ */
+const STORE_WAIT_MS = 2000;
 
 const NOT_ENOUGH_TITLE = "Ups! Not quite enough...";
 const NOT_ENOUGH_MESSAGE =
@@ -50,6 +59,8 @@ export class LoadingComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
 
   private timer: ReturnType<typeof setTimeout> | null = null;
+  /** Caps how long the cookbook write may delay the results view. */
+  private storeTimer: ReturnType<typeof setTimeout> | null = null;
   /** Settles the minimum-runtime promise when the view goes away early. */
   private releaseDelay: (() => void) | null = null;
   /** True once the view is gone, so a late response changes nothing. */
@@ -93,6 +104,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.abandoned = true;
     if (this.timer) clearTimeout(this.timer);
+    if (this.storeTimer) clearTimeout(this.storeTimer);
     this.releaseDelay?.();
   }
 
@@ -128,16 +140,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
       const recipes = await this.generator.generate(options);
       if (this.abandoned) return;
       this.wizard.results.set(recipes);
-      // Fire-and-forget: the cookbook is a nice-to-have, so a Firestore hiccup
-      // here must never block the user from seeing their own results.
-      // Once the write is through, the results carry their cookbook ids, which
-      // is what the heart on the recipe page needs to count against.
-      void this.store
-        .addGenerated(recipes, options.helpers)
-        .then(stored => {
-          if (!this.abandoned && stored.length === recipes.length) this.wizard.results.set(stored);
-        })
-        .catch(() => {});
+      await this.storeInCookbook(recipes, options.helpers);
     } catch (e) {
       error = e;
     }
@@ -153,6 +156,36 @@ export class LoadingComponent implements OnInit, OnDestroy {
     // button runs a second one - spending another of the three daily
     // generations and overwriting the results the user was just looking at.
     this.router.navigate(["/results"], { replaceUrl: true });
+  }
+
+  /**
+   * Writes the finished recipes to the cookbook and hands the ids they get
+   * back to the wizard state, so the heart works on a recipe the moment it
+   * is shown instead of only on a stored one opened from the cookbook later.
+   *
+   * Waits for the write, but never longer than STORE_WAIT_MS, and never
+   * fails the run: the cookbook is a nice-to-have, the recipes the user has
+   * been waiting for are not. The id handover deliberately survives this
+   * view, so a write that only finishes after the results have opened still
+   * enables the heart there.
+   */
+  private async storeInCookbook(recipes: ResultRecipe[], helpers: number): Promise<void> {
+    const write = this.store
+      .addGenerated(recipes, helpers)
+      .then(stored => {
+        if (stored.length === recipes.length) this.wizard.attachStoredIds(recipes, stored);
+      })
+      .catch(() => {});
+
+    await Promise.race([
+      write,
+      new Promise<void>(resolve => {
+        this.storeTimer = setTimeout(resolve, STORE_WAIT_MS);
+      }),
+    ]);
+
+    if (this.storeTimer) clearTimeout(this.storeTimer);
+    this.storeTimer = null;
   }
 
   /** Shows the notice popup with a title/message matching the failure kind. */

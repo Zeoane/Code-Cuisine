@@ -1,6 +1,10 @@
 import { Component, EventEmitter, Output, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { INGREDIENT_SUGGESTIONS } from "../../core/data/ingredient-suggestions";
+import {
+  INGREDIENT_SUGGESTIONS,
+  canonicalIngredient,
+  isKnownIngredient,
+} from "../../core/data/ingredient-suggestions";
 import { MAX_QUANTITY, clampQuantity, isQuantityValid, quantityHint } from "../../core/data/quantity-limits";
 import { IngredientEntry, IngredientUnit } from "../../core/models/recipe.models";
 import { UnitSelectComponent } from "../unit-select/unit-select.component";
@@ -46,18 +50,34 @@ export class IngredientQuantityFormComponent {
     return `ingredient-suggestion-${index}`;
   }
 
-  /** Emits the current form values as a new ingredient and clears the name. */
+  /**
+   * Emits the current form values as a new ingredient and clears the name.
+   * The suggestion list's own spelling is what gets stored, so "cheese"
+   * becomes "Cheese" and a name the list does not have never gets this far.
+   */
   submit(): void {
-    const trimmed = this.name.trim();
-    if (!this.canSubmit()) return;
-    this.add.emit({ name: trimmed, quantity: Number(this.quantity), unit: this.unit });
+    const canonical = canonicalIngredient(this.name);
+    if (canonical === null || !isQuantityValid(this.quantity, this.unit)) return;
+    this.add.emit({ name: canonical, quantity: Number(this.quantity), unit: this.unit });
     this.name = "";
     this.closeSuggestions();
   }
 
-  /** True while name and quantity together make a valid ingredient. */
+  /**
+   * True while name and quantity together make a valid ingredient. The name
+   * has to be one of the suggestions: a free-text typo has no recipe behind
+   * it, so it must not be addable at all.
+   */
   protected canSubmit(): boolean {
-    return this.name.trim().length > 0 && isQuantityValid(this.quantity, this.unit);
+    return isKnownIngredient(this.name) && isQuantityValid(this.quantity, this.unit);
+  }
+
+  /**
+   * True once something is typed that the suggestion list does not know. An
+   * empty field is not an error yet, it is simply unfinished.
+   */
+  protected hasUnknownName(): boolean {
+    return this.name.trim().length > 0 && !isKnownIngredient(this.name);
   }
 
   /**

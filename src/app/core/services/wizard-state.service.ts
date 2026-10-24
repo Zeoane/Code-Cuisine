@@ -39,6 +39,22 @@ export class WizardStateService {
   readonly preferences = signal<WizardPreferences>({ ...INITIAL_PREFERENCES });
   readonly results = signal<ResultRecipe[]>([]);
 
+  /**
+   * Hands the cookbook ids of a finished write to the results of the run
+   * they belong to. The heart on the recipe page counts against that id, so
+   * without this step a freshly generated recipe cannot be liked at all.
+   *
+   * The run is only updated while it is still the current one: the write can
+   * land after the user has already started over, and bringing back the
+   * recipes of an abandoned run would be worse than losing the ids.
+   */
+  attachStoredIds(run: ResultRecipe[], stored: ResultRecipe[]): void {
+    const current = this.results();
+    if (current.length !== run.length) return;
+    if (current.some((recipe, index) => recipe !== run[index])) return;
+    this.results.set(stored);
+  }
+
   /** Merges a partial preferences update into the current state. */
   patchPreferences(patch: Partial<WizardPreferences>): void {
     this.preferences.update(current => ({ ...current, ...patch }));

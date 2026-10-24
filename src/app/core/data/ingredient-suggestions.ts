@@ -999,3 +999,24 @@ export const INGREDIENT_SUGGESTIONS: string[] = [
   "Zapallo Squash",
   "Zucchini",
 ];
+
+/** The suggestion list keyed by its own lowercase spelling, built once. */
+const SUGGESTIONS_BY_LOWERCASE = new Map(
+  INGREDIENT_SUGGESTIONS.map(name => [name.toLowerCase(), name] as const),
+);
+
+/**
+ * The list's own spelling of a typed ingredient, or null when the list does
+ * not have it. Only a name that comes back from here may be added to the
+ * ingredient list: a typo like "Cheesee" has no recipe behind it, so it must
+ * not reach the generator in the first place - and a name typed in lower case
+ * is stored the way the list spells it.
+ */
+export function canonicalIngredient(name: string): string | null {
+  return SUGGESTIONS_BY_LOWERCASE.get(name.trim().toLowerCase()) ?? null;
+}
+
+/** True when a typed name is one of the suggested ingredients, ignoring case. */
+export function isKnownIngredient(name: string): boolean {
+  return canonicalIngredient(name) !== null;
+}
