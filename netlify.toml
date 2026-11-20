@@ -1,0 +1,10 @@
+# Netlify: Firebase-/n8n-Konfiguration erzeugen, dann die Angular-App bauen.
+[build]
+  command = "node scripts/write-config.mjs && npm run build"
+  publish = "dist/code-a-cuisine/browser"
+
+# Angular-Routing: jede Adresse liefert index.html aus (kein 404 beim Neuladen).
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
